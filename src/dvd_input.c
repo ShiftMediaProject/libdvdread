@@ -43,7 +43,6 @@ char *      (*dvdinput_error) (dvd_input_t);
 #define DVDcss_open(a) dvdcss_open((char*)(a))
 #define DVDcss_close   dvdcss_close
 #define DVDcss_seek    dvdcss_seek
-#define DVDcss_title   dvdcss_title
 #define DVDcss_read    dvdcss_read
 #define DVDcss_error   dvdcss_error
 #else
@@ -62,9 +61,9 @@ typedef struct dvdcss_s *dvdcss_t;
 static dvdcss_t (*DVDcss_open)  (const char *);
 static int      (*DVDcss_close) (dvdcss_t);
 static int      (*DVDcss_seek)  (dvdcss_t, int, int);
-static int      (*DVDcss_title) (dvdcss_t, int);
 static int      (*DVDcss_read)  (dvdcss_t, void *, int, int);
 static char *   (*DVDcss_error) (dvdcss_t);
+#define DVDCSS_SEEK_KEY (1 << 1)
 #endif
 
 /* The DVDinput handle, add stuff here for new input methods. */
@@ -124,7 +123,7 @@ static int css_seek(dvd_input_t dev, int blocks)
  */
 static int css_title(dvd_input_t dev, int block)
 {
-  return DVDcss_title(dev->dvdcss, block);
+  return DVDcss_seek(dev->dvdcss, block, DVDCSS_SEEK_KEY);
 }
 
 /**
@@ -303,8 +302,6 @@ int dvdinput_setup(void)
       dlsym(dvdcss_library, U_S "dvdcss_open");
     DVDcss_close = (int (*)(dvdcss_t))
       dlsym(dvdcss_library, U_S "dvdcss_close");
-    DVDcss_title = (int (*)(dvdcss_t, int))
-      dlsym(dvdcss_library, U_S "dvdcss_title");
     DVDcss_seek = (int (*)(dvdcss_t, int, int))
       dlsym(dvdcss_library, U_S "dvdcss_seek");
     DVDcss_read = (int (*)(dvdcss_t, void*, int, int))
@@ -319,7 +316,7 @@ int dvdinput_setup(void)
               "http://www.videolan.org/\n" );
       dlclose(dvdcss_library);
       dvdcss_library = NULL;
-    } else if(!DVDcss_open  || !DVDcss_close || !DVDcss_title || !DVDcss_seek
+    } else if(!DVDcss_open  || !DVDcss_close || !DVDcss_seek
               || !DVDcss_read || !DVDcss_error) {
       fprintf(stderr,  "libdvdread: Missing symbols in %s, "
               "this shouldn't happen !\n", CSS_LIB);

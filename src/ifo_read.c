@@ -567,6 +567,8 @@ static int ifoRead_VMG(ifo_handle_t *ifofile) {
 
   CHECK_ZERO(vmgi_mat->zero_1);
   CHECK_ZERO(vmgi_mat->zero_2);
+  /* DVDs created by VDR-to-DVD device LG RC590M violate the following check with
+   * vmgi_mat->zero_3 = 0x00000000010000000000000000000000000000. */
   CHECK_ZERO(vmgi_mat->zero_3);
   CHECK_ZERO(vmgi_mat->zero_4);
   CHECK_ZERO(vmgi_mat->zero_5);
@@ -1218,6 +1220,7 @@ int ifoRead_VTS_PTT_SRPT(ifo_handle_t *ifofile) {
        Titles with 0 PTTs. */
     if(n < 0) n = 0;
 
+    /* DVDs created by the VDR-to-DVD device LG RC590M violate the following requirement */
     CHECK_VALUE(n % 4 == 0);
 
     vts_ptt_srpt->title[i].nr_of_ptts = n / 4;

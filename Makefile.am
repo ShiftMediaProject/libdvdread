@@ -4,13 +4,11 @@ dist_doc_DATA = AUTHORS ChangeLog COPYING NEWS README TODO
 
 DISTCLEANFILES = ChangeLog
 
-ChangeLog: stamp-changelog
-
-stamp-changelog:
-	-git log > ChangeLog-tmp
-	test -s ChangeLog-tmp && mv ChangeLog-tmp ChangeLog
-	-rm -f ChangeLog-tmp
-	test -e ChangeLog || touch ChangeLog
+ChangeLog: $(wildcard $(srcdir)/.git/logs/HEAD)
+	-cd $(srcdir) && git log > $(abs_builddir)/$(@)-tmp
+	test -s $(@)-tmp && mv $(@)-tmp $(@)
+	-rm -f $(@)-tmp
+	test -e $(@) || touch $(@)
 
 EXTRA_DIST = msvc/ doc/footer.html doc/header.html
 

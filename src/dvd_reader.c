@@ -241,7 +241,7 @@ static dvd_reader_t *DVDOpenImageFile( const char *location, int have_css )
     return NULL;
   }
 
-  dvd = (dvd_reader_t *) malloc( sizeof( dvd_reader_t ) );
+  dvd = malloc( sizeof( dvd_reader_t ) );
   if( !dvd ) {
     dvdinput_close(dev);
     return NULL;
@@ -269,7 +269,7 @@ static dvd_reader_t *DVDOpenPath( const char *path_root )
 {
   dvd_reader_t *dvd;
 
-  dvd = (dvd_reader_t *) malloc( sizeof( dvd_reader_t ) );
+  dvd = malloc( sizeof( dvd_reader_t ) );
   if( !dvd ) return NULL;
   dvd->isImageFile = 0;
   dvd->dev = 0;
@@ -632,7 +632,7 @@ static dvd_file_t *DVDOpenFileUDF( dvd_reader_t *dvd, char *filename )
     return NULL;
   }
 
-  dvd_file = (dvd_file_t *) malloc( sizeof( dvd_file_t ) );
+  dvd_file = malloc( sizeof( dvd_file_t ) );
   if( !dvd_file ) {
     fprintf( stderr, "libdvdnav:DVDOpenFileUDF:malloc failed\n" );
     return NULL;
@@ -727,7 +727,7 @@ static dvd_file_t *DVDOpenFilePath( dvd_reader_t *dvd, char *filename )
     return NULL;
   }
 
-  dvd_file = (dvd_file_t *) malloc( sizeof( dvd_file_t ) );
+  dvd_file = malloc( sizeof( dvd_file_t ) );
   if( !dvd_file ) {
     fprintf( stderr, "libdvdnav:DVDOpenFilePath:dvd_file malloc failed\n" );
     dvdinput_close(dev);
@@ -767,7 +767,7 @@ static dvd_file_t *DVDOpenVOBUDF( dvd_reader_t *dvd, int title, int menu )
   start = UDFFindFile( dvd, filename, &len );
   if( start == 0 ) return NULL;
 
-  dvd_file = (dvd_file_t *) malloc( sizeof( dvd_file_t ) );
+  dvd_file = malloc( sizeof( dvd_file_t ) );
   if( !dvd_file ) return NULL;
   dvd_file->dvd = dvd;
   /*Hack*/ dvd_file->css_title = title << 1 | menu;
@@ -810,7 +810,7 @@ static dvd_file_t *DVDOpenVOBPath( dvd_reader_t *dvd, int title, int menu )
   dvd_file_t *dvd_file;
   int i;
 
-  dvd_file = (dvd_file_t *) malloc( sizeof( dvd_file_t ) );
+  dvd_file = malloc( sizeof( dvd_file_t ) );
   if( !dvd_file ) return NULL;
   dvd_file->dvd = dvd;
   /*Hack*/ dvd_file->css_title = title << 1 | menu;
@@ -1315,7 +1315,7 @@ ssize_t DVDReadBytes( dvd_file_t *dvd_file, void *data, size_t byte_size )
   numsec = ( ( seek_byte + byte_size ) / DVD_VIDEO_LB_LEN ) +
     ( ( ( seek_byte + byte_size ) % DVD_VIDEO_LB_LEN ) ? 1 : 0 );
 
-  secbuf_base = (unsigned char *) malloc( numsec * DVD_VIDEO_LB_LEN + 2048 );
+  secbuf_base = malloc( numsec * DVD_VIDEO_LB_LEN + 2048 );
   secbuf = (unsigned char *)(((uintptr_t)secbuf_base & ~((uintptr_t)2047)) + 2048);
   if( !secbuf_base ) {
     fprintf( stderr, "libdvdread: Can't allocate memory "

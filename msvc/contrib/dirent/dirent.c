@@ -46,8 +46,8 @@ DIR *opendir(const char *name)
         const char *all = /* the root directory is a special case... */
             strchr("/\\", name[base_length - 1]) ? "*" : "/*";
 
-        if((dir = (DIR *) malloc(sizeof *dir)) != 0 &&
-           (dir->name = (char *) malloc(base_length + strlen(all) + 1)) != 0)
+        if((dir = malloc(sizeof *dir)) != 0 &&
+           (dir->name = malloc(base_length + strlen(all) + 1)) != 0)
         {
             strcat(strcpy(dir->name, name), all);
 

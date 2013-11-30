@@ -1074,7 +1074,7 @@ int ifoRead_TT_SRPT(ifo_handle_t *ifofile) {
   }
 
   if(tt_srpt->nr_of_srpts>info_length/sizeof(title_info_t)){
-    fprintf(stderr,"libdvdread: data mismatch: info_length (%ld)!= nr_of_srpts (%d). Truncating.\n",
+    fprintf(stderr,"libdvdread: data mismatch: info_length (%zd)!= nr_of_srpts (%d). Truncating.\n",
             info_length/sizeof(title_info_t),tt_srpt->nr_of_srpts);
     tt_srpt->nr_of_srpts=info_length/sizeof(title_info_t);
   }

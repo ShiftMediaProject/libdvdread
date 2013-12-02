@@ -1310,7 +1310,7 @@ int ifoRead_PTL_MAIT(ifo_handle_t *ifofile) {
   if(!ifofile->vmgi_mat)
     return 0;
 
-  if(ifofile->vmgi_mat->ptl_mait == 0)
+  if(!ifofile->vmgi_mat->ptl_mait)
     return 1;
 
   if(!DVDFileSeek_(ifofile->file, ifofile->vmgi_mat->ptl_mait * DVD_BLOCK_LEN))

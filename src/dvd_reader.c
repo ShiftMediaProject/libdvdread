@@ -1369,7 +1369,7 @@ int DVDDiscID( dvd_reader_t *dvd, unsigned char *discid )
     dvd_file_t *dvd_file = DVDOpenFile( dvd, title, DVD_READ_INFO_FILE );
     if( dvd_file != NULL ) {
       ssize_t bytes_read;
-      size_t file_size = dvd_file->filesize * DVD_VIDEO_LB_LEN;
+      ssize_t file_size = dvd_file->filesize * DVD_VIDEO_LB_LEN;
       char *buffer_base = malloc( file_size + 2048 );
       char *buffer = (char *)(((uintptr_t)buffer_base & ~((uintptr_t)2047)) + 2048);
 

@@ -1185,6 +1185,12 @@ int ifoRead_VTS_PTT_SRPT(ifo_handle_t *ifofile) {
     fprintf(stderr, "libdvdread: PTT search table too small.\n");
     goto fail;
   }
+
+  if(vts_ptt_srpt->nr_of_srpts == 0) {
+    fprintf(stderr, "libdvdread: Zero entries in PTT search table.\n");
+    goto fail;
+  }
+
   for(i = 0; i < vts_ptt_srpt->nr_of_srpts; i++) {
     /* Transformers 3 has PTT start bytes that point outside the SRPT PTT */
     uint32_t start = data[i];

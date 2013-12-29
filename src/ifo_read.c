@@ -1633,7 +1633,7 @@ int ifoRead_C_ADT(ifo_handle_t *ifofile) {
 
 static int ifoRead_C_ADT_internal(ifo_handle_t *ifofile,
                                   c_adt_t *c_adt, unsigned int sector) {
-  int i, info_length;
+  size_t i, info_length;
 
   if(!DVDFileSeek_(ifofile->file, sector * DVD_BLOCK_LEN))
     return 0;
@@ -1643,6 +1643,9 @@ static int ifoRead_C_ADT_internal(ifo_handle_t *ifofile,
 
   B2N_16(c_adt->nr_of_vobs);
   B2N_32(c_adt->last_byte);
+
+  if(c_adt->last_byte + 1 < C_ADT_SIZE)
+    return 0;
 
   info_length = c_adt->last_byte + 1 - C_ADT_SIZE;
 

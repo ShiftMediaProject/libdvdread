@@ -1,3 +1,5 @@
+libdvdread (5.0.0)
+
 libdvdread (4.2.0)
   * added OS/2 support
   * fixed ARM memory alignment issue

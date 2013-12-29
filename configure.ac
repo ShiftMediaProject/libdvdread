@@ -102,5 +102,4 @@ AC_OUTPUT([
 Makefile
 doc/doxygen.cfg
 misc/dvdread.pc
-misc/libdvdread.spec
 ])

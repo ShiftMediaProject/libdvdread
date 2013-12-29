@@ -1029,7 +1029,8 @@ void ifoFree_FP_PGC(ifo_handle_t *ifofile) {
 
 int ifoRead_TT_SRPT(ifo_handle_t *ifofile) {
   tt_srpt_t *tt_srpt;
-  int i, info_length;
+  unsigned int i;
+  size_t info_length;
 
   if(!ifofile)
     return 0;
@@ -1088,7 +1089,7 @@ int ifoRead_TT_SRPT(ifo_handle_t *ifofile) {
   CHECK_ZERO(tt_srpt->zero_1);
   CHECK_VALUE(tt_srpt->nr_of_srpts != 0);
   CHECK_VALUE(tt_srpt->nr_of_srpts < 100); /* ?? */
-  CHECK_VALUE((int)tt_srpt->nr_of_srpts * sizeof(title_info_t) <= info_length);
+  CHECK_VALUE(tt_srpt->nr_of_srpts * sizeof(title_info_t) <= info_length);
 
   for(i = 0; i < tt_srpt->nr_of_srpts; i++) {
     read_playback_type(&tt_srpt->title[i].pb_ty);

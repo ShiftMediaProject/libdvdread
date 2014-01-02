@@ -1399,7 +1399,7 @@ int ifoRead_PTL_MAIT(ifo_handle_t *ifofile) {
       ifofile->ptl_mait = NULL;
       return 0;
     }
-    for (j = 0; j < ((ptl_mait->nr_of_vtss + 1) * 8); j++) {
+    for (j = 0; j < ((ptl_mait->nr_of_vtss + 1U) * 8U); j++) {
       B2N_16(pf_temp[j]);
     }
     ptl_mait->countries[i].pf_ptl_mai = malloc(info_length);

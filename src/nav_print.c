@@ -36,7 +36,6 @@ static void navPrint_PCI_GI(pci_gi_t *pci_gi) {
   printf("pci_gi:\n");
   printf("nv_pck_lbn    0x%08x\n", pci_gi->nv_pck_lbn);
   printf("vobu_cat      0x%04x\n", pci_gi->vobu_cat);
-  printf("vobu_uop_ctl  0x%08x\n", *(uint32_t*)&pci_gi->vobu_uop_ctl);
   printf("vobu_s_ptm    0x%08x\n", pci_gi->vobu_s_ptm);
   printf("vobu_e_ptm    0x%08x\n", pci_gi->vobu_e_ptm);
   printf("vobu_se_e_ptm 0x%08x\n", pci_gi->vobu_se_e_ptm);

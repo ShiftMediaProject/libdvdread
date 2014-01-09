@@ -298,6 +298,7 @@ static char *sun_block2char( const char *path )
 
   /* Replace "/dsk/" with "/rdsk/" */
   new_path = malloc( strlen(path) + 2 );
+  if(!new_path) return NULL;
   strcpy( new_path, path );
   strcpy( strstr( new_path, "/dsk/" ), "" );
   strcat( new_path, "/rdsk/" );
@@ -329,6 +330,7 @@ static char *bsd_block2char( const char *path )
 
   /* Replace "/dev/" with "/dev/r" */
   new_path = malloc( strlen(path) + 2 );
+  if(!new_path) return NULL;
   strcpy( new_path, "/dev/r" );
   strcat( new_path, path + strlen( "/dev/" ) );
 
@@ -404,6 +406,8 @@ dvd_reader_t *DVDOpen( const char *ppath )
 #else
     dev_name = strdup( path );
 #endif
+    if(!dev_name)
+        goto DVDOpen_error;
     dvd = DVDOpenImageFile( dev_name, have_css );
     free( dev_name );
     free(path);

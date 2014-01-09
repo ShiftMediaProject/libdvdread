@@ -20,25 +20,23 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <sys/time.h> /* For the timing of dvdcss_title crack. */
-#include <fcntl.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <errno.h>
-#include <string.h>
-#include <strings.h>
-#include <ctype.h>
-#include <unistd.h>
-#include <limits.h>
-#include <dirent.h>
+#include <sys/types.h>      /* off_t */
+#include <sys/stat.h>       /* stat */
+#include <sys/time.h>       /* For the timing of dvdcss_title crack. */
+#include <fcntl.h>          /* open */
+#include <stdlib.h>         /* free */
+#include <stdio.h>          /* fprintf */
+#include <errno.h>          /* errno, EIN* */
+#include <string.h>         /* memcpy, strlen */
+#include <unistd.h>         /* chdir, getcwd */
+#include <limits.h>         /* PATH_MAX */
+#include <dirent.h>         /* opendir, readdir */
 
 /* misc win32 helpers */
 #ifdef WIN32
-#ifndef HAVE_GETTIMEOFDAY
-/* replacement gettimeofday implementation */
-#include <sys/timeb.h>
+# ifndef HAVE_GETTIMEOFDAY
+   /* replacement gettimeofday implementation */
+#  include <sys/timeb.h>
 static inline int _private_gettimeofday( struct timeval *tv, void *tz )
 {
   struct timeb t;
@@ -47,32 +45,32 @@ static inline int _private_gettimeofday( struct timeval *tv, void *tz )
   tv->tv_usec = t.millitm * 1000;
   return 0;
 }
-#define gettimeofday(TV, TZ) _private_gettimeofday((TV), (TZ))
-#endif
-#include <io.h> /* read() */
-#define lseek64 _lseeki64
+#  define gettimeofday(TV, TZ) _private_gettimeofday((TV), (TZ))
+# endif
+# include <io.h> /* read() */
+# define lseek64 _lseeki64
 #endif
 
 #if defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__) || defined(__bsdi__) || defined(__APPLE__)
-#define SYS_BSD 1
+# define SYS_BSD 1
 #endif
 
 #if defined(__sun)
-#include <sys/mnttab.h>
+# include <sys/mnttab.h>
 #elif defined(__APPLE__)
-#include <sys/param.h>
-#include <sys/ucred.h>
-#include <sys/mount.h>
+# include <sys/param.h>
+# include <sys/ucred.h>
+# include <sys/mount.h>
 #elif defined(SYS_BSD)
-#include <fstab.h>
+# include <fstab.h>
 #elif defined(__linux__)
-#include <mntent.h>
-#include <paths.h>
+# include <mntent.h>
+# include <paths.h>
 #endif
 
 #include "dvdread/dvd_udf.h"
-#include "dvd_input.h"
 #include "dvdread/dvd_reader.h"
+#include "dvd_input.h"
 #include "dvdread_internal.h"
 #include "md5.h"
 

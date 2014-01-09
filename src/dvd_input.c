@@ -19,13 +19,13 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <fcntl.h>
-#include <unistd.h>
+#include <stdio.h>                               /* fprintf */
+#include <stdlib.h>                              /* free */
+#include <fcntl.h>                               /* open */
+#include <unistd.h>                              /* lseek */
 
-#include "config.h" /* Required for MingW */
-#include "dvdread/dvd_reader.h"
+#include "config.h"                  /* Required for HAVE_DVDCSS_DVDCSS_H */
+#include "dvdread/dvd_reader.h"      /* DVD_VIDEO_LB_LEN */
 #include "dvd_input.h"
 
 
@@ -39,22 +39,22 @@ char *      (*dvdinput_error) (dvd_input_t);
 
 #ifdef HAVE_DVDCSS_DVDCSS_H
 /* linking to libdvdcss */
-#include <dvdcss/dvdcss.h>
-#define DVDcss_open(a) dvdcss_open((char*)(a))
-#define DVDcss_close   dvdcss_close
-#define DVDcss_seek    dvdcss_seek
-#define DVDcss_read    dvdcss_read
-#define DVDcss_error   dvdcss_error
+# include <dvdcss/dvdcss.h>
+# define DVDcss_open(a) dvdcss_open((char*)(a))
+# define DVDcss_close   dvdcss_close
+# define DVDcss_seek    dvdcss_seek
+# define DVDcss_read    dvdcss_read
+# define DVDcss_error   dvdcss_error
 #else
 
 /* dlopening libdvdcss */
-#if defined(HAVE_DLFCN_H) && !defined(USING_BUILTIN_DLFCN)
-#include <dlfcn.h>
-#else
-#if defined(WIN32)
+# if defined(HAVE_DLFCN_H) && !defined(USING_BUILTIN_DLFCN)
+#  include <dlfcn.h>
+# else
+# if defined(WIN32)
 /* Only needed on MINGW at the moment */
-#include "../msvc/contrib/dlfcn.c"
-#endif
+#  include "../msvc/contrib/dlfcn.c"
+# endif
 #endif
 
 typedef struct dvdcss_s *dvdcss_t;

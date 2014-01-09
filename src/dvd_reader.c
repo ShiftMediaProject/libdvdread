@@ -630,13 +630,13 @@ static dvd_file_t *DVDOpenFileUDF( dvd_reader_t *dvd, char *filename )
 
   start = UDFFindFile( dvd, filename, &len );
   if( !start ) {
-    fprintf( stderr, "libdvdnav:DVDOpenFileUDF:UDFFindFile %s failed\n", filename );
+    fprintf( stderr, "libdvdread:DVDOpenFileUDF:UDFFindFile %s failed\n", filename );
     return NULL;
   }
 
   dvd_file = malloc( sizeof( dvd_file_t ) );
   if( !dvd_file ) {
-    fprintf( stderr, "libdvdnav:DVDOpenFileUDF:malloc failed\n" );
+    fprintf( stderr, "libdvdread:DVDOpenFileUDF:malloc failed\n" );
     return NULL;
   }
   dvd_file->dvd = dvd;
@@ -719,19 +719,19 @@ static dvd_file_t *DVDOpenFilePath( dvd_reader_t *dvd, char *filename )
 
   /* Get the full path of the file. */
   if( !findDVDFile( dvd, filename, full_path ) ) {
-    fprintf( stderr, "libdvdnav:DVDOpenFilePath:findDVDFile %s failed\n", filename );
+    fprintf( stderr, "libdvdread:DVDOpenFilePath:findDVDFile %s failed\n", filename );
     return NULL;
   }
 
   dev = dvdinput_open( full_path );
   if( !dev ) {
-    fprintf( stderr, "libdvdnav:DVDOpenFilePath:dvdinput_open %s failed\n", full_path );
+    fprintf( stderr, "libdvdread:DVDOpenFilePath:dvdinput_open %s failed\n", full_path );
     return NULL;
   }
 
   dvd_file = malloc( sizeof( dvd_file_t ) );
   if( !dvd_file ) {
-    fprintf( stderr, "libdvdnav:DVDOpenFilePath:dvd_file malloc failed\n" );
+    fprintf( stderr, "libdvdread:DVDOpenFilePath:dvd_file malloc failed\n" );
     dvdinput_close(dev);
     return NULL;
   }

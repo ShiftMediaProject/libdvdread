@@ -276,7 +276,7 @@ static dvd_reader_t *DVDOpenPath( const char *path_root )
   dvd->path_root = strdup( path_root );
   if(!dvd->path_root) {
     free(dvd);
-    return 0;
+    return NULL;
   }
   dvd->udfcache_level = DEFAULT_UDF_CACHE_LEVEL;
   dvd->udfcache = NULL;
@@ -909,7 +909,7 @@ dvd_file_t *DVDOpenFile( dvd_reader_t *dvd, int titlenum,
     }
     break;
   case DVD_READ_TITLE_VOBS:
-    if( titlenum == 0 ) return 0;
+    if( titlenum == 0 ) return NULL;
     if( dvd->isImageFile ) {
       return DVDOpenVOBUDF( dvd, titlenum, 0 );
     } else {

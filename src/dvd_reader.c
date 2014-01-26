@@ -246,6 +246,7 @@ static dvd_reader_t *DVDOpenImageFile( const char *location, int have_css )
     dvdinput_close(dev);
     return NULL;
   }
+  memset( dvd, 0, sizeof( dvd_reader_t ) );
   dvd->isImageFile = 1;
   dvd->dev = dev;
   dvd->path_root = NULL;

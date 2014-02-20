@@ -1,3 +1,5 @@
+ACLOCAL_AMFLAGS = -Im4
+
 AM_CPPFLAGS = -I$(top_srcdir)/src $(CSS_CFLAGS)
 
 dist_doc_DATA = AUTHORS ChangeLog COPYING NEWS README TODO

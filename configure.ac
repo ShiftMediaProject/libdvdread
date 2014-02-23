@@ -37,13 +37,13 @@ dnl  * DVDREAD_LT_AGE is the number of previous API versions still supported by 
 dnl  * libtool has its own numbering scheme, because local library numbering schemes
 dnl    are platform dependent
 dnl  * in Linux, the library will be named
-dnl    libname.so.(DVDREAD_LT_CURRENT - DVDREAD_LT_AGE).DVDREAD_LT_AGE.DVDREAD_LT_REVISION
+dnl    libname.so.(DVDREAD_LT_CURRENT - DVDREAD_LT_AGE).DVDREAD_LT_REVISION.DVDREAD_LT_AGE
 
 DVDREAD_LT_CURRENT=5
 DVDREAD_LT_AGE=1
 DVDREAD_LT_REVISION=2
 
-AC_SUBST([DVDREAD_LTVERSION], [$DVDREAD_LT_CURRENT:$DVDREAD_LT_AGE:$DVDREAD_LT_REVISION])
+AC_SUBST([DVDREAD_LTVERSION], [$DVDREAD_LT_CURRENT:$DVDREAD_LT_REVISION:$DVDREAD_LT_AGE])
 
 AC_PROG_CC
 

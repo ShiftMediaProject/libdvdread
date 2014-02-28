@@ -20,6 +20,7 @@
 
 /* Written by Ulrich Drepper <drepper@gnu.ai.mit.edu>, 1995.  */
 
+#include "config.h"
 #include <sys/types.h>
 
 #include <stdlib.h>
@@ -28,7 +29,6 @@
 #include "md5.h"
 /* #include "unlocked-io.h" */
 
-#include "config.h"
 
 #ifdef WORDS_BIGENDIAN
 # define SWAP(n)                                                        \

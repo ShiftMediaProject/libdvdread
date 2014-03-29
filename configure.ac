@@ -84,7 +84,7 @@ AC_SUBST([CSS_REQUIRES])
 CC_CHECK_CFLAGS_APPEND([-Wall -Wsign-compare])
 
 
-AC_ARG_ENABLE([doc],
+AC_ARG_ENABLE([apidoc],
   AS_HELP_STRING([--disable-apidoc], [Disable building (with Doxygen) and intalling API documentation @<:@default=auto@:@>]))
 
 AC_PATH_PROG([DOXYGEN], [doxygen])
@@ -94,7 +94,7 @@ AS_IF([test "x$DOXYGEN" = "x"], [
     AC_MSG_ERROR([You need Doxygen to build API documentation])
   ])
 ])
-AM_CONDITIONAL([APIDOC], [test "x$DOXYGEN" != "x"])
+AM_CONDITIONAL([APIDOC], [test "x$DOXYGEN" != "x" && test "x$enable_apidoc" = "xyes"])
 
 dnl ---------------------------------------------
 dnl Output configuration files

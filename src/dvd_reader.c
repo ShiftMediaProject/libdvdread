@@ -947,7 +947,7 @@ void DVDCloseFile( dvd_file_t *dvd_file )
     }
 
     free( dvd_file );
-    dvd_file = 0;
+    dvd_file = NULL;
   }
 }
 

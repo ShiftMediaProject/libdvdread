@@ -343,8 +343,8 @@ static void ifo_print_audio_attributes(int level, audio_attr_t *attr) {
     printf("(please send a bug report) ");
   }
 
-  printf("%d ", attr->unknown1);
-  printf("%d ", attr->unknown3);
+  printf("Unknown1: %d ", attr->unknown1);
+  printf("Unknown3: %d ", attr->unknown3);
 }
 
 static void ifo_print_subp_attributes(int level, subp_attr_t *attr) {

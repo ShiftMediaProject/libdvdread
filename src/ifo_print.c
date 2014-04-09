@@ -268,7 +268,8 @@ static void ifo_print_audio_attributes(int level, audio_attr_t *attr) {
   switch(attr->lang_type) {
   case 0:
     // not specified
-    assert(attr->lang_code == 0 || attr->lang_code == 0xffff);
+    if(attr->lang_code != 0 && attr->lang_code != 0xffff)
+        printf("Lang_code 0x%x, please send a bug report!", attr->lang_code);
     break;
   case 1:
     printf("%c%c ", attr->lang_code>>8, attr->lang_code & 0xff);

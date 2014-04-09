@@ -35,7 +35,7 @@
             __FILE__, __LINE__, # arg );                                \
   }
 
-int InternalUDFReadBlocksRaw(dvd_reader_t *device, uint32_t lb_number,
+int InternalUDFReadBlocksRaw(const dvd_reader_t *device, uint32_t lb_number,
                      size_t block_count, unsigned char *data, int encrypted);
 
 void *GetUDFCacheHandle(dvd_reader_t *device);

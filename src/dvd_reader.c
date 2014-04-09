@@ -119,7 +119,7 @@ struct dvd_file_s {
   ssize_t filesize;
 };
 
-int InternalUDFReadBlocksRaw( dvd_reader_t *device, uint32_t lb_number,
+int InternalUDFReadBlocksRaw( const dvd_reader_t *device, uint32_t lb_number,
                       size_t block_count, unsigned char *data,
                       int encrypted );
 
@@ -1126,7 +1126,7 @@ int DVDFileStat( dvd_reader_t *dvd, int titlenum,
 }
 
 /* Internal, but used from dvd_udf.c */
-int InternalUDFReadBlocksRaw( dvd_reader_t *device, uint32_t lb_number,
+int InternalUDFReadBlocksRaw( const dvd_reader_t *device, uint32_t lb_number,
                       size_t block_count, unsigned char *data,
                       int encrypted )
 {
@@ -1154,7 +1154,7 @@ int InternalUDFReadBlocksRaw( dvd_reader_t *device, uint32_t lb_number,
  * into the buffer located at 'data' and if 'encrypted' is set
  * descramble the data if it's encrypted.  Returning either an
  * negative error or the number of blocks read. */
-static int DVDReadBlocksUDF( dvd_file_t *dvd_file, uint32_t offset,
+static int DVDReadBlocksUDF( const dvd_file_t *dvd_file, uint32_t offset,
                              size_t block_count, unsigned char *data,
                              int encrypted )
 {
@@ -1168,7 +1168,7 @@ static int DVDReadBlocksUDF( dvd_file_t *dvd_file, uint32_t offset,
  * into the buffer located at 'data' and if 'encrypted' is set
  * descramble the data if it's encrypted.  Returning either an
  * negative error or the number of blocks read. */
-static int DVDReadBlocksPath( dvd_file_t *dvd_file, unsigned int offset,
+static int DVDReadBlocksPath( const dvd_file_t *dvd_file, unsigned int offset,
                               size_t block_count, unsigned char *data,
                               int encrypted )
 {

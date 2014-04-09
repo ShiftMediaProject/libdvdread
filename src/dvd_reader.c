@@ -937,7 +937,7 @@ void DVDCloseFile( dvd_file_t *dvd_file )
 {
   int i;
 
-  if( dvd_file ) {
+  if( dvd_file && dvd_file->dvd ) {
     if( !dvd_file->dvd->isImageFile ) {
       for( i = 0; i < TITLES_MAX; ++i ) {
         if( dvd_file->title_devs[ i ] ) {

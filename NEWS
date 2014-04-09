@@ -1,4 +1,12 @@
 libdvdread (4.9.9)
+  * major cleanup
+  * rewritten build system, including removal of configure2 and dvdread-config
+  * numerous crashes fixed, notably on ARCCOS protected DVDs,
+    like Transformers 3, Brave, The Express, Sherlock Holmes DVDs
+  * added QNX support
+  * updated to support libdvdcss 1.3.0
+  * improved dlopen support for Win32
+  * simplify static linking of libdvdcss
 
 libdvdread (4.2.0)
   * added OS/2 support

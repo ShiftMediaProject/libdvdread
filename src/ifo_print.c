@@ -150,7 +150,7 @@ static void ifo_print_video_attributes(int level, video_attr_t *attr) {
   }
 
   printf("U%x, ", attr->unknown1);
-  assert(!attr->unknown1);
+  /* assert(!attr->unknown1); */
 
   if(attr->line21_cc_1 || attr->line21_cc_2) {
     printf("NTSC CC ");

@@ -32,6 +32,7 @@
 #include <unistd.h>         /* chdir, getcwd */
 #include <limits.h>         /* PATH_MAX */
 #include <dirent.h>         /* opendir, readdir */
+#include <ctype.h>          /* isalpha */
 
 /* misc win32 helpers */
 #ifdef WIN32

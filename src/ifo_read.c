@@ -305,11 +305,9 @@ ifo_handle_t *ifoOpen(dvd_reader_t *dvd, int title) {
   }
 
   if (title)
-    snprintf(ifo_filename, 12, "VTS_%02d_0.%s", title, bup_file_opened ? "BUP" : "IFO");
+    snprintf(ifo_filename, 13, "VTS_%02d_0.%s", title, bup_file_opened ? "BUP" : "IFO");
   else
-    snprintf(ifo_filename, 12, "VIDEO_TS.%s", bup_file_opened ? "BUP" : "IFO");
-
-  ifo_filename[12] = '\0';
+    snprintf(ifo_filename, 13, "VIDEO_TS.%s", bup_file_opened ? "BUP" : "IFO");
 
   if(!ifofile->file) {
     fprintf(stderr, "libdvdread: Can't open file %s.\n", ifo_filename);
@@ -369,9 +367,9 @@ ifoOpen_try_bup:
   ifofile->file = DVDOpenFile(dvd, title, DVD_READ_INFO_BACKUP_FILE);
 
   if (title)
-    snprintf(ifo_filename, 12, "VTS_%02d_0.BUP", title);
+    snprintf(ifo_filename, 13, "VTS_%02d_0.BUP", title);
   else
-    strncpy(ifo_filename, "VIDEO_TS.BUP", 12);
+    strncpy(ifo_filename, "VIDEO_TS.BUP", 13);
 
   if (!ifofile->file) {
     fprintf(stderr, "libdvdread: Can't open file %s.\n", ifo_filename);

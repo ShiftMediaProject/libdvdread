@@ -88,10 +88,9 @@ static void ifo_print_video_attributes(video_attr_t *attr) {
      && attr->video_format == 0
      && attr->display_aspect_ratio == 0
      && attr->permitted_df == 0
-     && attr->unknown1 == 0
      && attr->line21_cc_1 == 0
      && attr->line21_cc_2 == 0
-     && attr->video_format == 0
+     && attr->unknown1 == 0
      && attr->letterboxed == 0
      && attr->film_mode == 0) {
     printf("-- Unspecified --");
@@ -149,9 +148,6 @@ static void ifo_print_video_attributes(video_attr_t *attr) {
     printf("(please send a bug report), ");
   }
 
-  printf("U%x, ", attr->unknown1);
-  /* assert(!attr->unknown1); */
-
   if(attr->line21_cc_1 || attr->line21_cc_2) {
     printf("NTSC CC ");
     if(attr->line21_cc_1)
@@ -187,10 +183,13 @@ static void ifo_print_video_attributes(video_attr_t *attr) {
   }
 
   if(attr->film_mode) {
-    printf("film. ");
+    printf("film, ");
   } else {
-    printf("video. "); //camera
+    printf("video, "); //camera
   }
+
+  printf("Unknown1: %x", attr->unknown1);
+
 }
 
 static void ifo_print_audio_attributes(audio_attr_t *attr) {
@@ -201,9 +200,9 @@ static void ifo_print_audio_attributes(audio_attr_t *attr) {
      && attr->application_mode == 0
      && attr->quantization == 0
      && attr->sample_frequency == 0
+     && attr->unknown1 == 0
      && attr->channels == 0
      && attr->lang_extension == 0
-     && attr->unknown1 == 0
      && attr->unknown3 == 0) {
     printf("-- Unspecified --");
     return;
@@ -351,9 +350,9 @@ static void ifo_print_audio_attributes(audio_attr_t *attr) {
 static void ifo_print_subp_attributes(subp_attr_t *attr) {
 
   if(attr->type == 0
-     && attr->lang_code == 0
      && attr->zero1 == 0
      && attr->zero2 == 0
+     && attr->lang_code == 0
      && attr->lang_extension== 0) {
     printf("-- Unspecified --");
     return;

@@ -56,7 +56,7 @@ AS_CASE([$host],
   [*mingw32* | *cygwin*], [AC_CHECK_FUNCS(gettimeofday)])
 
 AS_CASE([$host],
-  [*os2*], LDFLAGS="-no-undefined -Zbin-files $LDFLAGS")
+  [*-os2-*], LDFLAGS="-no-undefined -Zbin-files $LDFLAGS")
 
 AC_ARG_WITH([libdvdcss],
   AS_HELP_STRING([--with-libdvdcss], [Link directly against libdvdcss @<:@default=no@:>@]))

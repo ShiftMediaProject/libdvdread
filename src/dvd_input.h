@@ -42,6 +42,13 @@ typedef struct dvd_input_s *dvd_input_t;
 #   define wstat _wstati64
 #endif
 
+#ifdef __ANDROID__
+# undef  lseek
+# define lseek lseek64
+# undef  off_t
+# define off_t off64_t
+#endif
+
 /**
  * Function pointers that will be filled in by the input implementation.
  * These functions provide the main API.

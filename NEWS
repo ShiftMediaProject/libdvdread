@@ -1,6 +1,12 @@
+libdvdread (5.0.0)
+ * added support for Android
+ * fix build support for OS/2
+ * fix crashes in IFO parsing (Shark Week The Great Bites Collection)
+
 libdvdread (4.9.9)
   * major cleanup
   * rewritten build system, including removal of configure2 and dvdread-config
+  * fix numerous crashes
   * added QNX support
   * updated to support libdvdcss 1.3.0
   * improved dlopen support for Win32

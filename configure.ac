@@ -84,7 +84,7 @@ AS_IF([test x"$with_libdvdcss" = "xyes"], [
 ])
 AC_SUBST([CSS_REQUIRES])
 
-CC_CHECK_CFLAGS_APPEND([-Wall -Wsign-compare])
+CC_CHECK_CFLAGS_APPEND([-Wall -Wsign-compare -Wextra])
 
 
 AC_ARG_ENABLE([apidoc],

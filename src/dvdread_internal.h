@@ -23,7 +23,7 @@
 #include <sys/types.h>
 
 #ifdef _WIN32
-#include <unistd.h>
+# include <unistd.h>
 #endif /* _WIN32 */
 
 #include "dvdread/dvd_reader.h"
@@ -34,6 +34,31 @@
                     "\n*** for %s ***\n\n",                             \
             __FILE__, __LINE__, # arg );                                \
   }
+
+enum TagIdentifier {
+  /* ECMA 167 3/7.2.1 */
+  PrimaryVolumeDescriptor           = 1,
+  AnchorVolumeDescriptorPointer     = 2,
+  VolumeDescriptorPointer           = 3,
+  ImplementationUseVolumeDescriptor = 4,
+  PartitionDescriptor               = 5,
+  LogicalVolumeDescriptor           = 6,
+  UnallocatedSpaceDescriptor        = 7,
+  TerminatingDescriptor             = 8,
+  LogicalVolumeIntegrityDescriptor  = 9,
+  /* ECMA 167 4/7.2.1 */
+  FileSetDescriptor                 = 256,
+  FileIdentifierDescriptor          = 257,
+  AllocationExtentDescriptor        = 258,
+  IndirectEntry                     = 259,
+  TerminalEntry                     = 260,
+  FileEntry                         = 261,
+  ExtendedAttributeHeaderDescriptor = 262,
+  UnallocatedSpaceEntry             = 263,
+  SpaceBitmapDescriptor             = 264,
+  PartitionIntegrityEntry           = 265,
+  ExtendedFileEntry                 = 266,
+};
 
 int InternalUDFReadBlocksRaw(const dvd_reader_t *device, uint32_t lb_number,
                      size_t block_count, unsigned char *data, int encrypted);

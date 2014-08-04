@@ -238,8 +238,9 @@ static int file_read(dvd_input_t dev, void *buffer, int blocks, int flags)
        * Adjust the file position back to the previous block boundary. */
       size_t bytes = (size_t)blocks * DVD_VIDEO_LB_LEN - len;
       off_t over_read = -(bytes % DVD_VIDEO_LB_LEN);
-      /*off_t pos =*/ lseek(dev->fd, over_read, SEEK_CUR);
-      /* should have pos % 2048 == 0 */
+      off_t pos = lseek(dev->fd, over_read, SEEK_CUR);
+      if(pos % 2048 != 0)
+        fprintf( stderr, "libdvdread: lseek not multiple of 2048! Something is wrong!\n" );
       return (int) (bytes / DVD_VIDEO_LB_LEN);
     }
 

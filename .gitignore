@@ -7,6 +7,7 @@
 .libs/
 /aclocal.m4
 /autom4te.cache/
+/compile
 /config.guess
 /config.h
 /config.h.in
@@ -16,6 +17,7 @@
 /configure
 /depcomp
 /install-sh
+/libdvdread*.tar.bz2
 /libtool
 /ltmain.sh
 /m4/libtool.m4

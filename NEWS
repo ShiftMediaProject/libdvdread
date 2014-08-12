@@ -1,12 +1,23 @@
+libdvdread (5.0.0)
+ * added support for Android
+ * fix build support for OS/2
+ * fix crashes in IFO parsing (Shark Week The Great Bites Collection)
+
 libdvdread (4.9.9)
   * major cleanup
   * rewritten build system, including removal of configure2 and dvdread-config
-  * numerous crashes fixed, notably on ARCCOS protected DVDs,
-    like Transformers 3, Brave, The Express, Sherlock Holmes DVDs
+  * fix numerous crashes
   * added QNX support
   * updated to support libdvdcss 1.3.0
   * improved dlopen support for Win32
   * simplify static linking of libdvdcss
+
+libdvdread (4.2.1)
+  * fix huge memory consumption when reading DVDs: "Up" and "Dark Knight"
+  * numerous crashes fixed, notably on ARCCOS protected DVDs,
+    like Transformers 3, Brave, The Express, Sherlock Holmes
+    and Cars 2,
+  * fix packed structures with mingw gcc >= 4.7
 
 libdvdread (4.2.0)
   * added OS/2 support

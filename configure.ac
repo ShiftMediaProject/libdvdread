@@ -1,4 +1,4 @@
-AC_INIT(libdvdread, 4.9.9)
+AC_INIT(libdvdread, 5.0.0)
 AC_CONFIG_SRCDIR([src/dvd_reader.c])
 
 AC_PREREQ(2.53)
@@ -55,6 +55,9 @@ AC_C_BIGENDIAN
 AS_CASE([$host],
   [*mingw32* | *cygwin*], [AC_CHECK_FUNCS(gettimeofday)])
 
+AS_CASE([$host],
+  [*-os2-*], LDFLAGS="-no-undefined -Zbin-files $LDFLAGS")
+
 AC_ARG_WITH([libdvdcss],
   AS_HELP_STRING([--with-libdvdcss], [Link directly against libdvdcss @<:@default=no@:>@]))
 
@@ -81,7 +84,7 @@ AS_IF([test x"$with_libdvdcss" = "xyes"], [
 ])
 AC_SUBST([CSS_REQUIRES])
 
-CC_CHECK_CFLAGS_APPEND([-Wall -Wsign-compare])
+CC_CHECK_CFLAGS_APPEND([-Wall -Wsign-compare -Wextra])
 
 
 AC_ARG_ENABLE([apidoc],

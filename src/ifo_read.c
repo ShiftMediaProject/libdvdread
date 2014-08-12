@@ -305,11 +305,9 @@ ifo_handle_t *ifoOpen(dvd_reader_t *dvd, int title) {
   }
 
   if (title)
-    snprintf(ifo_filename, 12, "VTS_%02d_0.%s", title, bup_file_opened ? "BUP" : "IFO");
+    snprintf(ifo_filename, 13, "VTS_%02d_0.%s", title, bup_file_opened ? "BUP" : "IFO");
   else
-    snprintf(ifo_filename, 12, "VIDEO_TS.%s", bup_file_opened ? "BUP" : "IFO");
-
-  ifo_filename[12] = '\0';
+    snprintf(ifo_filename, 13, "VIDEO_TS.%s", bup_file_opened ? "BUP" : "IFO");
 
   if(!ifofile->file) {
     fprintf(stderr, "libdvdread: Can't open file %s.\n", ifo_filename);
@@ -369,9 +367,9 @@ ifoOpen_try_bup:
   ifofile->file = DVDOpenFile(dvd, title, DVD_READ_INFO_BACKUP_FILE);
 
   if (title)
-    snprintf(ifo_filename, 12, "VTS_%02d_0.BUP", title);
+    snprintf(ifo_filename, 13, "VTS_%02d_0.BUP", title);
   else
-    strncpy(ifo_filename, "VIDEO_TS.BUP", 12);
+    strncpy(ifo_filename, "VIDEO_TS.BUP", 13);
 
   if (!ifofile->file) {
     fprintf(stderr, "libdvdread: Can't open file %s.\n", ifo_filename);
@@ -1245,6 +1243,8 @@ int ifoRead_VTS_PTT_SRPT(ifo_handle_t *ifofile) {
         = *(uint16_t*)(((char *)data) + data[i] + 4*j - VTS_PTT_SRPT_SIZE);
       vts_ptt_srpt->title[i].ptt[j].pgn
         = *(uint16_t*)(((char *)data) + data[i] + 4*j + 2 - VTS_PTT_SRPT_SIZE);
+      if(!vts_ptt_srpt->title[i].ptt[j].pgn)
+        goto fail;
     }
   }
 
@@ -1452,9 +1452,8 @@ int ifoRead_VTS_TMAPT(ifo_handle_t *ifofile) {
   if(!ifofile->vtsi_mat)
     return 0;
 
-  if(ifofile->vtsi_mat->vts_tmapt == 0) { /* optional(?) */
+  if(ifofile->vtsi_mat->vts_tmapt == 0) {
     ifofile->vts_tmapt = NULL;
-    fprintf(stderr,"libdvdread: No VTS_TMAPT available - skipping.\n");
     return 1;
   }
 

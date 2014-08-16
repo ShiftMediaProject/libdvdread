@@ -90,7 +90,7 @@
     <None Include="libdvdread.def" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{2016A4DB-B9BA-4521-BDA7-0EB3806E1FC8}</ProjectGuid>
+    <ProjectGuid>{66351D03-374D-4A28-B5DF-3BEBEE3430D2}</ProjectGuid>
     <RootNamespace>libdvdread</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />

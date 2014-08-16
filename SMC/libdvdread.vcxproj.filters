@@ -1,0 +1,101 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{e850f24d-093f-4c30-a99c-413a7dfa71b8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{f18cd969-acc3-480c-9147-ea3ae1c8ba92}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{bdd0568e-d423-4fcc-affe-6ba0c2a40f78}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\src">
+      <UniqueIdentifier>{fcd80aa4-3619-4cdb-8ba7-5e8caf895acf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\src\dvdread">
+      <UniqueIdentifier>{2b416691-1a02-463e-ac5d-a8668090d94f}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="config.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="version.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\dvd_input.h">
+      <Filter>Header Files\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\dvdread_internal.h">
+      <Filter>Header Files\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\md5.h">
+      <Filter>Header Files\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\bswap.h">
+      <Filter>Header Files\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\dvdread\ifo_print.h">
+      <Filter>Header Files\src\dvdread</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\dvdread\ifo_read.h">
+      <Filter>Header Files\src\dvdread</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\dvdread\ifo_types.h">
+      <Filter>Header Files\src\dvdread</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\dvdread\nav_print.h">
+      <Filter>Header Files\src\dvdread</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\dvdread\nav_read.h">
+      <Filter>Header Files\src\dvdread</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\dvdread\nav_types.h">
+      <Filter>Header Files\src\dvdread</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\dvdread\bitreader.h">
+      <Filter>Header Files\src\dvdread</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\dvdread\dvd_reader.h">
+      <Filter>Header Files\src\dvdread</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\dvdread\dvd_udf.h">
+      <Filter>Header Files\src\dvdread</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\src\nav_read.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\bitreader.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\dvd_input.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\dvd_reader.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\dvd_udf.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ifo_print.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ifo_read.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\md5.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\nav_print.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="libdvdread.def">
+      <Filter>Resource Files</Filter>
+    </None>
+  </ItemGroup>
+</Project>

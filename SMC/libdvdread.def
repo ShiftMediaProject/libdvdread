@@ -1,0 +1,24 @@
+EXPORTS
+    DVDOpen
+    DVDClose
+    DVDOpenFile
+    DVDCloseFile
+    DVDReadBlocks
+
+    navRead_DSI
+    navRead_PCI
+
+    ifoClose
+    ifoRead_VOBU_ADMAP
+    ifoRead_VTS_ATRT
+    ifoRead_PTL_MAIT
+    ifoRead_PGCI_UT
+    ifoRead_TT_SRPT
+    ifoRead_FP_PGC
+    ifoOpenVMGI
+    ifoRead_TITLE_VOBU_ADMAP
+    ifoRead_PGCIT
+    ifoRead_VTS_PTT_SRPT
+    ifoOpenVTSI
+    ifoRead_VTS_TMAPT
+    ifoOpen

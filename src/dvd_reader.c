@@ -603,14 +603,11 @@ dvd_reader_t *DVDOpen( const char *ppath )
 DVDOpen_error:
   /* If it's none of the above, screw it. */
   fprintf( stderr, "libdvdread: Could not open %s\n", path );
-  if( path != NULL )
-    free( path );
-  if ( path_copy != NULL )
-    free( path_copy );
+  free( path );
+  free( path_copy );
   if ( cdir >= 0 )
     close( cdir );
-  if ( new_path != NULL )
-    free( new_path );
+  free( new_path );
   return NULL;
 }
 

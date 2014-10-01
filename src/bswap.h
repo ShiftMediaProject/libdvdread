@@ -109,7 +109,7 @@
 /* If there isn't a header provided with your system with this functionality
  * add the relevant || define( ) to the portable implementation above.
  */
-#error "You need to add endian swap macros for you're system"
+#error "You need to add endian swap macros for your system"
 
 #endif
 

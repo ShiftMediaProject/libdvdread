@@ -450,6 +450,7 @@ dvd_reader_t *DVDOpen( const char *ppath )
         if( retval == -1 ) {
           goto DVDOpen_error;
         }
+        free(path_copy);
         path_copy = new_path;
         new_path = NULL;
       }

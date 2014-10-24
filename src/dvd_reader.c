@@ -1183,7 +1183,7 @@ static int DVDReadBlocksPath( const dvd_file_t *dvd_file, unsigned int offset,
       if( ( offset + block_count ) <= dvd_file->title_sizes[ i ] ) {
         off = dvdinput_seek( dvd_file->title_devs[ i ], (int)offset );
         if( off < 0 || off != (int)offset ) {
-          fprintf( stderr, "libdvdread: Can't seek to block %d\n",
+          fprintf( stderr, "libdvdread: Can't seek to block %u\n",
                    offset );
           return off < 0 ? off : 0;
         }
@@ -1198,7 +1198,7 @@ static int DVDReadBlocksPath( const dvd_file_t *dvd_file, unsigned int offset,
         /* Read part 1 */
         off = dvdinput_seek( dvd_file->title_devs[ i ], (int)offset );
         if( off < 0 || off != (int)offset ) {
-          fprintf( stderr, "libdvdread: Can't seek to block %d\n",
+          fprintf( stderr, "libdvdread: Can't seek to block %u\n",
                    offset );
           return off < 0 ? off : 0;
         }

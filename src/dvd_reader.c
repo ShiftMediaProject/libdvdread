@@ -680,7 +680,6 @@ static int findDirFile( const char *path, const char *file, char *filename )
 
 static int findDVDFile( dvd_reader_t *dvd, const char *file, char *filename )
 {
-  char video_path[ PATH_MAX + 1 ];
   const char *nodirfile;
   int ret;
 
@@ -693,6 +692,8 @@ static int findDVDFile( dvd_reader_t *dvd, const char *file, char *filename )
 
   ret = findDirFile( dvd->path_root, nodirfile, filename );
   if( ret < 0 ) {
+    char video_path[ PATH_MAX + 1 ];
+
     /* Try also with adding the path, just in case. */
     sprintf( video_path, "%s/VIDEO_TS/", dvd->path_root );
     ret = findDirFile( video_path, nodirfile, filename );
@@ -812,7 +813,6 @@ static dvd_file_t *DVDOpenVOBPath( dvd_reader_t *dvd, int title, int menu )
   char full_path[ PATH_MAX + 1 ];
   struct stat fileinfo;
   dvd_file_t *dvd_file;
-  int i;
 
   dvd_file = malloc( sizeof( dvd_file_t ) );
   if( !dvd_file ) return NULL;
@@ -855,6 +855,8 @@ static dvd_file_t *DVDOpenVOBPath( dvd_reader_t *dvd, int title, int menu )
     dvd_file->filesize = dvd_file->title_sizes[ 0 ];
 
   } else {
+    int i;
+
     for( i = 0; i < TITLES_MAX; ++i ) {
 
       sprintf( filename, "VTS_%02i_%i.VOB", title, i + 1 );
@@ -934,10 +936,10 @@ dvd_file_t *DVDOpenFile( dvd_reader_t *dvd, int titlenum,
 
 void DVDCloseFile( dvd_file_t *dvd_file )
 {
-  int i;
-
   if( dvd_file && dvd_file->dvd ) {
     if( !dvd_file->dvd->isImageFile ) {
+      int i;
+
       for( i = 0; i < TITLES_MAX; ++i ) {
         if( dvd_file->title_devs[ i ] ) {
           dvdinput_close( dvd_file->title_devs[i] );
@@ -1054,7 +1056,6 @@ int DVDFileStat( dvd_reader_t *dvd, int titlenum,
                  dvd_read_domain_t domain, dvd_stat_t *statbuf )
 {
   char filename[ MAX_UDF_FILE_NAME_LEN ];
-  char full_path[ PATH_MAX + 1 ];
   struct stat fileinfo;
   uint32_t size;
 
@@ -1110,6 +1111,8 @@ int DVDFileStat( dvd_reader_t *dvd, int titlenum,
       return 0;
     }
   } else {
+    char full_path[ PATH_MAX + 1 ];
+
     if( findDVDFile( dvd, filename, full_path ) ) {
       if( stat( full_path, &fileinfo ) < 0 )
         fprintf( stderr, "libdvdread: Can't stat() %s.\n", filename );

@@ -99,6 +99,12 @@ AS_IF([test "x$DOXYGEN" = "x"], [
 ])
 AM_CONDITIONAL([APIDOC], [test "x$DOXYGEN" != "x" && test "x$enable_apidoc" = "xyes"])
 
+AS_IF([test "x$ac_cv_c_compiler_gnu" = "xyes"], [
+  AC_DEFINE([UNUSED], [__attribute__((unused))], [Unused parameter annotation])
+], [
+  AC_DEFINE([UNUSED], [], [Unused parameter annotation])
+])
+
 dnl ---------------------------------------------
 dnl Output configuration files
 dnl ---------------------------------------------

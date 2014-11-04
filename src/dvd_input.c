@@ -183,7 +183,7 @@ static dvd_input_t file_open(const char *target)
 /**
  * return the last error message
  */
-static char *file_error(dvd_input_t dev)
+static char *file_error(dvd_input_t dev UNUSED)
 {
   /* use strerror(errno)? */
   return (char *)"unknown error";
@@ -207,7 +207,7 @@ static int file_seek(dvd_input_t dev, int blocks)
 /**
  * set the block for the beginning of a new title (key).
  */
-static int file_title(dvd_input_t dev, int block)
+static int file_title(dvd_input_t dev UNUSED, int block UNUSED)
 {
   return -1;
 }
@@ -215,7 +215,8 @@ static int file_title(dvd_input_t dev, int block)
 /**
  * read data from the device.
  */
-static int file_read(dvd_input_t dev, void *buffer, int blocks, int flags)
+static int file_read(dvd_input_t dev, void *buffer, int blocks,
+		     int flags UNUSED)
 {
   size_t len;
 

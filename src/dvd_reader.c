@@ -1361,7 +1361,7 @@ ssize_t DVDFileSize( dvd_file_t *dvd_file )
 
 int DVDDiscID( dvd_reader_t *dvd, unsigned char *discid )
 {
-  struct md5_ctx ctx;
+  struct md5_s ctx;
   int title;
   int title_sets;
   int nr_of_files = 0;
@@ -1386,7 +1386,7 @@ int DVDDiscID( dvd_reader_t *dvd, unsigned char *discid )
 
   /* Go through the first IFO:s, in order, up until the tenth,
    * and md5sum them, i.e  VIDEO_TS.IFO and VTS_0?_0.IFO */
-  md5_init_ctx( &ctx );
+  InitMD5( &ctx );
   for( title = 0; title < title_sets; title++ ) {
     dvd_file_t *dvd_file = DVDOpenFile( dvd, title, DVD_READ_INFO_FILE );
     if( dvd_file != NULL ) {
@@ -1411,14 +1411,15 @@ int DVDDiscID( dvd_reader_t *dvd, unsigned char *discid )
           return -1;
       }
 
-      md5_process_bytes( buffer, file_size,  &ctx );
+      AddMD5( &ctx, buffer, file_size );
 
       DVDCloseFile( dvd_file );
       free( buffer_base );
       nr_of_files++;
     }
   }
-  md5_finish_ctx( &ctx, discid );
+  EndMD5( &ctx );
+  memcpy( discid, ctx.buf, 16 );
   if(!nr_of_files)
     return -1;
 

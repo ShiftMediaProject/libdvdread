@@ -53,7 +53,7 @@ static int DVDReadLBUDF( dvd_reader_t *device, uint32_t lb_number,
   while(count > 0) {
     int ret;
 
-    ret = InternalUDFReadBlocksRaw(device, lb_number, count, data, encrypted);
+    ret = InternalUDFReadBlocksRaw(device, lb_number, count, data + DVD_VIDEO_LB_LEN * (block_count - count), encrypted);
 
     if(ret <= 0) {
       /* One of the reads failed or nothing more to read, too bad.

@@ -218,12 +218,13 @@ static int file_title(dvd_input_t dev UNUSED, int block UNUSED)
 static int file_read(dvd_input_t dev, void *buffer, int blocks,
 		     int flags UNUSED)
 {
-  size_t len;
+  size_t len, bytes;
 
   len = (size_t)blocks * DVD_VIDEO_LB_LEN;
+  bytes = 0;
 
   while(len > 0) {
-    ssize_t ret = read(dev->fd, buffer, len);
+    ssize_t ret = read(dev->fd, ((char*)buffer) + bytes, len);
 
     if(ret < 0) {
       /* One of the reads failed, too bad.  We won't even bother
@@ -235,7 +236,6 @@ static int file_read(dvd_input_t dev, void *buffer, int blocks,
     if(ret == 0) {
       /* Nothing more to read.  Return all of the whole blocks, if any.
        * Adjust the file position back to the previous block boundary. */
-      size_t bytes = (size_t)blocks * DVD_VIDEO_LB_LEN - len;
       off_t over_read = -(bytes % DVD_VIDEO_LB_LEN);
       off_t pos = lseek(dev->fd, over_read, SEEK_CUR);
       if(pos % 2048 != 0)
@@ -244,6 +244,7 @@ static int file_read(dvd_input_t dev, void *buffer, int blocks,
     }
 
     len -= ret;
+    bytes += ret;
   }
 
   return blocks;

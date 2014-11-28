@@ -32,12 +32,3 @@
 /doc/doxygen.cfg
 /doc/html
 /stamp-*
-compile
-
-*.obj
-*.log
-*.tlog
-*.pdb
-*.ildb
-*.suo
-*.sdf

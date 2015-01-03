@@ -1,4 +1,8 @@
 libdvdread (5.0.1)
+ * support DragonFly BSD bswap
+ * new md5 implementation, under LGPL
+ * fix partial reads
+ * fix warnings and code cleanup
 
 libdvdread (5.0.0)
  * added support for Android

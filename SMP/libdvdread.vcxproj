@@ -73,7 +73,6 @@
     <ClInclude Include="..\src\dvd_input.h" />
     <ClInclude Include="..\src\md5.h" />
     <ClInclude Include="config.h" />
-    <ClInclude Include="version.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\bitreader.c" />

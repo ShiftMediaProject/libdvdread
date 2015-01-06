@@ -50,12 +50,12 @@ static int DVDReadLBUDF( dvd_reader_t *device, uint32_t lb_number,
                          size_t block_count, unsigned char *data,
                          int encrypted )
 {
-  int ret;
   size_t count = block_count;
 
   while(count > 0) {
+    int ret;
 
-    ret = InternalUDFReadBlocksRaw(device, lb_number, count, data, encrypted);
+    ret = InternalUDFReadBlocksRaw(device, lb_number, count, data + DVD_VIDEO_LB_LEN * (block_count - count), encrypted);
 
     if(ret <= 0) {
       /* One of the reads failed or nothing more to read, too bad.
@@ -566,13 +566,14 @@ static int UDFScanDir( dvd_reader_t *device, struct AD Dir, char *FileName,
   uint8_t *cached_dir_base = NULL, *cached_dir;
   uint32_t dir_lba;
   struct AD tmpICB;
-  int found = 0;
-  int in_cache = 0;
 
   /* Scan dir for ICB of file */
   lbnum = partition->Start + Dir.Location;
 
   if(DVDUDFCacheLevel(device, -1) > 0) {
+    int found = 0;
+    int in_cache = 0;
+
     /* caching */
 
     if(!GetUDFCache(device, LBUDFCache, lbnum, &cached_dir)) {
@@ -607,6 +608,7 @@ static int UDFScanDir( dvd_reader_t *device, struct AD Dir, char *FileName,
     p = 0;
 
     while( p < Dir.Length ) {
+
       UDFDescriptor( &cached_dir[ p ], &TagID );
       if( TagID == FileIdentifierDescriptor ) {
         p += UDFFileIdentifier( &cached_dir[ p ], &filechar,
@@ -804,7 +806,6 @@ uint32_t UDFFindFile( dvd_reader_t *device, char *filename,
   struct Partition partition;
   struct AD RootICB, File, ICB;
   char tokenline[ MAX_UDF_FILE_NAME_LEN ];
-  char *token;
   uint8_t filetype;
 
   *filesize = 0;
@@ -848,7 +849,7 @@ uint32_t UDFFindFile( dvd_reader_t *device, char *filename,
   {
     int cache_file_info = 0;
     /* Tokenize filepath */
-    token = strtok(tokenline, "/");
+    char *token = strtok(tokenline, "/");
 
     while( token != NULL ) {
       if( !UDFScanDir( device, File, token, &partition, &ICB,

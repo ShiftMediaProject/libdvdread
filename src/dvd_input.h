@@ -38,7 +38,9 @@ typedef struct dvd_input_s *dvd_input_t;
 #   define off_t off64_t
 #   undef  stat
 #   define stat  _stati64
+#   undef  fstat
 #   define fstat _fstati64
+#   undef  wstat
 #   define wstat _wstati64
 #endif
 

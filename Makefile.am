@@ -8,7 +8,7 @@ MAINTAINERCLEANFILES = ChangeLog
 
 ChangeLog: $(wildcard $(srcdir)/.git/logs/HEAD)
 	-cd $(srcdir) && git log > $(abs_builddir)/$(@)-tmp
-	test -s $(@)-tmp && mv $(@)-tmp $(@)
+	-test -s $(@)-tmp && mv $(@)-tmp $(@)
 	-rm -f $(@)-tmp
 	test -e $(@) || touch $(@)
 

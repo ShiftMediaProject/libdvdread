@@ -812,8 +812,8 @@ static void ifoPrint_TT_SRPT(tt_srpt_t *tt_srpt) {
     if (tt_srpt->title[i].pb_ty.jlc_exists_in_prepost_cmd) printf("\t\tJump/Link/Call exists in pre/post cmd\n");
     if (tt_srpt->title[i].pb_ty.jlc_exists_in_button_cmd) printf("\t\tJump/Link/Call exists in button cmd\n");
     if (tt_srpt->title[i].pb_ty.jlc_exists_in_tt_dom) printf("\t\tJump/Link/Call exists in tt_dom cmd\n");
-    printf("\t\tTitle or time play:%d\n", tt_srpt->title[i].pb_ty.title_or_time_play);
-    printf("\t\tChapter search or play:%d\n", tt_srpt->title[i].pb_ty.chapter_search_or_play);
+    printf("\t\tTitle or time play:%u\n", tt_srpt->title[i].pb_ty.title_or_time_play);
+    printf("\t\tChapter search or play:%u\n", tt_srpt->title[i].pb_ty.chapter_search_or_play);
 
     printf("\tParental ID field: %04x\n",
            tt_srpt->title[i].parental_id);

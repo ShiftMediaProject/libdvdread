@@ -1424,12 +1424,12 @@ int ifoRead_PTL_MAIT(ifo_handle_t *ifofile) {
 }
 
 void ifoFree_PTL_MAIT(ifo_handle_t *ifofile) {
-  unsigned int i;
-
   if(!ifofile)
     return;
 
   if(ifofile->ptl_mait) {
+    unsigned int i;
+
     for(i = 0; i < ifofile->ptl_mait->nr_of_countries; i++) {
       free(ifofile->ptl_mait->countries[i].pf_ptl_mai);
     }
@@ -1558,12 +1558,12 @@ int ifoRead_VTS_TMAPT(ifo_handle_t *ifofile) {
 }
 
 void ifoFree_VTS_TMAPT(ifo_handle_t *ifofile) {
-  unsigned int i;
-
   if(!ifofile)
     return;
 
   if(ifofile->vts_tmapt) {
+    unsigned int i;
+
     for(i = 0; i < ifofile->vts_tmapt->nr_of_tmaps; i++)
       if(ifofile->vts_tmapt->tmap[i].map_ent)
         free(ifofile->vts_tmapt->tmap[i].map_ent);
@@ -2112,12 +2112,12 @@ int ifoRead_PGCI_UT(ifo_handle_t *ifofile) {
 
 
 void ifoFree_PGCI_UT(ifo_handle_t *ifofile) {
-  unsigned int i;
-
   if(!ifofile)
     return;
 
   if(ifofile->pgci_ut) {
+    unsigned int i;
+
     for(i = 0; i < ifofile->pgci_ut->nr_of_lus; i++) {
       ifoFree_PGCIT_internal(&ifofile->pgci_ut->lu[i].pgcit);
     }

@@ -292,11 +292,9 @@ ifo_handle_t *ifoOpen(dvd_reader_t *dvd, int title) {
   int bup_file_opened = 0;
   char ifo_filename[13];
 
-  ifofile = malloc(sizeof(ifo_handle_t));
+  ifofile = calloc(1, sizeof(ifo_handle_t));
   if(!ifofile)
     return NULL;
-
-  memset(ifofile, 0, sizeof(ifo_handle_t));
 
   ifofile->file = DVDOpenFile(dvd, title, DVD_READ_INFO_FILE);
   if(!ifofile->file) { /* Failed to open IFO, try to open BUP */
@@ -359,11 +357,10 @@ ifoOpen_try_bup:
   /* Try BUP instead */
   ifoClose(ifofile);
 
-  ifofile = malloc(sizeof(ifo_handle_t));
+  ifofile = calloc(1, sizeof(ifo_handle_t));
   if(!ifofile)
     return NULL;
 
-  memset(ifofile, 0, sizeof(ifo_handle_t));
   ifofile->file = DVDOpenFile(dvd, title, DVD_READ_INFO_BACKUP_FILE);
 
   if (title)
@@ -425,11 +422,9 @@ ifoOpen_fail:
 ifo_handle_t *ifoOpenVMGI(dvd_reader_t *dvd) {
   ifo_handle_t *ifofile;
 
-  ifofile = malloc(sizeof(ifo_handle_t));
+  ifofile = calloc(1, sizeof(ifo_handle_t));
   if(!ifofile)
     return NULL;
-
-  memset(ifofile, 0, sizeof(ifo_handle_t));
 
   ifofile->file = DVDOpenFile(dvd, 0, DVD_READ_INFO_FILE);
   if(!ifofile->file) /* Should really catch any error and try to fallback */
@@ -452,11 +447,9 @@ ifo_handle_t *ifoOpenVMGI(dvd_reader_t *dvd) {
 ifo_handle_t *ifoOpenVTSI(dvd_reader_t *dvd, int title) {
   ifo_handle_t *ifofile;
 
-  ifofile = malloc(sizeof(ifo_handle_t));
+  ifofile = calloc(1, sizeof(ifo_handle_t));
   if(!ifofile)
     return NULL;
-
-  memset(ifofile, 0, sizeof(ifo_handle_t));
 
   if(title <= 0 || title > 99) {
     fprintf(stderr, "libdvdread: ifoOpenVTSI invalid title (%d).\n", title);

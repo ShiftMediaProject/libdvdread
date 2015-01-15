@@ -719,8 +719,6 @@ static int ifoRead_PGC_COMMAND_TBL(ifo_handle_t *ifofile,
                                    pgc_command_tbl_t *cmd_tbl,
                                    unsigned int offset) {
 
-  memset(cmd_tbl, 0, sizeof(pgc_command_tbl_t));
-
   if(!DVDFileSeek_(ifofile->file, offset))
     return 0;
 
@@ -1385,7 +1383,6 @@ int ifoRead_PTL_MAIT(ifo_handle_t *ifofile) {
       ifofile->ptl_mait = NULL;
       return 0;
     }
-    memset(pf_temp, 0, info_length);
     if(!(DVDReadBytes(ifofile->file, pf_temp, info_length))) {
       fprintf(stderr, "libdvdread: Unable to read PTL_MAIT table at index %d.\n",i);
       free(pf_temp);
@@ -1507,8 +1504,6 @@ int ifoRead_VTS_TMAPT(ifo_handle_t *ifofile) {
     ifofile->vts_tmapt = NULL;
     return 0;
   }
-
-  memset(vts_tmapt->tmap, 0, info_length); /* So ifoFree_VTS_TMAPT works. */
 
   for(i = 0; i < vts_tmapt->nr_of_tmaps; i++) {
     if(!DVDFileSeek_(ifofile->file, offset + vts_tmap_srp[i])) {

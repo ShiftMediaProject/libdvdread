@@ -517,7 +517,7 @@ void ifoClose(ifo_handle_t *ifofile) {
 static int ifoRead_VMG(ifo_handle_t *ifofile) {
   vmgi_mat_t *vmgi_mat;
 
-  vmgi_mat = malloc(sizeof(vmgi_mat_t));
+  vmgi_mat = calloc(1, sizeof(vmgi_mat_t));
   if(!vmgi_mat)
     return 0;
 

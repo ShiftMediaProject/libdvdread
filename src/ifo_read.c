@@ -916,7 +916,7 @@ static int ifoRead_PGC(ifo_handle_t *ifofile, pgc_t *pgc, unsigned int offset) {
   }
 
   if(pgc->command_tbl_offset != 0) {
-    pgc->command_tbl = malloc(sizeof(pgc_command_tbl_t));
+    pgc->command_tbl = calloc(1, sizeof(pgc_command_tbl_t));
     if(!pgc->command_tbl)
       return 0;
 
@@ -929,7 +929,7 @@ static int ifoRead_PGC(ifo_handle_t *ifofile, pgc_t *pgc, unsigned int offset) {
   }
 
   if(pgc->program_map_offset != 0 && pgc->nr_of_programs>0) {
-    pgc->program_map = malloc(pgc->nr_of_programs * sizeof(pgc_program_map_t));
+    pgc->program_map = calloc(pgc->nr_of_programs, sizeof(pgc_program_map_t));
     if(!pgc->program_map) {
       return 0;
     }
@@ -942,7 +942,7 @@ static int ifoRead_PGC(ifo_handle_t *ifofile, pgc_t *pgc, unsigned int offset) {
   }
 
   if(pgc->cell_playback_offset != 0 && pgc->nr_of_cells>0) {
-    pgc->cell_playback = malloc(pgc->nr_of_cells * sizeof(cell_playback_t));
+    pgc->cell_playback = calloc(pgc->nr_of_cells, sizeof(cell_playback_t));
     if(!pgc->cell_playback) {
       return 0;
     }
@@ -956,7 +956,7 @@ static int ifoRead_PGC(ifo_handle_t *ifofile, pgc_t *pgc, unsigned int offset) {
   }
 
   if(pgc->cell_position_offset != 0 && pgc->nr_of_cells>0) {
-    pgc->cell_position = malloc(pgc->nr_of_cells * sizeof(cell_position_t));
+    pgc->cell_position = calloc(pgc->nr_of_cells, sizeof(cell_position_t));
     if(!pgc->cell_position) {
       return 0;
     }
@@ -1042,7 +1042,7 @@ int ifoRead_TT_SRPT(ifo_handle_t *ifofile) {
   if(!DVDFileSeek_(ifofile->file, ifofile->vmgi_mat->tt_srpt * DVD_BLOCK_LEN))
     return 0;
 
-  tt_srpt = malloc(sizeof(tt_srpt_t));
+  tt_srpt = calloc(1, sizeof(tt_srpt_t));
   if(!tt_srpt)
     return 0;
 
@@ -1059,7 +1059,7 @@ int ifoRead_TT_SRPT(ifo_handle_t *ifofile) {
 
   info_length = tt_srpt->last_byte + 1 - TT_SRPT_SIZE;
 
-  tt_srpt->title = malloc(info_length);
+  tt_srpt->title = calloc(1, info_length);
   if(!tt_srpt->title) {
     free(tt_srpt);
     ifofile->tt_srpt = NULL;
@@ -1152,7 +1152,7 @@ int ifoRead_VTS_PTT_SRPT(ifo_handle_t *ifofile) {
                    ifofile->vtsi_mat->vts_ptt_srpt * DVD_BLOCK_LEN))
     return 0;
 
-  vts_ptt_srpt = malloc(sizeof(vts_ptt_srpt_t));
+  vts_ptt_srpt = calloc(1, sizeof(vts_ptt_srpt_t));
   if(!vts_ptt_srpt)
     return 0;
 
@@ -1172,7 +1172,7 @@ int ifoRead_VTS_PTT_SRPT(ifo_handle_t *ifofile) {
   CHECK_VALUE(vts_ptt_srpt->nr_of_srpts < 100); /* ?? */
 
   info_length = vts_ptt_srpt->last_byte + 1 - VTS_PTT_SRPT_SIZE;
-  data = malloc(info_length);
+  data = calloc(1, info_length);
   if(!data)
     goto fail;
 
@@ -1210,7 +1210,7 @@ int ifoRead_VTS_PTT_SRPT(ifo_handle_t *ifofile) {
 
   vts_ptt_srpt->ttu_offset = data;
 
-  vts_ptt_srpt->title = malloc(vts_ptt_srpt->nr_of_srpts * sizeof(ttu_t));
+  vts_ptt_srpt->title = calloc(vts_ptt_srpt->nr_of_srpts, sizeof(ttu_t));
   if(!vts_ptt_srpt->title)
     goto fail;
 
@@ -1230,7 +1230,7 @@ int ifoRead_VTS_PTT_SRPT(ifo_handle_t *ifofile) {
     CHECK_VALUE(n % 4 == 0);
 
     vts_ptt_srpt->title[i].nr_of_ptts = n / 4;
-    vts_ptt_srpt->title[i].ptt = malloc(n * sizeof(ptt_info_t));
+    vts_ptt_srpt->title[i].ptt = calloc(n, sizeof(ptt_info_t));
     if(!vts_ptt_srpt->title[i].ptt) {
       for(n = 0; n < i; n++)
         free(vts_ptt_srpt->title[n].ptt);
@@ -1317,7 +1317,7 @@ int ifoRead_PTL_MAIT(ifo_handle_t *ifofile) {
   if(!DVDFileSeek_(ifofile->file, ifofile->vmgi_mat->ptl_mait * DVD_BLOCK_LEN))
     return 0;
 
-  ptl_mait = malloc(sizeof(ptl_mait_t));
+  ptl_mait = calloc(1, sizeof(ptl_mait_t));
   if(!ptl_mait)
     return 0;
 
@@ -1341,7 +1341,7 @@ int ifoRead_PTL_MAIT(ifo_handle_t *ifofile) {
               <= ptl_mait->last_byte + 1 - PTL_MAIT_SIZE);
 
   info_length = ptl_mait->nr_of_countries * sizeof(ptl_mait_country_t);
-  ptl_mait->countries = malloc(info_length);
+  ptl_mait->countries = calloc(1, info_length);
   if(!ptl_mait->countries) {
     free(ptl_mait);
     ifofile->ptl_mait = NULL;
@@ -1386,7 +1386,7 @@ int ifoRead_PTL_MAIT(ifo_handle_t *ifofile) {
       return 0;
     }
     info_length = (ptl_mait->nr_of_vtss + 1) * sizeof(pf_level_t);
-    pf_temp = malloc(info_length);
+    pf_temp = calloc(1, info_length);
     if(!pf_temp) {
       free_ptl_mait(ptl_mait, i);
       ifofile->ptl_mait = NULL;
@@ -1403,7 +1403,7 @@ int ifoRead_PTL_MAIT(ifo_handle_t *ifofile) {
     for (j = 0; j < ((ptl_mait->nr_of_vtss + 1U) * 8U); j++) {
       B2N_16(pf_temp[j]);
     }
-    ptl_mait->countries[i].pf_ptl_mai = malloc(info_length);
+    ptl_mait->countries[i].pf_ptl_mai = calloc(1, info_length);
     if(!ptl_mait->countries[i].pf_ptl_mai) {
       free(pf_temp);
       free_ptl_mait(ptl_mait, i);
@@ -1463,7 +1463,7 @@ int ifoRead_VTS_TMAPT(ifo_handle_t *ifofile) {
   if(!DVDFileSeek_(ifofile->file, offset))
     return 0;
 
-  vts_tmapt = malloc(sizeof(vts_tmapt_t));
+  vts_tmapt = calloc(1, sizeof(vts_tmapt_t));
   if(!vts_tmapt)
     return 0;
 
@@ -1483,7 +1483,7 @@ int ifoRead_VTS_TMAPT(ifo_handle_t *ifofile) {
 
   info_length = vts_tmapt->nr_of_tmaps * 4;
 
-  vts_tmap_srp = malloc(info_length);
+  vts_tmap_srp = calloc(1, info_length);
   if(!vts_tmap_srp) {
     free(vts_tmapt);
     ifofile->vts_tmapt = NULL;
@@ -1507,7 +1507,7 @@ int ifoRead_VTS_TMAPT(ifo_handle_t *ifofile) {
 
   info_length = vts_tmapt->nr_of_tmaps * sizeof(vts_tmap_t);
 
-  vts_tmapt->tmap = malloc(info_length);
+  vts_tmapt->tmap = calloc(1, info_length);
   if(!vts_tmapt->tmap) {
     free(vts_tmap_srp);
     free(vts_tmapt);
@@ -1539,7 +1539,7 @@ int ifoRead_VTS_TMAPT(ifo_handle_t *ifofile) {
 
     info_length = vts_tmapt->tmap[i].nr_of_entries * sizeof(map_ent_t);
 
-    vts_tmapt->tmap[i].map_ent = malloc(info_length);
+    vts_tmapt->tmap[i].map_ent = calloc(1, info_length);
     if(!vts_tmapt->tmap[i].map_ent) {
       ifoFree_VTS_TMAPT(ifofile);
       return 0;
@@ -1587,7 +1587,7 @@ int ifoRead_TITLE_C_ADT(ifo_handle_t *ifofile) {
   if(ifofile->vtsi_mat->vts_c_adt == 0) /* mandatory */
     return 0;
 
-  ifofile->vts_c_adt = malloc(sizeof(c_adt_t));
+  ifofile->vts_c_adt = calloc(1, sizeof(c_adt_t));
   if(!ifofile->vts_c_adt)
     return 0;
 
@@ -1619,7 +1619,7 @@ int ifoRead_C_ADT(ifo_handle_t *ifofile) {
     return 0;
   }
 
-  ifofile->menu_c_adt = malloc(sizeof(c_adt_t));
+  ifofile->menu_c_adt = calloc(1, sizeof(c_adt_t));
   if(!ifofile->menu_c_adt)
     return 0;
 
@@ -1664,7 +1664,7 @@ static int ifoRead_C_ADT_internal(ifo_handle_t *ifofile,
     c_adt->nr_of_vobs = info_length / sizeof(cell_adr_t);
   }
 
-  c_adt->cell_adr_table = malloc(info_length);
+  c_adt->cell_adr_table = calloc(1, info_length);
   if(!c_adt->cell_adr_table)
     return 0;
 
@@ -1724,7 +1724,7 @@ int ifoRead_TITLE_VOBU_ADMAP(ifo_handle_t *ifofile) {
   if(ifofile->vtsi_mat->vts_vobu_admap == 0) /* mandatory */
     return 0;
 
-  ifofile->vts_vobu_admap = malloc(sizeof(vobu_admap_t));
+  ifofile->vts_vobu_admap = calloc(1, sizeof(vobu_admap_t));
   if(!ifofile->vts_vobu_admap)
     return 0;
 
@@ -1756,7 +1756,7 @@ int ifoRead_VOBU_ADMAP(ifo_handle_t *ifofile) {
     return 0;
   }
 
-  ifofile->menu_vobu_admap = malloc(sizeof(vobu_admap_t));
+  ifofile->menu_vobu_admap = calloc(1, sizeof(vobu_admap_t));
   if(!ifofile->menu_vobu_admap)
     return 0;
 
@@ -1789,7 +1789,7 @@ static int ifoRead_VOBU_ADMAP_internal(ifo_handle_t *ifofile,
      Titles with a VOBS that has no VOBUs. */
   CHECK_VALUE(info_length % sizeof(uint32_t) == 0);
 
-  vobu_admap->vobu_start_sectors = malloc(info_length);
+  vobu_admap->vobu_start_sectors = calloc(1, info_length);
   if(!vobu_admap->vobu_start_sectors) {
     return 0;
   }
@@ -1888,7 +1888,7 @@ static int ifoRead_PGCIT_internal(ifo_handle_t *ifofile, pgcit_t *pgcit,
   CHECK_VALUE(pgcit->nr_of_pgci_srp < 10000); /* ?? seen max of 1338 */
 
   info_length = pgcit->nr_of_pgci_srp * PGCI_SRP_SIZE;
-  data = malloc(info_length);
+  data = calloc(1, info_length);
   if(!data)
     return 0;
 
@@ -1897,7 +1897,7 @@ static int ifoRead_PGCIT_internal(ifo_handle_t *ifofile, pgcit_t *pgcit,
     return 0;
   }
 
-  pgcit->pgci_srp = malloc(pgcit->nr_of_pgci_srp * sizeof(pgci_srp_t));
+  pgcit->pgci_srp = calloc(pgcit->nr_of_pgci_srp, sizeof(pgci_srp_t));
   if(!pgcit->pgci_srp) {
     free(data);
     return 0;
@@ -2004,7 +2004,7 @@ int ifoRead_PGCI_UT(ifo_handle_t *ifofile) {
     return 0;
   }
 
-  ifofile->pgci_ut = malloc(sizeof(pgci_ut_t));
+  ifofile->pgci_ut = calloc(1, sizeof(pgci_ut_t));
   if(!ifofile->pgci_ut)
     return 0;
 
@@ -2031,7 +2031,7 @@ int ifoRead_PGCI_UT(ifo_handle_t *ifofile) {
   CHECK_VALUE((uint32_t)pgci_ut->nr_of_lus * PGCI_LU_SIZE < pgci_ut->last_byte);
 
   info_length = pgci_ut->nr_of_lus * PGCI_LU_SIZE;
-  data = malloc(info_length);
+  data = calloc(1, info_length);
   if(!data) {
     free(pgci_ut);
     ifofile->pgci_ut = NULL;
@@ -2044,7 +2044,7 @@ int ifoRead_PGCI_UT(ifo_handle_t *ifofile) {
     return 0;
   }
 
-  pgci_ut->lu = malloc(pgci_ut->nr_of_lus * sizeof(pgci_lu_t));
+  pgci_ut->lu = calloc(pgci_ut->nr_of_lus, sizeof(pgci_lu_t));
   if(!pgci_ut->lu) {
     free(data);
     free(pgci_ut);
@@ -2080,7 +2080,7 @@ int ifoRead_PGCI_UT(ifo_handle_t *ifofile) {
       pgci_ut->lu[i].pgcit->ref_count++;
       continue;
     }
-    pgci_ut->lu[i].pgcit = malloc(sizeof(pgcit_t));
+    pgci_ut->lu[i].pgcit = calloc(1, sizeof(pgcit_t));
     if(!pgci_ut->lu[i].pgcit) {
       unsigned int j;
       for(j = 0; j < i; j++) {
@@ -2199,7 +2199,7 @@ int ifoRead_VTS_ATRT(ifo_handle_t *ifofile) {
   if(!DVDFileSeek_(ifofile->file, sector * DVD_BLOCK_LEN))
     return 0;
 
-  vts_atrt = malloc(sizeof(vts_atrt_t));
+  vts_atrt = calloc(1, sizeof(vts_atrt_t));
   if(!vts_atrt)
     return 0;
 
@@ -2221,7 +2221,7 @@ int ifoRead_VTS_ATRT(ifo_handle_t *ifofile) {
               VTS_ATRT_SIZE < vts_atrt->last_byte + 1);
 
   info_length = vts_atrt->nr_of_vtss * sizeof(uint32_t);
-  data = malloc(info_length);
+  data = calloc(1, info_length);
   if(!data) {
     free(vts_atrt);
     ifofile->vts_atrt = NULL;
@@ -2243,7 +2243,7 @@ int ifoRead_VTS_ATRT(ifo_handle_t *ifofile) {
   }
 
   info_length = vts_atrt->nr_of_vtss * sizeof(vts_attributes_t);
-  vts_atrt->vts = malloc(info_length);
+  vts_atrt->vts = calloc(1, info_length);
   if(!vts_atrt->vts) {
     free(data);
     free(vts_atrt);
@@ -2299,7 +2299,7 @@ int ifoRead_TXTDT_MGI(ifo_handle_t *ifofile) {
                    ifofile->vmgi_mat->txtdt_mgi * DVD_BLOCK_LEN))
     return 0;
 
-  txtdt_mgi = malloc(sizeof(txtdt_mgi_t));
+  txtdt_mgi = calloc(1, sizeof(txtdt_mgi_t));
   if(!txtdt_mgi) {
     return 0;
   }

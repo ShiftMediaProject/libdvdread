@@ -1445,13 +1445,14 @@ int DVDISOVolumeInfo( dvd_reader_t *dvd,
   }
 
   buffer_base = malloc( DVD_VIDEO_LB_LEN + 2048 );
-  buffer = (unsigned char *)(((uintptr_t)buffer_base & ~((uintptr_t)2047)) + 2048);
 
   if( buffer_base == NULL ) {
     fprintf( stderr, "libdvdread: DVDISOVolumeInfo, failed to "
              "allocate memory for file read!\n" );
     return -1;
   }
+
+  buffer = (unsigned char *)(((uintptr_t)buffer_base & ~((uintptr_t)2047)) + 2048);
 
   ret = InternalUDFReadBlocksRaw( dvd, 16, 1, buffer, 0 );
   if( ret != 1 ) {

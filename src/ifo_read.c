@@ -611,7 +611,7 @@ static int ifoRead_VTS(ifo_handle_t *ifofile) {
   vtsi_mat_t *vtsi_mat;
   int i;
 
-  vtsi_mat = malloc(sizeof(vtsi_mat_t));
+  vtsi_mat = calloc(1, sizeof(vtsi_mat_t));
   if(!vtsi_mat)
     return 0;
 

@@ -303,7 +303,7 @@ int dvdinput_setup(void)
 #elif defined(WIN32)
   #define CSS_LIB "libdvdcss-2.dll"
 #elif defined(__OS2__)
-  #define CSS_LIB "dvdcss.dll"
+  #define CSS_LIB "dvdcss2.dll"
 #else
   #define CSS_LIB "libdvdcss.so.2"
 #endif

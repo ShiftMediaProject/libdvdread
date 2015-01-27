@@ -1,3 +1,6 @@
+libdvdread (5.0.2)
+ * Add DVDOpenStream to open a dvd from a set of callbacks
+
 libdvdread (5.0.1)
  * support DragonFly BSD bswap
  * new md5 implementation, under LGPL

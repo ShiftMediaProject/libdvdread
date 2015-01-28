@@ -163,7 +163,8 @@ static int css_close(dvd_input_t dev)
  * initialize and open a DVD device or file.
  */
 static dvd_input_t file_open(const char *target,
-                             void *stream, dvd_reader_stream_cb *stream_cb)
+                             void *stream UNUSED,
+                             dvd_reader_stream_cb *stream_cb UNUSED)
 {
   dvd_input_t dev;
 

@@ -101,10 +101,11 @@ static dvd_input_t css_open(const char *target,
   else if(stream && stream_cb) {
 #ifdef HAVE_DVDCSS_DVDCSS_H
       dev->dvdcss = DVDcss_open_stream(stream, (dvdcss_stream_cb *)stream_cb);
-#endif
+#else
       dev->dvdcss = DVDcss_open_stream ?
                     DVDcss_open_stream(stream, (dvdcss_stream_cb *)stream_cb) :
                     NULL;
+#endif
   }
   if(dev->dvdcss == 0) {
     fprintf(stderr, "libdvdread: Could not open %s with libdvdcss.\n", target);

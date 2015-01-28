@@ -98,8 +98,12 @@ static dvd_input_t css_open(const char *target,
   /* Really open it with libdvdcss */
   if(target)
       dev->dvdcss = DVDcss_open(target);
-  else if(stream && stream_cb)
+  else if(stream && stream_cb) {
+#ifndef HAVE_DVDCSS_DVDCSS_H
+    if (DVDcss_open_stream)
+#endif
       dev->dvdcss = DVDcss_open_stream(stream, (dvdcss_stream_cb *)stream_cb);
+  }
   if(dev->dvdcss == 0) {
     fprintf(stderr, "libdvdread: Could not open %s with libdvdcss.\n", target);
     free(dev);
@@ -331,7 +335,7 @@ int dvdinput_setup(void)
               "http://www.videolan.org/\n" );
       dlclose(dvdcss_library);
       dvdcss_library = NULL;
-    } else if(!DVDcss_open_stream ||!DVDcss_open || !DVDcss_close || !DVDcss_seek
+    } else if(!DVDcss_open || !DVDcss_close || !DVDcss_seek
               || !DVDcss_read || !DVDcss_error) {
       fprintf(stderr,  "libdvdread: Missing symbols in %s, "
               "this shouldn't happen !\n", CSS_LIB);

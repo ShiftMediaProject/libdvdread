@@ -1,24 +1,64 @@
 EXPORTS
+    dvdread_getbits_init
+    dvdread_getbits
+
     DVDOpen
+    DVDOpenStream
     DVDClose
+    DVDFileStat
     DVDOpenFile
     DVDCloseFile
     DVDReadBlocks
+    DVDFileSeek
+    DVDReadBytes
+    DVDFileSize
+    DVDDiscID
+    DVDUDFVolumeInfo
+    DVDFileSeekForce
+    DVDISOVolumeInfo
+    DVDUDFCacheLevel
 
-    navRead_DSI
-    navRead_PCI
+    UDFFindFile
+    UDFGetVolumeIdentifier
+    UDFGetVolumeSetIdentifier
 
-    ifoClose
-    ifoRead_VOBU_ADMAP
-    ifoRead_VTS_ATRT
-    ifoRead_PTL_MAIT
-    ifoRead_PGCI_UT
-    ifoRead_TT_SRPT
-    ifoRead_FP_PGC
-    ifoOpenVMGI
-    ifoRead_TITLE_VOBU_ADMAP
-    ifoRead_PGCIT
-    ifoRead_VTS_PTT_SRPT
-    ifoOpenVTSI
-    ifoRead_VTS_TMAPT
+    ifo_print
+    dvdread_print_time
+
     ifoOpen
+    ifoOpenVMGI
+    ifoOpenVTSI
+    ifoClose
+    ifoRead_PTL_MAIT
+    ifoRead_VTS_ATRT
+    ifoRead_TT_SRPT
+    ifoRead_VTS_PTT_SRPT
+    ifoRead_FP_PGC
+    ifoRead_PGCIT
+    ifoRead_PGCI_UT
+    ifoRead_VTS_TMAPT
+    ifoRead_C_ADT
+    ifoRead_TITLE_C_ADT
+    ifoRead_VOBU_ADMAP
+    ifoRead_TITLE_VOBU_ADMAP
+    ifoRead_TXTDT_MGI
+    ifoFree_PTL_MAIT
+    ifoFree_VTS_ATRT
+    ifoFree_TT_SRPT
+    ifoFree_VTS_PTT_SRPT
+    ifoFree_FP_PGC
+    ifoFree_PGCIT
+    ifoFree_PGCI_UT
+    ifoFree_VTS_TMAPT
+    ifoFree_C_ADT
+    ifoFree_TITLE_C_ADT
+    ifoFree_VOBU_ADMAP
+    ifoFree_TITLE_VOBU_ADMAP
+    ifoFree_TXTDT_MGI
+
+    navPrint_PCI
+    navPrint_DSI
+
+    navRead_PCI
+    navRead_DSI
+

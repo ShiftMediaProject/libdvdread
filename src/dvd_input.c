@@ -30,7 +30,7 @@
 
 
 /* The function pointers that is the exported interface of this file. */
-dvd_input_t (*dvdinput_open)  (const char *);
+dvd_input_t (*dvdinput_open)  (const char *, void *, dvd_reader_stream_cb *);
 int         (*dvdinput_close) (dvd_input_t);
 int         (*dvdinput_seek)  (dvd_input_t, int);
 int         (*dvdinput_title) (dvd_input_t, int);
@@ -40,6 +40,8 @@ char *      (*dvdinput_error) (dvd_input_t);
 #ifdef HAVE_DVDCSS_DVDCSS_H
 /* linking to libdvdcss */
 # include <dvdcss/dvdcss.h>
+# define DVDcss_open_stream(a, b) \
+    dvdcss_open_stream((void*)(a), (dvdcss_stream_cb*)(b))
 # define DVDcss_open(a) dvdcss_open((char*)(a))
 # define DVDcss_close   dvdcss_close
 # define DVDcss_seek    dvdcss_seek
@@ -58,6 +60,8 @@ char *      (*dvdinput_error) (dvd_input_t);
 #endif
 
 typedef struct dvdcss_s *dvdcss_t;
+typedef struct dvdcss_stream_cb dvdcss_stream_cb;
+static dvdcss_t (*DVDcss_open_stream) (void *, dvdcss_stream_cb *);
 static dvdcss_t (*DVDcss_open)  (const char *);
 static int      (*DVDcss_close) (dvdcss_t);
 static int      (*DVDcss_seek)  (dvdcss_t, int, int);
@@ -77,9 +81,10 @@ struct dvd_input_s {
 
 
 /**
- * initialize and open a DVD device or file.
+ * initialize and open a DVD (device or file or stream_cb)
  */
-static dvd_input_t css_open(const char *target)
+static dvd_input_t css_open(const char *target,
+                            void *stream, dvd_reader_stream_cb *stream_cb)
 {
   dvd_input_t dev;
 
@@ -91,7 +96,17 @@ static dvd_input_t css_open(const char *target)
   }
 
   /* Really open it with libdvdcss */
-  dev->dvdcss = DVDcss_open(target);
+  if(target)
+      dev->dvdcss = DVDcss_open(target);
+  else if(stream && stream_cb) {
+#ifdef HAVE_DVDCSS_DVDCSS_H
+      dev->dvdcss = DVDcss_open_stream(stream, (dvdcss_stream_cb *)stream_cb);
+#else
+      dev->dvdcss = DVDcss_open_stream ?
+                    DVDcss_open_stream(stream, (dvdcss_stream_cb *)stream_cb) :
+                    NULL;
+#endif
+  }
   if(dev->dvdcss == 0) {
     fprintf(stderr, "libdvdread: Could not open %s with libdvdcss.\n", target);
     free(dev);
@@ -154,10 +169,14 @@ static int css_close(dvd_input_t dev)
 /**
  * initialize and open a DVD device or file.
  */
-static dvd_input_t file_open(const char *target)
+static dvd_input_t file_open(const char *target,
+                             void *stream UNUSED,
+                             dvd_reader_stream_cb *stream_cb UNUSED)
 {
   dvd_input_t dev;
 
+  if(target == NULL)
+    return NULL;
   /* Allocate the library structure */
   dev = malloc(sizeof(*dev));
   if(dev == NULL) {
@@ -287,7 +306,7 @@ int dvdinput_setup(void)
 #elif defined(WIN32)
   #define CSS_LIB "libdvdcss-2.dll"
 #elif defined(__OS2__)
-  #define CSS_LIB "dvdcss.dll"
+  #define CSS_LIB "dvdcss2.dll"
 #else
   #define CSS_LIB "libdvdcss.so.2"
 #endif
@@ -299,6 +318,8 @@ int dvdinput_setup(void)
 #else
 #define U_S
 #endif
+    DVDcss_open_stream = (dvdcss_t (*)(void *, dvdcss_stream_cb *))
+      dlsym(dvdcss_library, U_S "dvdcss_open_stream");
     DVDcss_open = (dvdcss_t (*)(const char*))
       dlsym(dvdcss_library, U_S "dvdcss_open");
     DVDcss_close = (int (*)(dvdcss_t))
@@ -317,7 +338,7 @@ int dvdinput_setup(void)
               "http://www.videolan.org/\n" );
       dlclose(dvdcss_library);
       dvdcss_library = NULL;
-    } else if(!DVDcss_open  || !DVDcss_close || !DVDcss_seek
+    } else if(!DVDcss_open || !DVDcss_close || !DVDcss_seek
               || !DVDcss_read || !DVDcss_error) {
       fprintf(stderr,  "libdvdread: Missing symbols in %s, "
               "this shouldn't happen !\n", CSS_LIB);

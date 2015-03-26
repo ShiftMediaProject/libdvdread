@@ -118,6 +118,10 @@ struct dvd_file_s {
 
   /* Calculated at open-time, size in blocks. */
   ssize_t filesize;
+
+  /* Cache of the dvd_file. If not NULL, the cache corresponds to the whole
+   * dvd_file. Used only for IFO and BUP. */
+  unsigned char *cache;
 };
 
 int InternalUDFReadBlocksRaw( const dvd_reader_t *device, uint32_t lb_number,
@@ -647,7 +651,8 @@ void DVDClose( dvd_reader_t *dvd )
 /**
  * Open an unencrypted file on a DVD image file.
  */
-static dvd_file_t *DVDOpenFileUDF( dvd_reader_t *dvd, char *filename )
+static dvd_file_t *DVDOpenFileUDF( dvd_reader_t *dvd, char *filename,
+                                   int do_cache )
 {
   uint32_t start, len;
   dvd_file_t *dvd_file;
@@ -669,6 +674,25 @@ static dvd_file_t *DVDOpenFileUDF( dvd_reader_t *dvd, char *filename )
   memset( dvd_file->title_sizes, 0, sizeof( dvd_file->title_sizes ) );
   memset( dvd_file->title_devs, 0, sizeof( dvd_file->title_devs ) );
   dvd_file->filesize = len / DVD_VIDEO_LB_LEN;
+  dvd_file->cache = NULL;
+
+  /* Read the whole file in cache (unencrypted) if asked and if it doesn't
+   * exceed 128KB */
+  if( do_cache && len < 64 * DVD_VIDEO_LB_LEN ) {
+    int ret;
+
+    dvd_file->cache = malloc( len );
+    if( !dvd_file->cache )
+        return dvd_file;
+
+    ret = InternalUDFReadBlocksRaw( dvd, dvd_file->lb_start,
+                                    dvd_file->filesize, dvd_file->cache,
+                                    DVDINPUT_NOFLAGS );
+    if( ret != dvd_file->filesize ) {
+        free( dvd_file->cache );
+        dvd_file->cache = NULL;
+    }
+  }
 
   return dvd_file;
 }
@@ -766,6 +790,7 @@ static dvd_file_t *DVDOpenFilePath( dvd_reader_t *dvd, char *filename )
   memset( dvd_file->title_sizes, 0, sizeof( dvd_file->title_sizes ) );
   memset( dvd_file->title_devs, 0, sizeof( dvd_file->title_devs ) );
   dvd_file->filesize = 0;
+  dvd_file->cache = NULL;
 
   if( stat( full_path, &fileinfo ) < 0 ) {
     fprintf( stderr, "libdvdread: Can't stat() %s.\n", filename );
@@ -803,6 +828,7 @@ static dvd_file_t *DVDOpenVOBUDF( dvd_reader_t *dvd, int title, int menu )
   memset( dvd_file->title_sizes, 0, sizeof( dvd_file->title_sizes ) );
   memset( dvd_file->title_devs, 0, sizeof( dvd_file->title_devs ) );
   dvd_file->filesize = len / DVD_VIDEO_LB_LEN;
+  dvd_file->cache = NULL;
 
   /* Calculate the complete file size for every file in the VOBS */
   if( !menu ) {
@@ -845,6 +871,7 @@ static dvd_file_t *DVDOpenVOBPath( dvd_reader_t *dvd, int title, int menu )
   memset( dvd_file->title_sizes, 0, sizeof( dvd_file->title_sizes ) );
   memset( dvd_file->title_devs, 0, sizeof( dvd_file->title_devs ) );
   dvd_file->filesize = 0;
+  dvd_file->cache = NULL;
 
   if( menu ) {
     dvd_input_t dev;
@@ -909,6 +936,7 @@ dvd_file_t *DVDOpenFile( dvd_reader_t *dvd, int titlenum,
                          dvd_read_domain_t domain )
 {
   char filename[ MAX_UDF_FILE_NAME_LEN ];
+  int do_cache = 0;
 
   /* Check arguments. */
   if( dvd == NULL || titlenum < 0 )
@@ -921,6 +949,7 @@ dvd_file_t *DVDOpenFile( dvd_reader_t *dvd, int titlenum,
     } else {
       sprintf( filename, "/VIDEO_TS/VTS_%02i_0.IFO", titlenum );
     }
+    do_cache = 1;
     break;
   case DVD_READ_INFO_BACKUP_FILE:
     if( titlenum == 0 ) {
@@ -928,6 +957,7 @@ dvd_file_t *DVDOpenFile( dvd_reader_t *dvd, int titlenum,
     } else {
       sprintf( filename, "/VIDEO_TS/VTS_%02i_0.BUP", titlenum );
     }
+    do_cache = 1;
     break;
   case DVD_READ_MENU_VOBS:
     if( dvd->isImageFile ) {
@@ -950,7 +980,7 @@ dvd_file_t *DVDOpenFile( dvd_reader_t *dvd, int titlenum,
   }
 
   if( dvd->isImageFile ) {
-    return DVDOpenFileUDF( dvd, filename );
+    return DVDOpenFileUDF( dvd, filename, do_cache );
   } else {
     return DVDOpenFilePath( dvd, filename );
   }
@@ -969,6 +999,7 @@ void DVDCloseFile( dvd_file_t *dvd_file )
       }
     }
 
+    free( dvd_file->cache );
     free( dvd_file );
     dvd_file = NULL;
   }
@@ -1182,8 +1213,25 @@ static int DVDReadBlocksUDF( const dvd_file_t *dvd_file, uint32_t offset,
                              size_t block_count, unsigned char *data,
                              int encrypted )
 {
-  return InternalUDFReadBlocksRaw( dvd_file->dvd, dvd_file->lb_start + offset,
-                           block_count, data, encrypted );
+  /* If the cache is present and we don't need to decrypt, use the cache to
+   * feed the data */
+  if( dvd_file->cache && (encrypted & DVDINPUT_READ_DECRYPT) == 0 ) {
+    /* Check if we don't exceed the cache (or file) size */
+    if( block_count + offset > (size_t) dvd_file->filesize )
+      return 0;
+
+    /* Copy the cache at a specified offset into data. offset and block_count
+     * must be converted into bytes */
+    memcpy( data, dvd_file->cache + (off_t)offset * (off_t)DVD_VIDEO_LB_LEN,
+            (off_t)block_count * (off_t)DVD_VIDEO_LB_LEN );
+
+    /* return the amount of blocks copied */
+    return block_count;
+  } else {
+    /* use dvdinput access */
+    return InternalUDFReadBlocksRaw( dvd_file->dvd, dvd_file->lb_start + offset,
+                             block_count, data, encrypted );
+  }
 }
 
 /* This is using possibly several inputs and starting from an offset of '0'.

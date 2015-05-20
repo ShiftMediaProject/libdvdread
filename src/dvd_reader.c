@@ -374,7 +374,7 @@ static dvd_reader_t *DVDOpenCommon( const char *ppath,
   if( ppath == NULL )
     goto DVDOpen_error;
 
-      path = strdup(ppath);
+  path = strdup(ppath);
   if( path == NULL )
     goto DVDOpen_error;
 
@@ -398,9 +398,9 @@ static dvd_reader_t *DVDOpenCommon( const char *ppath,
 
     /* maybe "host:port" url? try opening it with acCeSS library */
     if( strchr(path,':') ) {
-                    ret_val = DVDOpenImageFile( path, NULL, NULL, have_css );
-                    free(path);
-            return ret_val;
+      ret_val = DVDOpenImageFile( path, NULL, NULL, have_css );
+      free(path);
+      return ret_val;
     }
 
     /* If we can't stat the file, give up */

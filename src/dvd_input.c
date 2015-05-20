@@ -53,11 +53,11 @@ char *      (*dvdinput_error) (dvd_input_t);
 # if defined(HAVE_DLFCN_H) && !defined(USING_BUILTIN_DLFCN)
 #  include <dlfcn.h>
 # else
-# if defined(WIN32)
+#   if defined(WIN32)
 /* Only needed on MINGW at the moment */
-#  include "../msvc/contrib/dlfcn.c"
+#    include "../msvc/contrib/dlfcn.c"
+#   endif
 # endif
-#endif
 
 typedef struct dvdcss_s *dvdcss_t;
 typedef struct dvdcss_stream_cb dvdcss_stream_cb;

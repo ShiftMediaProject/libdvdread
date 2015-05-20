@@ -498,8 +498,9 @@ static dvd_reader_t *DVDOpenCommon( const char *ppath,
     }
 
     if(path_copy[0] == '\0') {
-      path_copy[0] = '/';
-      path_copy[1] = '\0';
+      free( path_copy );
+      if( !(path_copy = strdup( "/" ) ) )
+        goto DVDOpen_error;
     }
 
 #if defined(__APPLE__)

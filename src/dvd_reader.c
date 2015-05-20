@@ -249,18 +249,15 @@ static dvd_reader_t *DVDOpenImageFile( const char *location,
     return NULL;
   }
 
-  dvd = malloc( sizeof( dvd_reader_t ) );
+  dvd = calloc( 1, sizeof( dvd_reader_t ) );
   if( !dvd ) {
     dvdinput_close(dev);
     return NULL;
   }
-  memset( dvd, 0, sizeof( dvd_reader_t ) );
   dvd->isImageFile = 1;
   dvd->dev = dev;
-  dvd->path_root = NULL;
 
   dvd->udfcache_level = DEFAULT_UDF_CACHE_LEVEL;
-  dvd->udfcache = NULL;
 
   if( have_css ) {
     /* Only if DVDCSS_METHOD = title, a bit if it's disc or if
@@ -269,7 +266,6 @@ static dvd_reader_t *DVDOpenImageFile( const char *location,
 
     dvd->css_state = 1; /* Need key init. */
   }
-  dvd->css_title = 0;
 
   return dvd;
 }
@@ -278,20 +274,14 @@ static dvd_reader_t *DVDOpenPath( const char *path_root )
 {
   dvd_reader_t *dvd;
 
-  dvd = malloc( sizeof( dvd_reader_t ) );
+  dvd = calloc( 1, sizeof( dvd_reader_t ) );
   if( !dvd ) return NULL;
-  dvd->isImageFile = 0;
-  dvd->dev = 0;
   dvd->path_root = strdup( path_root );
   if(!dvd->path_root) {
     free(dvd);
     return NULL;
   }
   dvd->udfcache_level = DEFAULT_UDF_CACHE_LEVEL;
-  dvd->udfcache = NULL;
-
-  dvd->css_state = 0; /* Only used in the UDF path */
-  dvd->css_title = 0; /* Only matters in the UDF path */
 
   return dvd;
 }
@@ -664,18 +654,14 @@ static dvd_file_t *DVDOpenFileUDF( dvd_reader_t *dvd, char *filename,
     return NULL;
   }
 
-  dvd_file = malloc( sizeof( dvd_file_t ) );
+  dvd_file = calloc( 1, sizeof( dvd_file_t ) );
   if( !dvd_file ) {
     fprintf( stderr, "libdvdread:DVDOpenFileUDF:malloc failed\n" );
     return NULL;
   }
   dvd_file->dvd = dvd;
   dvd_file->lb_start = start;
-  dvd_file->seek_pos = 0;
-  memset( dvd_file->title_sizes, 0, sizeof( dvd_file->title_sizes ) );
-  memset( dvd_file->title_devs, 0, sizeof( dvd_file->title_devs ) );
   dvd_file->filesize = len / DVD_VIDEO_LB_LEN;
-  dvd_file->cache = NULL;
 
   /* Read the whole file in cache (unencrypted) if asked and if it doesn't
    * exceed 128KB */
@@ -779,19 +765,13 @@ static dvd_file_t *DVDOpenFilePath( dvd_reader_t *dvd, char *filename )
     return NULL;
   }
 
-  dvd_file = malloc( sizeof( dvd_file_t ) );
+  dvd_file = calloc( 1, sizeof( dvd_file_t ) );
   if( !dvd_file ) {
     fprintf( stderr, "libdvdread:DVDOpenFilePath:dvd_file malloc failed\n" );
     dvdinput_close(dev);
     return NULL;
   }
   dvd_file->dvd = dvd;
-  dvd_file->lb_start = 0;
-  dvd_file->seek_pos = 0;
-  memset( dvd_file->title_sizes, 0, sizeof( dvd_file->title_sizes ) );
-  memset( dvd_file->title_devs, 0, sizeof( dvd_file->title_devs ) );
-  dvd_file->filesize = 0;
-  dvd_file->cache = NULL;
 
   if( stat( full_path, &fileinfo ) < 0 ) {
     fprintf( stderr, "libdvdread: Can't stat() %s.\n", filename );
@@ -820,16 +800,12 @@ static dvd_file_t *DVDOpenVOBUDF( dvd_reader_t *dvd, int title, int menu )
   start = UDFFindFile( dvd, filename, &len );
   if( start == 0 ) return NULL;
 
-  dvd_file = malloc( sizeof( dvd_file_t ) );
+  dvd_file = calloc( 1, sizeof( dvd_file_t ) );
   if( !dvd_file ) return NULL;
   dvd_file->dvd = dvd;
   /*Hack*/ dvd_file->css_title = title << 1 | menu;
   dvd_file->lb_start = start;
-  dvd_file->seek_pos = 0;
-  memset( dvd_file->title_sizes, 0, sizeof( dvd_file->title_sizes ) );
-  memset( dvd_file->title_devs, 0, sizeof( dvd_file->title_devs ) );
   dvd_file->filesize = len / DVD_VIDEO_LB_LEN;
-  dvd_file->cache = NULL;
 
   /* Calculate the complete file size for every file in the VOBS */
   if( !menu ) {
@@ -863,16 +839,10 @@ static dvd_file_t *DVDOpenVOBPath( dvd_reader_t *dvd, int title, int menu )
   struct stat fileinfo;
   dvd_file_t *dvd_file;
 
-  dvd_file = malloc( sizeof( dvd_file_t ) );
+  dvd_file = calloc( 1, sizeof( dvd_file_t ) );
   if( !dvd_file ) return NULL;
   dvd_file->dvd = dvd;
   /*Hack*/ dvd_file->css_title = title << 1 | menu;
-  dvd_file->lb_start = 0;
-  dvd_file->seek_pos = 0;
-  memset( dvd_file->title_sizes, 0, sizeof( dvd_file->title_sizes ) );
-  memset( dvd_file->title_devs, 0, sizeof( dvd_file->title_devs ) );
-  dvd_file->filesize = 0;
-  dvd_file->cache = NULL;
 
   if( menu ) {
     dvd_input_t dev;

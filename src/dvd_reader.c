@@ -484,16 +484,16 @@ static dvd_reader_t *DVDOpenCommon( const char *ppath,
     }
 
 #if defined(_WIN32) || defined(__OS2__)
-    if(strlen(path_copy) > TITLES_MAX) {
-      if(!strcasecmp(&(path_copy[strlen( path_copy ) - TITLES_MAX]),
+    if( strlen( path_copy ) > 9 ) {
+      if( !strcasecmp( &(path_copy[ strlen( path_copy ) - 9 ]),
                        "\\video_ts"))
-        path_copy[strlen(path_copy) - (TITLES_MAX-1)] = '\0';
+        path_copy[ strlen( path_copy ) - (9-1) ] = '\0';
     }
 #endif
-    if( strlen( path_copy ) > TITLES_MAX ) {
-      if( !strcasecmp( &(path_copy[ strlen( path_copy ) - TITLES_MAX ]),
+    if( strlen( path_copy ) > 9 ) {
+      if( !strcasecmp( &(path_copy[ strlen( path_copy ) - 9 ]),
                        "/video_ts" ) ) {
-        path_copy[ strlen( path_copy ) - TITLES_MAX ] = '\0';
+        path_copy[ strlen( path_copy ) - 9 ] = '\0';
       }
     }
 

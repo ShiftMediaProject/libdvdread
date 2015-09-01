@@ -1,3 +1,7 @@
+libdvdread (5.0.4)
+ * fix write after free in ifoFree functions
+ * fix possible buffer overflow in open
+
 libdvdread (5.0.3)
  * Cache IFO and BUP files (only for ImageFiles) in order to reduce the number
    of read/seek access

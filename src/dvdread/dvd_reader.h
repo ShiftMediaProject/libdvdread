@@ -43,7 +43,7 @@
 /**
  * The current version.
  */
-#define DVDREAD_VERSION 50300
+#define DVDREAD_VERSION 50400
 
 /**
  * The length of one Logical Block of a DVD.

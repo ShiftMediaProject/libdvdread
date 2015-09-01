@@ -1,4 +1,4 @@
-AC_INIT(libdvdread, 5.0.3)
+AC_INIT(libdvdread, 5.0.4)
 AC_CONFIG_SRCDIR([src/dvd_reader.c])
 
 AC_PREREQ(2.53)

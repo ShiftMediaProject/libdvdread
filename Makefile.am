@@ -1,6 +1,6 @@
 ACLOCAL_AMFLAGS = -Im4
 
-AM_CPPFLAGS = -I$(top_srcdir)/src $(CSS_CFLAGS)
+AM_CPPFLAGS = -I$(top_srcdir)/src -I$(top_builddir)/src/dvdread $(CSS_CFLAGS)
 
 dist_doc_DATA = AUTHORS ChangeLog COPYING NEWS README TODO
 
@@ -46,7 +46,8 @@ pkginclude_HEADERS = \
 	src/dvdread/ifo_types.h \
 	src/dvdread/nav_print.h \
 	src/dvdread/nav_read.h \
-	src/dvdread/nav_types.h
+	src/dvdread/nav_types.h \
+	src/dvdread/version.h
 
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = misc/dvdread.pc

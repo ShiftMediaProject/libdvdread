@@ -1354,7 +1354,7 @@ ssize_t DVDReadBytes( dvd_file_t *dvd_file, void *data, size_t byte_size )
   int ret;
 
   /* Check arguments. */
-  if( dvd_file == NULL || data == NULL )
+  if( dvd_file == NULL || data == NULL || (ssize_t)byte_size < 0 )
     return -1;
 
   seek_sector = dvd_file->seek_pos / DVD_VIDEO_LB_LEN;

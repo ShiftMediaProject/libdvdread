@@ -173,7 +173,7 @@ static int initAllCSSKeys( dvd_reader_t *dvd )
   uint32_t start, len;
   int title;
 
-  char *nokeys_str = getenv("DVDREAD_NOKEYS");
+  const char *nokeys_str = getenv("DVDREAD_NOKEYS");
   if(nokeys_str != NULL)
     return 0;
 
@@ -642,7 +642,7 @@ void DVDClose( dvd_reader_t *dvd )
 /**
  * Open an unencrypted file on a DVD image file.
  */
-static dvd_file_t *DVDOpenFileUDF( dvd_reader_t *dvd, char *filename,
+static dvd_file_t *DVDOpenFileUDF( dvd_reader_t *dvd, const char *filename,
                                    int do_cache )
 {
   uint32_t start, len;
@@ -746,7 +746,7 @@ static int findDVDFile( dvd_reader_t *dvd, const char *file, char *filename )
 /**
  * Open an unencrypted file from a DVD directory tree.
  */
-static dvd_file_t *DVDOpenFilePath( dvd_reader_t *dvd, char *filename )
+static dvd_file_t *DVDOpenFilePath( dvd_reader_t *dvd, const char *filename )
 {
   char full_path[ PATH_MAX + 1 ];
   dvd_file_t *dvd_file;

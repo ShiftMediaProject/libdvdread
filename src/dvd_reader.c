@@ -793,7 +793,7 @@ static dvd_file_t *DVDOpenVOBUDF( dvd_reader_t *dvd, int title, int menu )
   dvd_file_t *dvd_file;
 
   if( title == 0 ) {
-    sprintf( filename, "/VIDEO_TS/VIDEO_TS.VOB" );
+    strcpy( filename, "/VIDEO_TS/VIDEO_TS.VOB" );
   } else {
     sprintf( filename, "/VIDEO_TS/VTS_%02d_%d.VOB", title, menu ? 0 : 1 );
   }
@@ -848,7 +848,7 @@ static dvd_file_t *DVDOpenVOBPath( dvd_reader_t *dvd, int title, int menu )
     dvd_input_t dev;
 
     if( title == 0 ) {
-      sprintf( filename, "VIDEO_TS.VOB" );
+      strcpy( filename, "VIDEO_TS.VOB" );
     } else {
       sprintf( filename, "VTS_%02i_0.VOB", title );
     }
@@ -916,7 +916,7 @@ dvd_file_t *DVDOpenFile( dvd_reader_t *dvd, int titlenum,
   switch( domain ) {
   case DVD_READ_INFO_FILE:
     if( titlenum == 0 ) {
-      sprintf( filename, "/VIDEO_TS/VIDEO_TS.IFO" );
+      strcpy( filename, "/VIDEO_TS/VIDEO_TS.IFO" );
     } else {
       sprintf( filename, "/VIDEO_TS/VTS_%02i_0.IFO", titlenum );
     }
@@ -924,7 +924,7 @@ dvd_file_t *DVDOpenFile( dvd_reader_t *dvd, int titlenum,
     break;
   case DVD_READ_INFO_BACKUP_FILE:
     if( titlenum == 0 ) {
-      sprintf( filename, "/VIDEO_TS/VIDEO_TS.BUP" );
+      strcpy( filename, "/VIDEO_TS/VIDEO_TS.BUP" );
     } else {
       sprintf( filename, "/VIDEO_TS/VTS_%02i_0.BUP", titlenum );
     }
@@ -987,7 +987,7 @@ static int DVDFileStatVOBUDF( dvd_reader_t *dvd, int title,
   int n;
 
   if( title == 0 )
-    sprintf( filename, "/VIDEO_TS/VIDEO_TS.VOB" );
+    strcpy( filename, "/VIDEO_TS/VIDEO_TS.VOB" );
   else
     sprintf( filename, "/VIDEO_TS/VTS_%02d_%d.VOB", title, menu ? 0 : 1 );
 
@@ -1033,7 +1033,7 @@ static int DVDFileStatVOBPath( dvd_reader_t *dvd, int title,
   int n;
 
   if( title == 0 )
-    sprintf( filename, "VIDEO_TS.VOB" );
+    strcpy( filename, "VIDEO_TS.VOB" );
   else
     sprintf( filename, "VTS_%02d_%d.VOB", title, menu ? 0 : 1 );
 
@@ -1092,14 +1092,14 @@ int DVDFileStat( dvd_reader_t *dvd, int titlenum,
   switch( domain ) {
   case DVD_READ_INFO_FILE:
     if( titlenum == 0 )
-      sprintf( filename, "/VIDEO_TS/VIDEO_TS.IFO" );
+      strcpy( filename, "/VIDEO_TS/VIDEO_TS.IFO" );
     else
       sprintf( filename, "/VIDEO_TS/VTS_%02i_0.IFO", titlenum );
 
     break;
   case DVD_READ_INFO_BACKUP_FILE:
     if( titlenum == 0 )
-      sprintf( filename, "/VIDEO_TS/VIDEO_TS.BUP" );
+      strcpy( filename, "/VIDEO_TS/VIDEO_TS.BUP" );
     else
       sprintf( filename, "/VIDEO_TS/VTS_%02i_0.BUP", titlenum );
 

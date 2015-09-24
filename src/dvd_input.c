@@ -107,7 +107,7 @@ static dvd_input_t css_open(const char *target,
                     NULL;
 #endif
   }
-  if(dev->dvdcss == 0) {
+  if(dev->dvdcss == NULL) {
     fprintf(stderr, "libdvdread: Could not open %s with libdvdcss.\n", target);
     free(dev);
     return NULL;

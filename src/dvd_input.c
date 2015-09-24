@@ -158,12 +158,9 @@ static int css_close(dvd_input_t dev)
 
   ret = DVDcss_close(dev->dvdcss);
 
-  if(ret < 0)
-    return ret;
-
   free(dev);
 
-  return 0;
+  return ret;
 }
 
 /**
@@ -278,12 +275,9 @@ static int file_close(dvd_input_t dev)
 
   ret = close(dev->fd);
 
-  if(ret < 0)
-    return ret;
-
   free(dev);
 
-  return 0;
+  return ret;
 }
 
 

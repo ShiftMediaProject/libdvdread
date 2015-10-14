@@ -35,7 +35,6 @@ int         (*dvdinput_close) (dvd_input_t);
 int         (*dvdinput_seek)  (dvd_input_t, int);
 int         (*dvdinput_title) (dvd_input_t, int);
 int         (*dvdinput_read)  (dvd_input_t, void *, int, int);
-char *      (*dvdinput_error) (dvd_input_t);
 
 #ifdef HAVE_DVDCSS_DVDCSS_H
 /* linking to libdvdcss */
@@ -46,7 +45,6 @@ char *      (*dvdinput_error) (dvd_input_t);
 # define DVDcss_close   dvdcss_close
 # define DVDcss_seek    dvdcss_seek
 # define DVDcss_read    dvdcss_read
-# define DVDcss_error   dvdcss_error
 #else
 
 /* dlopening libdvdcss */
@@ -66,7 +64,6 @@ static dvdcss_t (*DVDcss_open)  (const char *);
 static int      (*DVDcss_close) (dvdcss_t);
 static int      (*DVDcss_seek)  (dvdcss_t, int, int);
 static int      (*DVDcss_read)  (dvdcss_t, void *, int, int);
-static char *   (*DVDcss_error) (dvdcss_t);
 #define DVDCSS_SEEK_KEY (1 << 1)
 #endif
 
@@ -114,14 +111,6 @@ static dvd_input_t css_open(const char *target,
   }
 
   return dev;
-}
-
-/**
- * return the last error message
- */
-static char *css_error(dvd_input_t dev)
-{
-  return DVDcss_error(dev->dvdcss);
 }
 
 /**
@@ -194,15 +183,6 @@ static dvd_input_t file_open(const char *target,
   }
 
   return dev;
-}
-
-/**
- * return the last error message
- */
-static char *file_error(dvd_input_t dev UNUSED)
-{
-  /* use strerror(errno)? */
-  return (char *)"unknown error";
 }
 
 /**
@@ -322,8 +302,6 @@ int dvdinput_setup(void)
       dlsym(dvdcss_library, U_S "dvdcss_seek");
     DVDcss_read = (int (*)(dvdcss_t, void*, int, int))
       dlsym(dvdcss_library, U_S "dvdcss_read");
-    DVDcss_error = (char* (*)(dvdcss_t))
-      dlsym(dvdcss_library, U_S "dvdcss_error");
 
     if(dlsym(dvdcss_library, U_S "dvdcss_crack")) {
       fprintf(stderr,
@@ -333,7 +311,7 @@ int dvdinput_setup(void)
       dlclose(dvdcss_library);
       dvdcss_library = NULL;
     } else if(!DVDcss_open || !DVDcss_close || !DVDcss_seek
-              || !DVDcss_read || !DVDcss_error) {
+              || !DVDcss_read) {
       fprintf(stderr,  "libdvdread: Missing symbols in %s, "
               "this shouldn't happen !\n", CSS_LIB);
       dlclose(dvdcss_library);
@@ -356,7 +334,6 @@ int dvdinput_setup(void)
     dvdinput_seek  = css_seek;
     dvdinput_title = css_title;
     dvdinput_read  = css_read;
-    dvdinput_error = css_error;
     return 1;
 
   } else {
@@ -368,7 +345,6 @@ int dvdinput_setup(void)
     dvdinput_seek  = file_seek;
     dvdinput_title = file_title;
     dvdinput_read  = file_read;
-    dvdinput_error = file_error;
     return 0;
   }
 }

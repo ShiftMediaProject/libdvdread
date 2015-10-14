@@ -124,10 +124,6 @@ struct dvd_file_s {
   unsigned char *cache;
 };
 
-int InternalUDFReadBlocksRaw( const dvd_reader_t *device, uint32_t lb_number,
-                      size_t block_count, unsigned char *data,
-                      int encrypted );
-
 /**
  * Set the level of caching on udf
  * level = 0 (no caching)

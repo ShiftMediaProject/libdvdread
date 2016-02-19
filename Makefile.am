@@ -34,7 +34,7 @@ libdvdread_la_SOURCES = \
 libdvdread_la_LIBADD = $(CSS_LIBS)
 
 libdvdread_la_LDFLAGS = -version-info $(DVDREAD_LTVERSION) \
-	-export-symbols-regex "(^dvd.*|^nav.*|^ifo.*|^DVD.*|^UDF.*)"
+	-export-symbols-regex "(^dvdread.*|^nav.*|^ifo.*|^DVD.*|^UDF.*)"
 
 pkgincludedir = $(includedir)/dvdread
 pkginclude_HEADERS = \

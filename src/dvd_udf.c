@@ -516,6 +516,7 @@ static int UDFMapICB( dvd_reader_t *device, struct AD ICB, uint8_t *FileType,
   uint32_t lbnum;
   uint16_t TagID;
   struct icbmap tmpmap;
+  int ret;
 
   lbnum = partition->Start + ICB.Location;
   tmpmap.lbn = lbnum;
@@ -526,10 +527,16 @@ static int UDFMapICB( dvd_reader_t *device, struct AD ICB, uint8_t *FileType,
   }
 
   do {
-    if( DVDReadLBUDF( device, lbnum++, 1, LogBlock, 0 ) <= 0 )
+    ret = DVDReadLBUDF( device, lbnum++, 1, LogBlock, 0 );
+    if( ret < 0 ) {
+      return ret;
+    }
+    else if( ret == 0 ) {
       TagID = 0;
-    else
+    }
+    else {
       UDFDescriptor( LogBlock, &TagID );
+    }
 
     if( TagID == FileEntry ) {
       UDFFileEntry( LogBlock, FileType, partition, File );
@@ -564,6 +571,7 @@ static int UDFScanDir( dvd_reader_t *device, struct AD Dir, char *FileName,
   uint8_t *cached_dir_base = NULL, *cached_dir;
   uint32_t dir_lba;
   struct AD tmpICB;
+  int ret;
 
   /* Scan dir for ICB of file */
   lbnum = partition->Start + Dir.Location;
@@ -579,10 +587,13 @@ static int UDFScanDir( dvd_reader_t *device, struct AD Dir, char *FileName,
       if((cached_dir_base = malloc(dir_lba * DVD_VIDEO_LB_LEN + 2048)) == NULL)
         return 0;
       cached_dir = (uint8_t *)(((uintptr_t)cached_dir_base & ~((uintptr_t)2047)) + 2048);
-      if( DVDReadLBUDF( device, lbnum, dir_lba, cached_dir, 0) <= 0 ) {
+      ret = DVDReadLBUDF( device, lbnum, dir_lba, cached_dir, 0);
+      if( ret <= 0 ) {
         free(cached_dir_base);
         cached_dir_base = NULL;
         cached_dir = NULL;
+        if( ret < 0 )
+            return ret;
       }
       /*
       if(cached_dir) {
@@ -677,6 +688,7 @@ static int UDFGetAVDP( dvd_reader_t *device,
   uint32_t lastsector;
   int terminate;
   struct avdp_t;
+  int ret;
 
   if(GetUDFCache(device, AVDPCache, 0, avdp))
     return 1;
@@ -687,10 +699,15 @@ static int UDFGetAVDP( dvd_reader_t *device,
   terminate = 0;
 
   for(;;) {
-    if( DVDReadLBUDF( device, lbnum, 1, Anchor, 0 ) > 0 ) {
-      UDFDescriptor( Anchor, &TagID );
-    } else {
+    ret = DVDReadLBUDF( device, lbnum, 1, Anchor, 0 );
+    if( ret < 0 ) {
+      return ret;
+    }
+    else if( ret == 0 ) {
       TagID = 0;
+    }
+    else {
+      UDFDescriptor( Anchor, &TagID );
     }
     if (TagID != AnchorVolumeDescriptorPointer) {
       /* Not an anchor */
@@ -742,7 +759,7 @@ static int UDFFindPartition( dvd_reader_t *device, int partnum,
   uint8_t *LogBlock = (uint8_t *)(((uintptr_t)LogBlock_base & ~((uintptr_t)2047)) + 2048);
   uint32_t lbnum, MVDS_location, MVDS_length;
   uint16_t TagID;
-  int i, volvalid;
+  int i, volvalid, ret;
   struct avdp_t avdp;
 
   if(!UDFGetAVDP(device, &avdp))
@@ -761,10 +778,16 @@ static int UDFFindPartition( dvd_reader_t *device, int partnum,
     lbnum = MVDS_location;
     do {
 
-      if( DVDReadLBUDF( device, lbnum++, 1, LogBlock, 0 ) <= 0 )
+      ret = DVDReadLBUDF( device, lbnum++, 1, LogBlock, 0 );
+      if( ret < 0 ) {
+        return ret;
+      }
+      else if( ret == 0 ) {
         TagID = 0;
-      else
+      }
+      else {
         UDFDescriptor( LogBlock, &TagID );
+      }
 
       if( ( TagID == PartitionDescriptor ) && ( !part->valid ) ) {
         /* Partition Descriptor */
@@ -805,6 +828,7 @@ uint32_t UDFFindFile( dvd_reader_t *device, const char *filename,
   struct AD RootICB, File, ICB;
   char tokenline[ MAX_UDF_FILE_NAME_LEN ];
   uint8_t filetype;
+  int ret;
 
   *filesize = 0;
   tokenline[0] = '\0';
@@ -820,10 +844,16 @@ uint32_t UDFFindFile( dvd_reader_t *device, const char *filename,
     /* Find root dir ICB */
     lbnum = partition.Start;
     do {
-      if( DVDReadLBUDF( device, lbnum++, 1, LogBlock, 0 ) <= 0 )
+      ret = DVDReadLBUDF( device, lbnum++, 1, LogBlock, 0 );
+      if( ret < 0 ) {
+        return ret;
+      }
+      else if( ret == 0 ) {
         TagID = 0;
-      else
+      }
+      else {
         UDFDescriptor( LogBlock, &TagID );
+      }
 
       /* File Set Descriptor */
       if( TagID == FileSetDescriptor )  /* File Set Descriptor */
@@ -886,7 +916,7 @@ static int UDFGetDescriptor( dvd_reader_t *device, int id,
   uint32_t lbnum, MVDS_location, MVDS_length;
   struct avdp_t avdp;
   uint16_t TagID;
-  int i, desc_found = 0;
+  int i, desc_found = 0, ret;
   /* Find Anchor */
   lbnum = 256;   /* Try #1, prime anchor */
   if(bufsize < DVD_VIDEO_LB_LEN)
@@ -904,10 +934,16 @@ static int UDFGetDescriptor( dvd_reader_t *device, int id,
     /* Find  Descriptor */
     lbnum = MVDS_location;
     do {
-      if( DVDReadLBUDF( device, lbnum++, 1, descriptor, 0 ) <= 0 )
+      ret = DVDReadLBUDF( device, lbnum++, 1, descriptor, 0 );
+      if( ret < 0 ) {
+        return ret;
+      }
+      else if( ret == 0 ) {
         TagID = 0;
-      else
+      }
+      else {
         UDFDescriptor( descriptor, &TagID );
+      }
       if( (TagID == id) && ( !desc_found ) )
         /* Descriptor */
         desc_found = 1;

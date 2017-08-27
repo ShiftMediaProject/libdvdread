@@ -362,9 +362,9 @@
       <AdditionalLibraryDirectories>$(OutDir)\lib\x86\;$(ProjectDir)\..\..\prebuilt\lib\x86\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
     <PostBuildEvent>
-      <Command>mkdir $(OutDir)\include
-mkdir $(OutDir)\include\dvdread
-copy ..\src\dvdread\*.h $(OutDir)\include\dvdread
+      <Command>mkdir "$(OutDir)"\include
+mkdir "$(OutDir)"\include\dvdread
+copy ..\src\dvdread\*.h "$(OutDir)"\include\dvdread
 mkdir $(OutDir)\licenses
 copy ..\COPYING $(OutDir)\licenses\libdvdread.txt</Command>
     </PostBuildEvent>
@@ -372,8 +372,8 @@ copy ..\COPYING $(OutDir)\licenses\libdvdread.txt</Command>
       <Command>if exist ..\config.h (
 del ..\config.h
 )
-if exist $(OutDir)\include\dvdread (
-rd /s /q $(OutDir)\include\dvdread
+if exist "$(OutDir)"\include\dvdread (
+rd /s /q "$(OutDir)"\include\dvdread
 cd ../
 cd $(ProjectDir)
 )</Command>
@@ -383,8 +383,8 @@ cd $(ProjectDir)
     </CustomBuildStep>
     <CustomBuildStep>
       <Outputs>force_clean</Outputs>
-      <Command>if exist $(OutDir)\include\dvdread (
-rmdir /s /q $(OutDir)\include\dvdread
+      <Command>if exist "$(OutDir)"\include\dvdread (
+rmdir /s /q "$(OutDir)"\include\dvdread
 )
 if exist $(OutDir)\licenses\libdvdread.txt (
 del /f /q $(OutDir)\licenses\libdvdread.txt
@@ -414,9 +414,9 @@ del /f /q $(OutDir)\licenses\libdvdread.txt
       <AdditionalLibraryDirectories>$(OutDir)\lib\x64\;$(ProjectDir)\..\..\prebuilt\lib\x64\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
     <PostBuildEvent>
-      <Command>mkdir $(OutDir)\include
-mkdir $(OutDir)\include\dvdread
-copy ..\src\dvdread\*.h $(OutDir)\include\dvdread
+      <Command>mkdir "$(OutDir)"\include
+mkdir "$(OutDir)"\include\dvdread
+copy ..\src\dvdread\*.h "$(OutDir)"\include\dvdread
 mkdir $(OutDir)\licenses
 copy ..\COPYING $(OutDir)\licenses\libdvdread.txt</Command>
     </PostBuildEvent>
@@ -424,8 +424,8 @@ copy ..\COPYING $(OutDir)\licenses\libdvdread.txt</Command>
       <Command>if exist ..\config.h (
 del ..\config.h
 )
-if exist $(OutDir)\include\dvdread (
-rd /s /q $(OutDir)\include\dvdread
+if exist "$(OutDir)"\include\dvdread (
+rd /s /q "$(OutDir)"\include\dvdread
 cd ../
 cd $(ProjectDir)
 )</Command>
@@ -435,8 +435,8 @@ cd $(ProjectDir)
     </CustomBuildStep>
     <CustomBuildStep>
       <Outputs>force_clean</Outputs>
-      <Command>if exist $(OutDir)\include\dvdread (
-rmdir /s /q $(OutDir)\include\dvdread
+      <Command>if exist "$(OutDir)"\include\dvdread (
+rmdir /s /q "$(OutDir)"\include\dvdread
 )
 if exist $(OutDir)\licenses\libdvdread.txt (
 del /f /q $(OutDir)\licenses\libdvdread.txt
@@ -470,9 +470,9 @@ del /f /q $(OutDir)\licenses\libdvdread.txt
       <MinimumRequiredVersion>5.1</MinimumRequiredVersion>
     </Link>
     <PostBuildEvent>
-      <Command>mkdir $(OutDir)\include
-mkdir $(OutDir)\include\dvdread
-copy ..\src\dvdread\*.h $(OutDir)\include\dvdread
+      <Command>mkdir "$(OutDir)"\include
+mkdir "$(OutDir)"\include\dvdread
+copy ..\src\dvdread\*.h "$(OutDir)"\include\dvdread
 mkdir $(OutDir)\licenses
 copy ..\COPYING $(OutDir)\licenses\libdvdread.txt</Command>
     </PostBuildEvent>
@@ -480,8 +480,8 @@ copy ..\COPYING $(OutDir)\licenses\libdvdread.txt</Command>
       <Command>if exist ..\config.h (
 del ..\config.h
 )
-if exist $(OutDir)\include\dvdread (
-rd /s /q $(OutDir)\include\dvdread
+if exist "$(OutDir)"\include\dvdread (
+rd /s /q "$(OutDir)"\include\dvdread
 cd ../
 cd $(ProjectDir)
 )</Command>
@@ -491,8 +491,8 @@ cd $(ProjectDir)
     </CustomBuildStep>
     <CustomBuildStep>
       <Outputs>force_clean</Outputs>
-      <Command>if exist $(OutDir)\include\dvdread (
-rmdir /s /q $(OutDir)\include\dvdread
+      <Command>if exist "$(OutDir)"\include\dvdread (
+rmdir /s /q "$(OutDir)"\include\dvdread
 )
 if exist $(OutDir)\licenses\libdvdread.txt (
 del /f /q $(OutDir)\licenses\libdvdread.txt
@@ -526,9 +526,9 @@ del /f /q $(OutDir)\licenses\libdvdread.txt
       <MinimumRequiredVersion>5.1</MinimumRequiredVersion>
     </Link>
     <PostBuildEvent>
-      <Command>mkdir $(OutDir)\include
-mkdir $(OutDir)\include\dvdread
-copy ..\src\dvdread\*.h $(OutDir)\include\dvdread
+      <Command>mkdir "$(OutDir)"\include
+mkdir "$(OutDir)"\include\dvdread
+copy ..\src\dvdread\*.h "$(OutDir)"\include\dvdread
 mkdir $(OutDir)\licenses
 copy ..\COPYING $(OutDir)\licenses\libdvdread.txt</Command>
     </PostBuildEvent>
@@ -536,8 +536,8 @@ copy ..\COPYING $(OutDir)\licenses\libdvdread.txt</Command>
       <Command>if exist ..\config.h (
 del ..\config.h
 )
-if exist $(OutDir)\include\dvdread (
-rd /s /q $(OutDir)\include\dvdread
+if exist "$(OutDir)"\include\dvdread (
+rd /s /q "$(OutDir)"\include\dvdread
 cd ../
 cd $(ProjectDir)
 )</Command>
@@ -547,8 +547,8 @@ cd $(ProjectDir)
     </CustomBuildStep>
     <CustomBuildStep>
       <Outputs>force_clean</Outputs>
-      <Command>if exist $(OutDir)\include\dvdread (
-rmdir /s /q $(OutDir)\include\dvdread
+      <Command>if exist "$(OutDir)"\include\dvdread (
+rmdir /s /q "$(OutDir)"\include\dvdread
 )
 if exist $(OutDir)\licenses\libdvdread.txt (
 del /f /q $(OutDir)\licenses\libdvdread.txt
@@ -580,9 +580,9 @@ del /f /q $(OutDir)\licenses\libdvdread.txt
       <MinimumRequiredVersion>6.0</MinimumRequiredVersion>
     </Link>
     <PostBuildEvent>
-      <Command>mkdir $(OutDir)\include
-mkdir $(OutDir)\include\dvdread
-copy ..\src\dvdread\*.h $(OutDir)\include\dvdread
+      <Command>mkdir "$(OutDir)"\include
+mkdir "$(OutDir)"\include\dvdread
+copy ..\src\dvdread\*.h "$(OutDir)"\include\dvdread
 mkdir $(OutDir)\licenses
 copy ..\COPYING $(OutDir)\licenses\libdvdread.txt</Command>
     </PostBuildEvent>
@@ -590,8 +590,8 @@ copy ..\COPYING $(OutDir)\licenses\libdvdread.txt</Command>
       <Command>if exist ..\config.h (
 del ..\config.h
 )
-if exist $(OutDir)\include\dvdread (
-rd /s /q $(OutDir)\include\dvdread
+if exist "$(OutDir)"\include\dvdread (
+rd /s /q "$(OutDir)"\include\dvdread
 cd ../
 cd $(ProjectDir)
 )</Command>
@@ -601,8 +601,8 @@ cd $(ProjectDir)
     </CustomBuildStep>
     <CustomBuildStep>
       <Outputs>force_clean</Outputs>
-      <Command>if exist $(OutDir)\include\dvdread (
-rmdir /s /q $(OutDir)\include\dvdread
+      <Command>if exist "$(OutDir)"\include\dvdread (
+rmdir /s /q "$(OutDir)"\include\dvdread
 )
 if exist $(OutDir)\licenses\libdvdread.txt (
 del /f /q $(OutDir)\licenses\libdvdread.txt
@@ -634,9 +634,9 @@ del /f /q $(OutDir)\licenses\libdvdread.txt
       <MinimumRequiredVersion>6.0</MinimumRequiredVersion>
     </Link>
     <PostBuildEvent>
-      <Command>mkdir $(OutDir)\include
-mkdir $(OutDir)\include\dvdread
-copy ..\src\dvdread\*.h $(OutDir)\include\dvdread
+      <Command>mkdir "$(OutDir)"\include
+mkdir "$(OutDir)"\include\dvdread
+copy ..\src\dvdread\*.h "$(OutDir)"\include\dvdread
 mkdir $(OutDir)\licenses
 copy ..\COPYING $(OutDir)\licenses\libdvdread.txt</Command>
     </PostBuildEvent>
@@ -644,8 +644,8 @@ copy ..\COPYING $(OutDir)\licenses\libdvdread.txt</Command>
       <Command>if exist ..\config.h (
 del ..\config.h
 )
-if exist $(OutDir)\include\dvdread (
-rd /s /q $(OutDir)\include\dvdread
+if exist "$(OutDir)"\include\dvdread (
+rd /s /q "$(OutDir)"\include\dvdread
 cd ../
 cd $(ProjectDir)
 )</Command>
@@ -655,8 +655,8 @@ cd $(ProjectDir)
     </CustomBuildStep>
     <CustomBuildStep>
       <Outputs>force_clean</Outputs>
-      <Command>if exist $(OutDir)\include\dvdread (
-rmdir /s /q $(OutDir)\include\dvdread
+      <Command>if exist "$(OutDir)"\include\dvdread (
+rmdir /s /q "$(OutDir)"\include\dvdread
 )
 if exist $(OutDir)\licenses\libdvdread.txt (
 del /f /q $(OutDir)\licenses\libdvdread.txt
@@ -695,9 +695,9 @@ del /f /q $(OutDir)\licenses\libdvdread.txt
       <AdditionalLibraryDirectories>$(OutDir)\lib\x86\;$(ProjectDir)\..\..\prebuilt\lib\x86\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
     <PostBuildEvent>
-      <Command>mkdir $(OutDir)\include
-mkdir $(OutDir)\include\dvdread
-copy ..\src\dvdread\*.h $(OutDir)\include\dvdread
+      <Command>mkdir "$(OutDir)"\include
+mkdir "$(OutDir)"\include\dvdread
+copy ..\src\dvdread\*.h "$(OutDir)"\include\dvdread
 mkdir $(OutDir)\licenses
 copy ..\COPYING $(OutDir)\licenses\libdvdread.txt</Command>
     </PostBuildEvent>
@@ -705,8 +705,8 @@ copy ..\COPYING $(OutDir)\licenses\libdvdread.txt</Command>
       <Command>if exist ..\config.h (
 del ..\config.h
 )
-if exist $(OutDir)\include\dvdread (
-rd /s /q $(OutDir)\include\dvdread
+if exist "$(OutDir)"\include\dvdread (
+rd /s /q "$(OutDir)"\include\dvdread
 cd ../
 cd $(ProjectDir)
 )</Command>
@@ -716,8 +716,8 @@ cd $(ProjectDir)
     </CustomBuildStep>
     <CustomBuildStep>
       <Outputs>force_clean</Outputs>
-      <Command>if exist $(OutDir)\include\dvdread (
-rmdir /s /q $(OutDir)\include\dvdread
+      <Command>if exist "$(OutDir)"\include\dvdread (
+rmdir /s /q "$(OutDir)"\include\dvdread
 )
 if exist $(OutDir)\licenses\libdvdread.txt (
 del /f /q $(OutDir)\licenses\libdvdread.txt
@@ -756,9 +756,9 @@ del /f /q $(OutDir)\licenses\libdvdread.txt
       <AdditionalLibraryDirectories>$(OutDir)\lib\x86\;$(ProjectDir)\..\..\prebuilt\lib\x86\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
     <PostBuildEvent>
-      <Command>mkdir $(OutDir)\include
-mkdir $(OutDir)\include\dvdread
-copy ..\src\dvdread\*.h $(OutDir)\include\dvdread
+      <Command>mkdir "$(OutDir)"\include
+mkdir "$(OutDir)"\include\dvdread
+copy ..\src\dvdread\*.h "$(OutDir)"\include\dvdread
 mkdir $(OutDir)\licenses
 copy ..\COPYING $(OutDir)\licenses\libdvdread.txt</Command>
     </PostBuildEvent>
@@ -766,8 +766,8 @@ copy ..\COPYING $(OutDir)\licenses\libdvdread.txt</Command>
       <Command>if exist ..\config.h (
 del ..\config.h
 )
-if exist $(OutDir)\include\dvdread (
-rd /s /q $(OutDir)\include\dvdread
+if exist "$(OutDir)"\include\dvdread (
+rd /s /q "$(OutDir)"\include\dvdread
 cd ../
 cd $(ProjectDir)
 )</Command>
@@ -777,8 +777,8 @@ cd $(ProjectDir)
     </CustomBuildStep>
     <CustomBuildStep>
       <Outputs>force_clean</Outputs>
-      <Command>if exist $(OutDir)\include\dvdread (
-rmdir /s /q $(OutDir)\include\dvdread
+      <Command>if exist "$(OutDir)"\include\dvdread (
+rmdir /s /q "$(OutDir)"\include\dvdread
 )
 if exist $(OutDir)\licenses\libdvdread.txt (
 del /f /q $(OutDir)\licenses\libdvdread.txt
@@ -817,9 +817,9 @@ del /f /q $(OutDir)\licenses\libdvdread.txt
       <AdditionalLibraryDirectories>$(OutDir)\lib\x64\;$(ProjectDir)\..\..\prebuilt\lib\x64\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
     <PostBuildEvent>
-      <Command>mkdir $(OutDir)\include
-mkdir $(OutDir)\include\dvdread
-copy ..\src\dvdread\*.h $(OutDir)\include\dvdread
+      <Command>mkdir "$(OutDir)"\include
+mkdir "$(OutDir)"\include\dvdread
+copy ..\src\dvdread\*.h "$(OutDir)"\include\dvdread
 mkdir $(OutDir)\licenses
 copy ..\COPYING $(OutDir)\licenses\libdvdread.txt</Command>
     </PostBuildEvent>
@@ -827,8 +827,8 @@ copy ..\COPYING $(OutDir)\licenses\libdvdread.txt</Command>
       <Command>if exist ..\config.h (
 del ..\config.h
 )
-if exist $(OutDir)\include\dvdread (
-rd /s /q $(OutDir)\include\dvdread
+if exist "$(OutDir)"\include\dvdread (
+rd /s /q "$(OutDir)"\include\dvdread
 cd ../
 cd $(ProjectDir)
 )</Command>
@@ -838,8 +838,8 @@ cd $(ProjectDir)
     </CustomBuildStep>
     <CustomBuildStep>
       <Outputs>force_clean</Outputs>
-      <Command>if exist $(OutDir)\include\dvdread (
-rmdir /s /q $(OutDir)\include\dvdread
+      <Command>if exist "$(OutDir)"\include\dvdread (
+rmdir /s /q "$(OutDir)"\include\dvdread
 )
 if exist $(OutDir)\licenses\libdvdread.txt (
 del /f /q $(OutDir)\licenses\libdvdread.txt
@@ -878,9 +878,9 @@ del /f /q $(OutDir)\licenses\libdvdread.txt
       <AdditionalLibraryDirectories>$(OutDir)\lib\x64\;$(ProjectDir)\..\..\prebuilt\lib\x64\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
     <PostBuildEvent>
-      <Command>mkdir $(OutDir)\include
-mkdir $(OutDir)\include\dvdread
-copy ..\src\dvdread\*.h $(OutDir)\include\dvdread
+      <Command>mkdir "$(OutDir)"\include
+mkdir "$(OutDir)"\include\dvdread
+copy ..\src\dvdread\*.h "$(OutDir)"\include\dvdread
 mkdir $(OutDir)\licenses
 copy ..\COPYING $(OutDir)\licenses\libdvdread.txt</Command>
     </PostBuildEvent>
@@ -888,8 +888,8 @@ copy ..\COPYING $(OutDir)\licenses\libdvdread.txt</Command>
       <Command>if exist ..\config.h (
 del ..\config.h
 )
-if exist $(OutDir)\include\dvdread (
-rd /s /q $(OutDir)\include\dvdread
+if exist "$(OutDir)"\include\dvdread (
+rd /s /q "$(OutDir)"\include\dvdread
 cd ../
 cd $(ProjectDir)
 )</Command>
@@ -899,8 +899,8 @@ cd $(ProjectDir)
     </CustomBuildStep>
     <CustomBuildStep>
       <Outputs>force_clean</Outputs>
-      <Command>if exist $(OutDir)\include\dvdread (
-rmdir /s /q $(OutDir)\include\dvdread
+      <Command>if exist "$(OutDir)"\include\dvdread (
+rmdir /s /q "$(OutDir)"\include\dvdread
 )
 if exist $(OutDir)\licenses\libdvdread.txt (
 del /f /q $(OutDir)\licenses\libdvdread.txt
@@ -941,9 +941,9 @@ del /f /q $(OutDir)\licenses\libdvdread.txt
       <MinimumRequiredVersion>5.1</MinimumRequiredVersion>
     </Link>
     <PostBuildEvent>
-      <Command>mkdir $(OutDir)\include
-mkdir $(OutDir)\include\dvdread
-copy ..\src\dvdread\*.h $(OutDir)\include\dvdread
+      <Command>mkdir "$(OutDir)"\include
+mkdir "$(OutDir)"\include\dvdread
+copy ..\src\dvdread\*.h "$(OutDir)"\include\dvdread
 mkdir $(OutDir)\licenses
 copy ..\COPYING $(OutDir)\licenses\libdvdread.txt</Command>
     </PostBuildEvent>
@@ -951,8 +951,8 @@ copy ..\COPYING $(OutDir)\licenses\libdvdread.txt</Command>
       <Command>if exist ..\config.h (
 del ..\config.h
 )
-if exist $(OutDir)\include\dvdread (
-rd /s /q $(OutDir)\include\dvdread
+if exist "$(OutDir)"\include\dvdread (
+rd /s /q "$(OutDir)"\include\dvdread
 cd ../
 cd $(ProjectDir)
 )</Command>
@@ -962,8 +962,8 @@ cd $(ProjectDir)
     </CustomBuildStep>
     <CustomBuildStep>
       <Outputs>force_clean</Outputs>
-      <Command>if exist $(OutDir)\include\dvdread (
-rmdir /s /q $(OutDir)\include\dvdread
+      <Command>if exist "$(OutDir)"\include\dvdread (
+rmdir /s /q "$(OutDir)"\include\dvdread
 )
 if exist $(OutDir)\licenses\libdvdread.txt (
 del /f /q $(OutDir)\licenses\libdvdread.txt
@@ -1004,9 +1004,9 @@ del /f /q $(OutDir)\licenses\libdvdread.txt
       <MinimumRequiredVersion>5.1</MinimumRequiredVersion>
     </Link>
     <PostBuildEvent>
-      <Command>mkdir $(OutDir)\include
-mkdir $(OutDir)\include\dvdread
-copy ..\src\dvdread\*.h $(OutDir)\include\dvdread
+      <Command>mkdir "$(OutDir)"\include
+mkdir "$(OutDir)"\include\dvdread
+copy ..\src\dvdread\*.h "$(OutDir)"\include\dvdread
 mkdir $(OutDir)\licenses
 copy ..\COPYING $(OutDir)\licenses\libdvdread.txt</Command>
     </PostBuildEvent>
@@ -1014,8 +1014,8 @@ copy ..\COPYING $(OutDir)\licenses\libdvdread.txt</Command>
       <Command>if exist ..\config.h (
 del ..\config.h
 )
-if exist $(OutDir)\include\dvdread (
-rd /s /q $(OutDir)\include\dvdread
+if exist "$(OutDir)"\include\dvdread (
+rd /s /q "$(OutDir)"\include\dvdread
 cd ../
 cd $(ProjectDir)
 )</Command>
@@ -1025,8 +1025,8 @@ cd $(ProjectDir)
     </CustomBuildStep>
     <CustomBuildStep>
       <Outputs>force_clean</Outputs>
-      <Command>if exist $(OutDir)\include\dvdread (
-rmdir /s /q $(OutDir)\include\dvdread
+      <Command>if exist "$(OutDir)"\include\dvdread (
+rmdir /s /q "$(OutDir)"\include\dvdread
 )
 if exist $(OutDir)\licenses\libdvdread.txt (
 del /f /q $(OutDir)\licenses\libdvdread.txt
@@ -1066,9 +1066,9 @@ del /f /q $(OutDir)\licenses\libdvdread.txt
       <MinimumRequiredVersion>6.0</MinimumRequiredVersion>
     </Link>
     <PostBuildEvent>
-      <Command>mkdir $(OutDir)\include
-mkdir $(OutDir)\include\dvdread
-copy ..\src\dvdread\*.h $(OutDir)\include\dvdread
+      <Command>mkdir "$(OutDir)"\include
+mkdir "$(OutDir)"\include\dvdread
+copy ..\src\dvdread\*.h "$(OutDir)"\include\dvdread
 mkdir $(OutDir)\licenses
 copy ..\COPYING $(OutDir)\licenses\libdvdread.txt</Command>
     </PostBuildEvent>
@@ -1076,8 +1076,8 @@ copy ..\COPYING $(OutDir)\licenses\libdvdread.txt</Command>
       <Command>if exist ..\config.h (
 del ..\config.h
 )
-if exist $(OutDir)\include\dvdread (
-rd /s /q $(OutDir)\include\dvdread
+if exist "$(OutDir)"\include\dvdread (
+rd /s /q "$(OutDir)"\include\dvdread
 cd ../
 cd $(ProjectDir)
 )</Command>
@@ -1087,8 +1087,8 @@ cd $(ProjectDir)
     </CustomBuildStep>
     <CustomBuildStep>
       <Outputs>force_clean</Outputs>
-      <Command>if exist $(OutDir)\include\dvdread (
-rmdir /s /q $(OutDir)\include\dvdread
+      <Command>if exist "$(OutDir)"\include\dvdread (
+rmdir /s /q "$(OutDir)"\include\dvdread
 )
 if exist $(OutDir)\licenses\libdvdread.txt (
 del /f /q $(OutDir)\licenses\libdvdread.txt
@@ -1128,9 +1128,9 @@ del /f /q $(OutDir)\licenses\libdvdread.txt
       <MinimumRequiredVersion>6.0</MinimumRequiredVersion>
     </Link>
     <PostBuildEvent>
-      <Command>mkdir $(OutDir)\include
-mkdir $(OutDir)\include\dvdread
-copy ..\src\dvdread\*.h $(OutDir)\include\dvdread
+      <Command>mkdir "$(OutDir)"\include
+mkdir "$(OutDir)"\include\dvdread
+copy ..\src\dvdread\*.h "$(OutDir)"\include\dvdread
 mkdir $(OutDir)\licenses
 copy ..\COPYING $(OutDir)\licenses\libdvdread.txt</Command>
     </PostBuildEvent>
@@ -1138,8 +1138,8 @@ copy ..\COPYING $(OutDir)\licenses\libdvdread.txt</Command>
       <Command>if exist ..\config.h (
 del ..\config.h
 )
-if exist $(OutDir)\include\dvdread (
-rd /s /q $(OutDir)\include\dvdread
+if exist "$(OutDir)"\include\dvdread (
+rd /s /q "$(OutDir)"\include\dvdread
 cd ../
 cd $(ProjectDir)
 )</Command>
@@ -1149,8 +1149,8 @@ cd $(ProjectDir)
     </CustomBuildStep>
     <CustomBuildStep>
       <Outputs>force_clean</Outputs>
-      <Command>if exist $(OutDir)\include\dvdread (
-rmdir /s /q $(OutDir)\include\dvdread
+      <Command>if exist "$(OutDir)"\include\dvdread (
+rmdir /s /q "$(OutDir)"\include\dvdread
 )
 if exist $(OutDir)\licenses\libdvdread.txt (
 del /f /q $(OutDir)\licenses\libdvdread.txt

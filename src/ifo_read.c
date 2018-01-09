@@ -1263,13 +1263,7 @@ int ifoRead_VTS_PTT_SRPT(ifo_handle_t *ifofile) {
       CHECK_VALUE(vts_ptt_srpt->title[i].ptt[j].pgcn < 1000); /* ?? */
       CHECK_VALUE(vts_ptt_srpt->title[i].ptt[j].pgn != 0);
       CHECK_VALUE(vts_ptt_srpt->title[i].ptt[j].pgn < 100); /* ?? */
-      if (vts_ptt_srpt->title[i].ptt[j].pgcn == 0 ||
-          vts_ptt_srpt->title[i].ptt[j].pgcn >= 1000 ||
-          vts_ptt_srpt->title[i].ptt[j].pgn == 0 ||
-          vts_ptt_srpt->title[i].ptt[j].pgn >= 100) {
-        return 0;
-      }
-
+      //don't abort here. E-One DVDs contain PTT with pgcn or pgn == 0
     }
   }
 

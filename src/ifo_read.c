@@ -1048,6 +1048,10 @@ int ifoRead_TT_SRPT(ifo_handle_t *ifofile) {
   B2N_16(tt_srpt->nr_of_srpts);
   B2N_32(tt_srpt->last_byte);
 
+  /* E-One releases don't fill this field */
+  if(tt_srpt->last_byte == 0) {
+    tt_srpt->last_byte = tt_srpt->nr_of_srpts * sizeof(title_info_t) - 1 + TT_SRPT_SIZE;
+  }
   info_length = tt_srpt->last_byte + 1 - TT_SRPT_SIZE;
 
   tt_srpt->title = calloc(1, info_length);
@@ -1162,6 +1166,10 @@ int ifoRead_VTS_PTT_SRPT(ifo_handle_t *ifofile) {
   CHECK_VALUE(vts_ptt_srpt->nr_of_srpts != 0);
   CHECK_VALUE(vts_ptt_srpt->nr_of_srpts < 100); /* ?? */
 
+  /* E-One releases don't fill this field */
+  if(vts_ptt_srpt->last_byte == 0) {
+    vts_ptt_srpt->last_byte  = vts_ptt_srpt->nr_of_srpts * sizeof(*data) - 1 + VTS_PTT_SRPT_SIZE;
+  }
   info_length = vts_ptt_srpt->last_byte + 1 - VTS_PTT_SRPT_SIZE;
   data = calloc(1, info_length);
   if(!data)

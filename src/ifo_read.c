@@ -228,7 +228,7 @@ static void read_pgci_srp(pgci_srp_t *ps) {
   ps->entry_id                       = dvdread_getbits(&state, 8);
   ps->block_mode                     = dvdread_getbits(&state, 2);
   ps->block_type                     = dvdread_getbits(&state, 2);
-  ps->unknown1                       = dvdread_getbits(&state, 4);
+  ps->zero_1                         = dvdread_getbits(&state, 4);
   ps->ptl_id_mask                    = dvdread_getbits(&state, 16);
   ps->pgc_start_byte                 = dvdread_getbits(&state, 32);
 }
@@ -245,9 +245,10 @@ static void read_cell_playback(cell_playback_t *cp) {
   cp->interleaved                     = dvdread_getbits(&state, 1);
   cp->stc_discontinuity               = dvdread_getbits(&state, 1);
   cp->seamless_angle                  = dvdread_getbits(&state, 1);
+  cp->zero_1                          = dvdread_getbits(&state, 1);
   cp->playback_mode                   = dvdread_getbits(&state, 1);
   cp->restricted                      = dvdread_getbits(&state, 1);
-  cp->unknown2                        = dvdread_getbits(&state, 6);
+  cp->cell_type                       = dvdread_getbits(&state, 5);
   cp->still_time                      = dvdread_getbits(&state, 8);
   cp->cell_cmd_nr                     = dvdread_getbits(&state, 8);
 
@@ -1903,7 +1904,7 @@ static int ifoRead_PGCIT_internal(ifo_handle_t *ifofile, pgcit_t *pgcit,
     memcpy(&pgcit->pgci_srp[i], ptr, PGCI_SRP_SIZE);
     ptr += PGCI_SRP_SIZE;
     read_pgci_srp(&pgcit->pgci_srp[i]);
-    CHECK_VALUE(pgcit->pgci_srp[i].unknown1 == 0);
+    CHECK_VALUE(pgcit->pgci_srp[i].zero_1 == 0);
   }
   free(data);
 

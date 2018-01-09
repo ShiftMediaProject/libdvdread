@@ -1928,12 +1928,10 @@ static int ifoRead_PGCIT_internal(ifo_handle_t *ifofile, pgcit_t *pgcit,
     pgcit->pgci_srp[i].pgc->ref_count = 1;
     if(!ifoRead_PGC(ifofile, pgcit->pgci_srp[i].pgc,
                     offset + pgcit->pgci_srp[i].pgc_start_byte)) {
-      int j;
-      for(j = 0; j <= i; j++) {
-        ifoFree_PGC(&pgcit->pgci_srp[j].pgc);
-      }
+      fprintf(stderr, "libdvdread: Unable to read invalid PCG\n");
+      //E-One releases provide boggus PGC, ie: out of bound start_byte
       free(pgcit->pgci_srp[i].pgc);
-      goto fail;
+      pgcit->pgci_srp[i].pgc = NULL;
     }
   }
 

@@ -124,10 +124,6 @@ struct dvd_file_s {
   unsigned char *cache;
 };
 
-int InternalUDFReadBlocksRaw( const dvd_reader_t *device, uint32_t lb_number,
-                      size_t block_count, unsigned char *data,
-                      int encrypted );
-
 /**
  * Set the level of caching on udf
  * level = 0 (no caching)
@@ -173,7 +169,7 @@ static int initAllCSSKeys( dvd_reader_t *dvd )
   uint32_t start, len;
   int title;
 
-  char *nokeys_str = getenv("DVDREAD_NOKEYS");
+  const char *nokeys_str = getenv("DVDREAD_NOKEYS");
   if(nokeys_str != NULL)
     return 0;
 
@@ -249,18 +245,15 @@ static dvd_reader_t *DVDOpenImageFile( const char *location,
     return NULL;
   }
 
-  dvd = malloc( sizeof( dvd_reader_t ) );
+  dvd = calloc( 1, sizeof( dvd_reader_t ) );
   if( !dvd ) {
     dvdinput_close(dev);
     return NULL;
   }
-  memset( dvd, 0, sizeof( dvd_reader_t ) );
   dvd->isImageFile = 1;
   dvd->dev = dev;
-  dvd->path_root = NULL;
 
   dvd->udfcache_level = DEFAULT_UDF_CACHE_LEVEL;
-  dvd->udfcache = NULL;
 
   if( have_css ) {
     /* Only if DVDCSS_METHOD = title, a bit if it's disc or if
@@ -269,7 +262,6 @@ static dvd_reader_t *DVDOpenImageFile( const char *location,
 
     dvd->css_state = 1; /* Need key init. */
   }
-  dvd->css_title = 0;
 
   return dvd;
 }
@@ -278,20 +270,14 @@ static dvd_reader_t *DVDOpenPath( const char *path_root )
 {
   dvd_reader_t *dvd;
 
-  dvd = malloc( sizeof( dvd_reader_t ) );
+  dvd = calloc( 1, sizeof( dvd_reader_t ) );
   if( !dvd ) return NULL;
-  dvd->isImageFile = 0;
-  dvd->dev = 0;
   dvd->path_root = strdup( path_root );
   if(!dvd->path_root) {
     free(dvd);
     return NULL;
   }
   dvd->udfcache_level = DEFAULT_UDF_CACHE_LEVEL;
-  dvd->udfcache = NULL;
-
-  dvd->css_state = 0; /* Only used in the UDF path */
-  dvd->css_title = 0; /* Only matters in the UDF path */
 
   return dvd;
 }
@@ -374,7 +360,7 @@ static dvd_reader_t *DVDOpenCommon( const char *ppath,
   if( ppath == NULL )
     goto DVDOpen_error;
 
-      path = strdup(ppath);
+  path = strdup(ppath);
   if( path == NULL )
     goto DVDOpen_error;
 
@@ -398,9 +384,9 @@ static dvd_reader_t *DVDOpenCommon( const char *ppath,
 
     /* maybe "host:port" url? try opening it with acCeSS library */
     if( strchr(path,':') ) {
-                    ret_val = DVDOpenImageFile( path, NULL, NULL, have_css );
-                    free(path);
-            return ret_val;
+      ret_val = DVDOpenImageFile( path, NULL, NULL, have_css );
+      free(path);
+      return ret_val;
     }
 
     /* If we can't stat the file, give up */
@@ -484,22 +470,23 @@ static dvd_reader_t *DVDOpenCommon( const char *ppath,
     }
 
 #if defined(_WIN32) || defined(__OS2__)
-    if(strlen(path_copy) > TITLES_MAX) {
-      if(!strcasecmp(&(path_copy[strlen( path_copy ) - TITLES_MAX]),
+    if( strlen( path_copy ) > 9 ) {
+      if( !strcasecmp( &(path_copy[ strlen( path_copy ) - 9 ]),
                        "\\video_ts"))
-        path_copy[strlen(path_copy) - (TITLES_MAX-1)] = '\0';
+        path_copy[ strlen( path_copy ) - (9-1) ] = '\0';
     }
 #endif
-    if( strlen( path_copy ) > TITLES_MAX ) {
-      if( !strcasecmp( &(path_copy[ strlen( path_copy ) - TITLES_MAX ]),
+    if( strlen( path_copy ) > 9 ) {
+      if( !strcasecmp( &(path_copy[ strlen( path_copy ) - 9 ]),
                        "/video_ts" ) ) {
-        path_copy[ strlen( path_copy ) - TITLES_MAX ] = '\0';
+        path_copy[ strlen( path_copy ) - 9 ] = '\0';
       }
     }
 
     if(path_copy[0] == '\0') {
-      path_copy[0] = '/';
-      path_copy[1] = '\0';
+      free( path_copy );
+      if( !(path_copy = strdup( "/" ) ) )
+        goto DVDOpen_error;
     }
 
 #if defined(__APPLE__)
@@ -651,7 +638,7 @@ void DVDClose( dvd_reader_t *dvd )
 /**
  * Open an unencrypted file on a DVD image file.
  */
-static dvd_file_t *DVDOpenFileUDF( dvd_reader_t *dvd, char *filename,
+static dvd_file_t *DVDOpenFileUDF( dvd_reader_t *dvd, const char *filename,
                                    int do_cache )
 {
   uint32_t start, len;
@@ -663,18 +650,14 @@ static dvd_file_t *DVDOpenFileUDF( dvd_reader_t *dvd, char *filename,
     return NULL;
   }
 
-  dvd_file = malloc( sizeof( dvd_file_t ) );
+  dvd_file = calloc( 1, sizeof( dvd_file_t ) );
   if( !dvd_file ) {
     fprintf( stderr, "libdvdread:DVDOpenFileUDF:malloc failed\n" );
     return NULL;
   }
   dvd_file->dvd = dvd;
   dvd_file->lb_start = start;
-  dvd_file->seek_pos = 0;
-  memset( dvd_file->title_sizes, 0, sizeof( dvd_file->title_sizes ) );
-  memset( dvd_file->title_devs, 0, sizeof( dvd_file->title_devs ) );
   dvd_file->filesize = len / DVD_VIDEO_LB_LEN;
-  dvd_file->cache = NULL;
 
   /* Read the whole file in cache (unencrypted) if asked and if it doesn't
    * exceed 128KB */
@@ -759,7 +742,7 @@ static int findDVDFile( dvd_reader_t *dvd, const char *file, char *filename )
 /**
  * Open an unencrypted file from a DVD directory tree.
  */
-static dvd_file_t *DVDOpenFilePath( dvd_reader_t *dvd, char *filename )
+static dvd_file_t *DVDOpenFilePath( dvd_reader_t *dvd, const char *filename )
 {
   char full_path[ PATH_MAX + 1 ];
   dvd_file_t *dvd_file;
@@ -778,19 +761,13 @@ static dvd_file_t *DVDOpenFilePath( dvd_reader_t *dvd, char *filename )
     return NULL;
   }
 
-  dvd_file = malloc( sizeof( dvd_file_t ) );
+  dvd_file = calloc( 1, sizeof( dvd_file_t ) );
   if( !dvd_file ) {
     fprintf( stderr, "libdvdread:DVDOpenFilePath:dvd_file malloc failed\n" );
     dvdinput_close(dev);
     return NULL;
   }
   dvd_file->dvd = dvd;
-  dvd_file->lb_start = 0;
-  dvd_file->seek_pos = 0;
-  memset( dvd_file->title_sizes, 0, sizeof( dvd_file->title_sizes ) );
-  memset( dvd_file->title_devs, 0, sizeof( dvd_file->title_devs ) );
-  dvd_file->filesize = 0;
-  dvd_file->cache = NULL;
 
   if( stat( full_path, &fileinfo ) < 0 ) {
     fprintf( stderr, "libdvdread: Can't stat() %s.\n", filename );
@@ -812,23 +789,19 @@ static dvd_file_t *DVDOpenVOBUDF( dvd_reader_t *dvd, int title, int menu )
   dvd_file_t *dvd_file;
 
   if( title == 0 ) {
-    sprintf( filename, "/VIDEO_TS/VIDEO_TS.VOB" );
+    strcpy( filename, "/VIDEO_TS/VIDEO_TS.VOB" );
   } else {
     sprintf( filename, "/VIDEO_TS/VTS_%02d_%d.VOB", title, menu ? 0 : 1 );
   }
   start = UDFFindFile( dvd, filename, &len );
   if( start == 0 ) return NULL;
 
-  dvd_file = malloc( sizeof( dvd_file_t ) );
+  dvd_file = calloc( 1, sizeof( dvd_file_t ) );
   if( !dvd_file ) return NULL;
   dvd_file->dvd = dvd;
   /*Hack*/ dvd_file->css_title = title << 1 | menu;
   dvd_file->lb_start = start;
-  dvd_file->seek_pos = 0;
-  memset( dvd_file->title_sizes, 0, sizeof( dvd_file->title_sizes ) );
-  memset( dvd_file->title_devs, 0, sizeof( dvd_file->title_devs ) );
   dvd_file->filesize = len / DVD_VIDEO_LB_LEN;
-  dvd_file->cache = NULL;
 
   /* Calculate the complete file size for every file in the VOBS */
   if( !menu ) {
@@ -862,22 +835,16 @@ static dvd_file_t *DVDOpenVOBPath( dvd_reader_t *dvd, int title, int menu )
   struct stat fileinfo;
   dvd_file_t *dvd_file;
 
-  dvd_file = malloc( sizeof( dvd_file_t ) );
+  dvd_file = calloc( 1, sizeof( dvd_file_t ) );
   if( !dvd_file ) return NULL;
   dvd_file->dvd = dvd;
   /*Hack*/ dvd_file->css_title = title << 1 | menu;
-  dvd_file->lb_start = 0;
-  dvd_file->seek_pos = 0;
-  memset( dvd_file->title_sizes, 0, sizeof( dvd_file->title_sizes ) );
-  memset( dvd_file->title_devs, 0, sizeof( dvd_file->title_devs ) );
-  dvd_file->filesize = 0;
-  dvd_file->cache = NULL;
 
   if( menu ) {
     dvd_input_t dev;
 
     if( title == 0 ) {
-      sprintf( filename, "VIDEO_TS.VOB" );
+      strcpy( filename, "VIDEO_TS.VOB" );
     } else {
       sprintf( filename, "VTS_%02i_0.VOB", title );
     }
@@ -945,7 +912,7 @@ dvd_file_t *DVDOpenFile( dvd_reader_t *dvd, int titlenum,
   switch( domain ) {
   case DVD_READ_INFO_FILE:
     if( titlenum == 0 ) {
-      sprintf( filename, "/VIDEO_TS/VIDEO_TS.IFO" );
+      strcpy( filename, "/VIDEO_TS/VIDEO_TS.IFO" );
     } else {
       sprintf( filename, "/VIDEO_TS/VTS_%02i_0.IFO", titlenum );
     }
@@ -953,7 +920,7 @@ dvd_file_t *DVDOpenFile( dvd_reader_t *dvd, int titlenum,
     break;
   case DVD_READ_INFO_BACKUP_FILE:
     if( titlenum == 0 ) {
-      sprintf( filename, "/VIDEO_TS/VIDEO_TS.BUP" );
+      strcpy( filename, "/VIDEO_TS/VIDEO_TS.BUP" );
     } else {
       sprintf( filename, "/VIDEO_TS/VTS_%02i_0.BUP", titlenum );
     }
@@ -1016,7 +983,7 @@ static int DVDFileStatVOBUDF( dvd_reader_t *dvd, int title,
   int n;
 
   if( title == 0 )
-    sprintf( filename, "/VIDEO_TS/VIDEO_TS.VOB" );
+    strcpy( filename, "/VIDEO_TS/VIDEO_TS.VOB" );
   else
     sprintf( filename, "/VIDEO_TS/VTS_%02d_%d.VOB", title, menu ? 0 : 1 );
 
@@ -1062,7 +1029,7 @@ static int DVDFileStatVOBPath( dvd_reader_t *dvd, int title,
   int n;
 
   if( title == 0 )
-    sprintf( filename, "VIDEO_TS.VOB" );
+    strcpy( filename, "VIDEO_TS.VOB" );
   else
     sprintf( filename, "VTS_%02d_%d.VOB", title, menu ? 0 : 1 );
 
@@ -1121,14 +1088,14 @@ int DVDFileStat( dvd_reader_t *dvd, int titlenum,
   switch( domain ) {
   case DVD_READ_INFO_FILE:
     if( titlenum == 0 )
-      sprintf( filename, "/VIDEO_TS/VIDEO_TS.IFO" );
+      strcpy( filename, "/VIDEO_TS/VIDEO_TS.IFO" );
     else
       sprintf( filename, "/VIDEO_TS/VTS_%02i_0.IFO", titlenum );
 
     break;
   case DVD_READ_INFO_BACKUP_FILE:
     if( titlenum == 0 )
-      sprintf( filename, "/VIDEO_TS/VIDEO_TS.BUP" );
+      strcpy( filename, "/VIDEO_TS/VIDEO_TS.BUP" );
     else
       sprintf( filename, "/VIDEO_TS/VTS_%02i_0.BUP", titlenum );
 
@@ -1383,7 +1350,7 @@ ssize_t DVDReadBytes( dvd_file_t *dvd_file, void *data, size_t byte_size )
   int ret;
 
   /* Check arguments. */
-  if( dvd_file == NULL || data == NULL )
+  if( dvd_file == NULL || data == NULL || (ssize_t)byte_size < 0 )
     return -1;
 
   seek_sector = dvd_file->seek_pos / DVD_VIDEO_LB_LEN;

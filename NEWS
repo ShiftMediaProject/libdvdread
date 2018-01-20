@@ -1,10 +1,19 @@
+libdvdread (6.0.0)
+ * restrict the number of symbols to be exposed to the shared-object
+ * remove dvdinput_error function
+ * improve compatibility with some DVDs (notably the eOne ones)
+ * fix write after free in ifoFree functions
+ * fix possible buffer overflow in open
+ * additional checks on DVDReadBytes arguments
+ * fix leaks
+
 libdvdread (5.0.3)
- * Cache IFO and BUP files (only for ImageFiles) in order to reduce the number
+ * cache IFO and BUP files (only for ImageFiles) in order to reduce the number
    of read/seek access
- * Fix compilation warnings for OS/2
+ * fix compilation warnings for OS/2
 
 libdvdread (5.0.2)
- * Add DVDOpenStream to open a dvd from a set of callbacks
+ * add DVDOpenStream to open a dvd from a set of callbacks
 
 libdvdread (5.0.1)
  * support DragonFly BSD bswap

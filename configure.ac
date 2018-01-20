@@ -1,4 +1,11 @@
-AC_INIT(libdvdread, 5.0.3)
+dnl library version number
+m4_define([dvdread_major], 6)
+m4_define([dvdread_minor], 0)
+m4_define([dvdread_micro], 0)
+m4_define([dvdread_version],[dvdread_major.dvdread_minor.dvdread_micro])
+
+AC_INIT(libdvdread, dvdread_version)
+
 AC_CONFIG_SRCDIR([src/dvd_reader.c])
 
 AC_PREREQ(2.53)
@@ -105,6 +112,14 @@ AS_IF([test "x$ac_cv_c_compiler_gnu" = "xyes"], [
   AC_DEFINE([UNUSED], [], [Unused parameter annotation])
 ])
 
+dnl export library version number
+DVDREAD_VERSION_MAJOR=dvdread_major()
+DVDREAD_VERSION_MINOR=dvdread_minor()
+DVDREAD_VERSION_MICRO=dvdread_micro()
+AC_SUBST(DVDREAD_VERSION_MAJOR)
+AC_SUBST(DVDREAD_VERSION_MINOR)
+AC_SUBST(DVDREAD_VERSION_MICRO)
+
 dnl ---------------------------------------------
 dnl Output configuration files
 dnl ---------------------------------------------
@@ -112,4 +127,5 @@ AC_OUTPUT([
 Makefile
 doc/doxygen.cfg
 misc/dvdread.pc
+src/dvdread/version.h
 ])

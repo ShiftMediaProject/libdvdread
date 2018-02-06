@@ -1244,8 +1244,6 @@ int ifoRead_VTS_PTT_SRPT(ifo_handle_t *ifofile) {
         = *(uint16_t*)(((char *)data) + data[i] + 4*j - VTS_PTT_SRPT_SIZE);
       vts_ptt_srpt->title[i].ptt[j].pgn
         = *(uint16_t*)(((char *)data) + data[i] + 4*j + 2 - VTS_PTT_SRPT_SIZE);
-      if(!vts_ptt_srpt->title[i].ptt[j].pgn)
-        goto fail;
     }
   }
 

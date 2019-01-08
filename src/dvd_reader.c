@@ -1332,6 +1332,8 @@ int DVDFileSeekForce(dvd_file_t *dvd_file, int offset, int force_size)
       force_size = (offset - 1) / DVD_VIDEO_LB_LEN + 1;
     if( dvd_file->filesize < force_size ) {
       dvd_file->filesize = force_size;
+      free(dvd_file->cache);
+      dvd_file->cache = NULL;
       fprintf(stderr, "libdvdread: Ignored size of file indicated in UDF.\n");
     }
   }

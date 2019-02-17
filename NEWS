@@ -1,3 +1,8 @@
+libdvdread (6.0.1)
+ * fix a regression on some DVDs, like Resident Evil
+ * check InternalUDFReadBlocksRaw I/O issues
+ * fix issues with some DVD burnt by Nero
+
 libdvdread (6.0.0)
  * restrict the number of symbols to be exposed to the shared-object
  * remove dvdinput_error function

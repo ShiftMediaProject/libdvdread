@@ -219,6 +219,7 @@ static void ifo_print_audio_attributes(audio_attr_t *attr) {
     break;
   case 2:
     printf("mpeg1 ");
+    /* Falls Through. */ /* to MPEG-2 */
   case 3:
     printf("mpeg2ext ");
     switch(attr->quantization) {

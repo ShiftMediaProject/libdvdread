@@ -543,9 +543,10 @@ static dvd_reader_t *DVDOpenCommon( const char *ppath,
 #elif defined(__linux__)
     mntfile = fopen( _PATH_MOUNTED, "r" );
     if( mntfile ) {
-      struct mntent *me;
+      struct mntent *me, mbuf;
+      char buf [8192];
 
-      while( ( me = getmntent( mntfile ) ) ) {
+      while( ( me = getmntent_r( mntfile, &mbuf, buf, sizeof(buf) ) ) ) {
         if( !strcmp( me->mnt_dir, path_copy ) ) {
           fprintf( stderr,
                    "libdvdread: Attempting to use device %s"

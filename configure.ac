@@ -65,6 +65,9 @@ AS_CASE([$host],
 AS_CASE([$host],
   [*-os2-*], LDFLAGS="-no-undefined -Zbin-files $LDFLAGS")
 
+AS_CASE([$host],
+  [*-linux-*], [AC_CHECK_FUNCS([getmntent_r])])
+
 AC_ARG_WITH([libdvdcss],
   AS_HELP_STRING([--with-libdvdcss], [Link directly against libdvdcss @<:@default=no@:>@]))
 

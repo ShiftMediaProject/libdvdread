@@ -1,3 +1,7 @@
+libdvdread (6.0.2)
+ * use reentrant getmntent_r
+ * fix playback of some discs, by fixing pgc_t structure
+
 libdvdread (6.0.1)
  * fix a regression on some DVDs, like Resident Evil
  * check InternalUDFReadBlocksRaw I/O issues

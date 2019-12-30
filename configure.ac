@@ -1,7 +1,7 @@
 dnl library version number
 m4_define([dvdread_major], 6)
 m4_define([dvdread_minor], 0)
-m4_define([dvdread_micro], 1)
+m4_define([dvdread_micro], 2)
 m4_define([dvdread_version],[dvdread_major.dvdread_minor.dvdread_micro])
 
 AC_INIT(libdvdread, dvdread_version)
@@ -46,8 +46,8 @@ dnl    are platform dependent
 dnl  * in Linux, the library will be named
 dnl    libname.so.(DVDREAD_LT_CURRENT - DVDREAD_LT_AGE).DVDREAD_LT_REVISION.DVDREAD_LT_AGE
 
-DVDREAD_LT_CURRENT=6
-DVDREAD_LT_AGE=2
+DVDREAD_LT_CURRENT=7
+DVDREAD_LT_AGE=0
 DVDREAD_LT_REVISION=0
 
 AC_SUBST([DVDREAD_LTVERSION], [$DVDREAD_LT_CURRENT:$DVDREAD_LT_REVISION:$DVDREAD_LT_AGE])

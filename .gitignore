@@ -32,3 +32,5 @@
 /doc/doxygen.cfg
 /doc/html
 /stamp-*
+/build
+/releases

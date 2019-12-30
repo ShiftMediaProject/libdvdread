@@ -294,8 +294,8 @@ typedef struct {
   uint16_t next_pgc_nr;
   uint16_t prev_pgc_nr;
   uint16_t goup_pgc_nr;
-  uint8_t  still_time;
   uint8_t  pg_playback_mode;
+  uint8_t  still_time;
   uint32_t palette[16]; /* New type struct {zero_1, Y, Cr, Cb} ? */
   uint16_t command_tbl_offset;
   uint16_t program_map_offset;

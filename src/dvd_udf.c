@@ -433,6 +433,7 @@ static int UDFFileEntry( uint8_t *data, uint8_t *FileType,
   uint16_t flags;
   uint32_t L_EA, L_AD;
   unsigned int p;
+  struct AD tmpad;
 
   UDFICB( &data[ 16 ], FileType, &flags );
 
@@ -452,10 +453,12 @@ static int UDFFileEntry( uint8_t *data, uint8_t *FileType,
   while( p < 176 + L_EA + L_AD ) {
     switch( flags & 0x0007 ) {
     case 0:
-      UDFShortAD( &data[ p ], ad, partition );
+      UDFShortAD( &data[ p ], &tmpad, partition );
+      if( ad->Location == 0 ) /* We do not support more than one AD */
+          *ad = tmpad;        /* This was exploited by copy protections adding empty AD */
       p += 8;
       break;
-    case 1:
+    case 1: /* FIXME ? UDF 2.60 2.3.7.1 Only Short Allocation Descriptors shall be used */
       UDFLongAD( &data[ p ], ad );
       p += 16;
       break;

@@ -63,6 +63,7 @@ extern "C" {
  * Opaque type that is used as a handle for one instance of an opened DVD.
  */
 typedef struct dvd_reader_s dvd_reader_t;
+typedef struct dvd_reader_device_s dvd_reader_device_t;
 
 /**
  * Opaque type for a file read handle, much like a normal fd or FILE *.

@@ -35,6 +35,11 @@
             __FILE__, __LINE__, # arg );                                \
   }
 
+struct dvd_reader_s
+{
+    dvd_reader_device_t *rd;
+};
+
 enum TagIdentifier {
   /* ECMA 167 3/7.2.1 */
   PrimaryVolumeDescriptor           = 1,
@@ -60,11 +65,11 @@ enum TagIdentifier {
   ExtendedFileEntry                 = 266,
 };
 
-int InternalUDFReadBlocksRaw(const dvd_reader_t *device, uint32_t lb_number,
+int InternalUDFReadBlocksRaw(const dvd_reader_t *, uint32_t lb_number,
                      size_t block_count, unsigned char *data, int encrypted);
 
-void *GetUDFCacheHandle(dvd_reader_t *device);
-void SetUDFCacheHandle(dvd_reader_t *device, void *cache);
+void *GetUDFCacheHandle(dvd_reader_t *);
+void SetUDFCacheHandle(dvd_reader_t *, void *cache);
 void FreeUDFCache(void *cache);
 
 #endif /* LIBDVDREAD_DVDREAD_INTERNAL_H */

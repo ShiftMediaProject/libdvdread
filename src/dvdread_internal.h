@@ -38,6 +38,9 @@
 struct dvd_reader_s
 {
     dvd_reader_device_t *rd;
+    /* Set 100 flags for BUP fallback, most signifiant left
+       [0] for upper remaining VTS, [1] for the first Main + 63 VTS */
+    uint64_t ifoBUPflags[2];
 };
 
 enum TagIdentifier {

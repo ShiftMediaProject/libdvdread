@@ -360,21 +360,42 @@ ifoOpen_fail:
   return NULL;
 }
 
+static void ifoSetBupFlag(dvd_reader_t *ctx, int title)
+{
+    if(title > 63)
+        ctx->ifoBUPflags[0] |= 1 << (title - 64);
+    else
+        ctx->ifoBUPflags[1] |= 1 << title;
+}
+
+static int ifoGetBupFlag(const dvd_reader_t *ctx, int title)
+{
+    int bupflag;
+    if(title > 63)
+        bupflag = !! (ctx->ifoBUPflags[0] & (1 << (title - 64)));
+    else
+        bupflag = !! (ctx->ifoBUPflags[1] & (1 << title));
+    return bupflag;
+}
 
 ifo_handle_t *ifoOpen(dvd_reader_t *ctx, int title) {
   ifo_handle_t *ifofile;
+  int bupflag = ifoGetBupFlag(ctx, title);
 
-  ifofile = ifoOpenFileOrBackup(ctx, title, 0);
+  ifofile = ifoOpenFileOrBackup(ctx, title, bupflag);
   if(!ifofile) /* Try backup */
+  {
       ifofile = ifoOpenFileOrBackup(ctx, title, 1);
+      if(ifofile && !bupflag)
+          ifoSetBupFlag(ctx, title);
+  }
   return ifofile;
 }
-
 
 ifo_handle_t *ifoOpenVMGI(dvd_reader_t *ctx) {
   ifo_handle_t *ifofile;
 
-  for(int backup = 0; backup <= 1; backup++)
+  for(int backup = ifoGetBupFlag(ctx, 0); backup <= 1; backup++)
   {
     ifofile = calloc(1, sizeof(ifo_handle_t));
     if(!ifofile)
@@ -409,7 +430,7 @@ ifo_handle_t *ifoOpenVTSI(dvd_reader_t *ctx, int title) {
     return NULL;
   }
 
-  for(int backup = 0; backup <= 1; backup++)
+  for(int backup = ifoGetBupFlag(ctx, title); backup <= 1; backup++)
   {
     ifofile = calloc(1, sizeof(ifo_handle_t));
     if(!ifofile)

@@ -123,10 +123,6 @@ SOURCE=.\libwin32utils.def
 
 SOURCE=.\contrib\dlfcn.c
 # End Source File
-# Begin Source File
-
-SOURCE=.\contrib\getopt.c
-# End Source File
 # End Group
 # End Target
 # End Project

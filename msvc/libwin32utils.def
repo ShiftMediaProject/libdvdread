@@ -210,15 +210,6 @@ gzputs
 gzgets
 
 ;------------------------------------------------------------
-; timer exports
-
-gettimeofday
-setitimer
-pause
-sleep
-nanosleep
-
-;------------------------------------------------------------
 ; other exports
 dlclose
 dlsym

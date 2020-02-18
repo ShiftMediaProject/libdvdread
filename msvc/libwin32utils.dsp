@@ -100,14 +100,7 @@ LIB32=link.exe -lib
 SOURCE=.\contrib\dirent\dirent.c
 # End Source File
 # End Group
-# Begin Group "Source Files ( timer )"
-
-# PROP Default_Filter ""
-# Begin Source File
-
-SOURCE=.\contrib\timer\timer.c
-# End Source File
-# End Group
+#
 # Begin Group "DLL Defs"
 
 # PROP Default_Filter ""

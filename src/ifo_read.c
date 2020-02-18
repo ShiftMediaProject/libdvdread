@@ -399,31 +399,36 @@ ifo_handle_t *ifoOpenVMGI(dvd_reader_t *dvd) {
 ifo_handle_t *ifoOpenVTSI(dvd_reader_t *dvd, int title) {
   ifo_handle_t *ifofile;
 
-  ifofile = calloc(1, sizeof(ifo_handle_t));
-  if(!ifofile)
-    return NULL;
-
   if(title <= 0 || title > 99) {
     fprintf(stderr, "libdvdread: ifoOpenVTSI invalid title (%d).\n", title);
-    free(ifofile);
     return NULL;
   }
 
-  ifofile->file = DVDOpenFile(dvd, title, DVD_READ_INFO_FILE);
-  if(!ifofile->file) /* Should really catch any error and try to fallback */
-    ifofile->file = DVDOpenFile(dvd, title, DVD_READ_INFO_BACKUP_FILE);
-  if(!ifofile->file) {
-    fprintf(stderr, "libdvdread: Can't open file VTS_%02d_0.IFO.\n", title);
-    free(ifofile);
-    return NULL;
+  for(int backup = 0; backup <= 1; backup++)
+  {
+    ifofile = calloc(1, sizeof(ifo_handle_t));
+    if(!ifofile)
+      return NULL;
+
+    const dvd_read_domain_t domain = backup ? DVD_READ_INFO_BACKUP_FILE
+                                            : DVD_READ_INFO_FILE;
+    const char *ext = backup ? "BUP" : "IFO";
+    ifofile->file = DVDOpenFile(dvd, title, domain);
+    /* Should really catch any error */
+    if(!ifofile->file) {
+      fprintf(stderr, "libdvdread: Can't open file VTS_%02d_0.%s.\n", title, ext);
+      free(ifofile);
+      continue;
+    }
+
+    if(ifoRead_VTS(ifofile) && ifofile->vtsi_mat)
+      return ifofile;
+
+    fprintf(stderr, "libdvdread: Invalid IFO for title %d (VTS_%02d_0.%s).\n",
+            title, title, ext);
+    ifoClose(ifofile);
   }
 
-  if(ifoRead_VTS(ifofile) && ifofile->vtsi_mat)
-    return ifofile;
-
-  fprintf(stderr, "libdvdread: Invalid IFO for title %d (VTS_%02d_0.IFO).\n",
-          title, title);
-  ifoClose(ifofile);
   return NULL;
 }
 

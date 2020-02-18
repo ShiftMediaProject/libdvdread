@@ -220,7 +220,6 @@ nanosleep
 
 ;------------------------------------------------------------
 ; other exports
-bcopy
 dlclose
 dlsym
 dlopen

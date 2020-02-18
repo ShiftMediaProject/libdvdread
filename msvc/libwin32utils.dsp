@@ -121,10 +121,6 @@ SOURCE=.\libwin32utils.def
 # PROP Default_Filter ""
 # Begin Source File
 
-SOURCE=.\contrib\bcopy.c
-# End Source File
-# Begin Source File
-
 SOURCE=.\contrib\dlfcn.c
 # End Source File
 # Begin Source File

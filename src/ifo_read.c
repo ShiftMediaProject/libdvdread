@@ -374,24 +374,29 @@ ifo_handle_t *ifoOpen(dvd_reader_t *dvd, int title) {
 ifo_handle_t *ifoOpenVMGI(dvd_reader_t *dvd) {
   ifo_handle_t *ifofile;
 
-  ifofile = calloc(1, sizeof(ifo_handle_t));
-  if(!ifofile)
-    return NULL;
+  for(int backup = 0; backup <= 1; backup++)
+  {
+    ifofile = calloc(1, sizeof(ifo_handle_t));
+    if(!ifofile)
+      return NULL;
 
-  ifofile->file = DVDOpenFile(dvd, 0, DVD_READ_INFO_FILE);
-  if(!ifofile->file) /* Should really catch any error and try to fallback */
-    ifofile->file = DVDOpenFile(dvd, 0, DVD_READ_INFO_BACKUP_FILE);
-  if(!ifofile->file) {
-    fprintf(stderr, "libdvdread: Can't open file VIDEO_TS.IFO.\n");
-    free(ifofile);
-    return NULL;
+    const dvd_read_domain_t domain = backup ? DVD_READ_INFO_BACKUP_FILE
+                                            : DVD_READ_INFO_FILE;
+    const char *ext = backup ? "BUP" : "IFO";
+
+    ifofile->file = DVDOpenFile(dvd, 0, domain);
+    if(!ifofile->file) { /* Should really catch any error */
+      fprintf(stderr, "libdvdread: Can't open file VIDEO_TS.%s.\n", ext);
+      free(ifofile);
+      return NULL;
+    }
+
+    if(ifoRead_VMG(ifofile))
+      return ifofile;
+
+    fprintf(stderr, "libdvdread,ifoOpenVMGI(): Invalid main menu IFO (VIDEO_TS.%s).\n", ext);
+    ifoClose(ifofile);
   }
-
-  if(ifoRead_VMG(ifofile))
-    return ifofile;
-
-  fprintf(stderr, "libdvdread,ifoOpenVMGI(): Invalid main menu IFO (VIDEO_TS.IFO).\n");
-  ifoClose(ifofile);
   return NULL;
 }
 

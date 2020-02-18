@@ -51,7 +51,7 @@ int         (*dvdinput_read)  (dvd_input_t, void *, int, int);
 # if defined(HAVE_DLFCN_H) && !defined(USING_BUILTIN_DLFCN)
 #  include <dlfcn.h>
 # else
-#   if defined(WIN32)
+#   if defined(_WIN32)
 /* Only needed on MINGW at the moment */
 #    include "../msvc/contrib/dlfcn.c"
 #   endif
@@ -171,7 +171,7 @@ static dvd_input_t file_open(const char *target,
   }
 
   /* Open the device */
-#if !defined(WIN32) && !defined(__OS2__)
+#if !defined(_WIN32) && !defined(__OS2__)
   dev->fd = open(target, O_RDONLY);
 #else
   dev->fd = open(target, O_RDONLY | O_BINARY);
@@ -277,7 +277,7 @@ int dvdinput_setup(void)
 
 #ifdef __APPLE__
   #define CSS_LIB "libdvdcss.2.dylib"
-#elif defined(WIN32)
+#elif defined(_WIN32)
   #define CSS_LIB "libdvdcss-2.dll"
 #elif defined(__OS2__)
   #define CSS_LIB "dvdcss2.dll"

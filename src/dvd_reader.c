@@ -35,7 +35,7 @@
 #include <ctype.h>          /* isalpha */
 
 /* misc win32 helpers */
-#ifdef WIN32
+#ifdef _WIN32
 # ifndef HAVE_GETTIMEOFDAY
    /* replacement gettimeofday implementation */
 #  include <sys/timeb.h>
@@ -429,7 +429,7 @@ static dvd_reader_t *DVDOpenCommon( const char *ppath,
     if( !(path_copy = strdup( path ) ) )
       goto DVDOpen_error;
 
-#ifndef WIN32 /* don't have fchdir, and getcwd( NULL, ... ) is strange */
+#ifndef _WIN32 /* don't have fchdir, and getcwd( NULL, ... ) is strange */
               /* Also WIN32 does not have symlinks, so we don't need this bit of code. */
 
     /* Resolve any symlinks and get the absolute dir name. */

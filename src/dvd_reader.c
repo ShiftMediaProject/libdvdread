@@ -233,7 +233,7 @@ static dvd_reader_device_t *DVDOpenImageFile( dvd_reader_t *ctx,
   dvd_reader_device_t *dvd;
   dvd_input_t dev;
 
-  dev = dvdinput_open( location, ctx->priv, stream_cb );
+  dev = dvdinput_open( ctx->priv, &ctx->logcb, location, stream_cb );
   if( !dev ) {
     Log0(ctx,"Can't open %s for reading", location );
     return NULL;
@@ -354,7 +354,7 @@ static dvd_reader_t *DVDOpenCommon( void *priv,
   /* Try to open DVD using stream_cb functions */
   if( priv != NULL && stream_cb != NULL )
   {
-    have_css = dvdinput_setup();
+    have_css = dvdinput_setup( ctx->priv, &ctx->logcb );
     ctx->rd = DVDOpenImageFile( ctx, NULL, stream_cb, have_css );
     if(!ctx->rd)
     {
@@ -372,7 +372,7 @@ static dvd_reader_t *DVDOpenCommon( void *priv,
     goto DVDOpen_error;
 
   /* Try to open libdvdcss or fall back to standard functions */
-  have_css = dvdinput_setup();
+  have_css = dvdinput_setup( ctx->priv, &ctx->logcb );
 
 #if defined(_WIN32) || defined(__OS2__)
   /* Strip off the trailing \ if it is not a drive */
@@ -791,7 +791,7 @@ static dvd_file_t *DVDOpenFilePath( dvd_reader_t *ctx, const char *filename )
     return NULL;
   }
 
-  dev = dvdinput_open( full_path, NULL, NULL );
+  dev = dvdinput_open( ctx->priv, &ctx->logcb, full_path, NULL );
   if( !dev ) {
     Log0(ctx, "DVDOpenFilePath:dvdinput_open %s failed", full_path );
     return NULL;
@@ -888,7 +888,7 @@ static dvd_file_t *DVDOpenVOBPath( dvd_reader_t *ctx, int title, int menu )
       return NULL;
     }
 
-    dev = dvdinput_open( full_path, NULL, NULL );
+    dev = dvdinput_open( ctx->priv, &ctx->logcb, full_path, NULL );
     if( dev == NULL ) {
       free( dvd_file );
       return NULL;
@@ -921,7 +921,7 @@ static dvd_file_t *DVDOpenVOBPath( dvd_reader_t *ctx, int title, int menu )
       }
 
       dvd_file->title_sizes[ i ] = fileinfo.st_size / DVD_VIDEO_LB_LEN;
-      dvd_file->title_devs[ i ] = dvdinput_open( full_path, NULL, NULL );
+      dvd_file->title_devs[ i ] = dvdinput_open( ctx->priv, &ctx->logcb, full_path, NULL );
       dvdinput_title( dvd_file->title_devs[ i ], 0 );
       dvd_file->filesize += dvd_file->title_sizes[ i ];
     }

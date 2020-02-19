@@ -232,7 +232,7 @@ static int SetUDFCache(dvd_reader_t *ctx, UDFCacheType type,
 
   if(c == NULL) {
     c = calloc(1, sizeof(struct udf_cache));
-    /* fprintf(stderr, "calloc: %d\n", sizeof(struct udf_cache)); */
+    /* Log3(ctx, "calloc: %d", sizeof(struct udf_cache)); */
     if(c == NULL)
       return 0;
     SetUDFCacheHandle(ctx, c);
@@ -269,7 +269,7 @@ static int SetUDFCache(dvd_reader_t *ctx, UDFCacheType type,
     c->lb_num++;
     tmp = realloc(c->lbs, c->lb_num * sizeof(struct lbudf));
     /*
-    fprintf(stderr, "realloc lb: %d * %d = %d\n",
+    Log3(ctx, "realloc lb: %d * %d = %d",
     c->lb_num, sizeof(struct lbudf),
     c->lb_num * sizeof(struct lbudf));
     */
@@ -295,7 +295,7 @@ static int SetUDFCache(dvd_reader_t *ctx, UDFCacheType type,
     c->map_num++;
     tmp = realloc(c->maps, c->map_num * sizeof(struct icbmap));
     /*
-    fprintf(stderr, "realloc maps: %d * %d = %d\n",
+    Log3(ctx, "realloc maps: %d * %d = %d\n",
       c->map_num, sizeof(struct icbmap),
       c->map_num * sizeof(struct icbmap));
     */
@@ -600,7 +600,7 @@ static int UDFScanDir( dvd_reader_t *ctx, struct AD Dir, char *FileName,
       }
       /*
       if(cached_dir) {
-        fprintf(stderr, "malloc dir: %d\n",  dir_lba * DVD_VIDEO_LB_LEN);
+        Log3(ctx, "malloc dir: %d",  dir_lba * DVD_VIDEO_LB_LEN);
       }
       */
       {

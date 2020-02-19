@@ -232,15 +232,15 @@ static int initAllCSSKeys( dvd_reader_t *ctx )
 /**
  * Open a DVD image or block device file or use stream_cb functions.
  */
-static dvd_reader_device_t *DVDOpenImageFile( const char *location,
-                                       void *stream,
-                                       dvd_reader_stream_cb *stream_cb,
+static dvd_reader_device_t *DVDOpenImageFile( dvd_reader_t *ctx,
+                                              const char *location,
+                                        dvd_reader_stream_cb *stream_cb,
                                        int have_css )
 {
   dvd_reader_device_t *dvd;
   dvd_input_t dev;
 
-  dev = dvdinput_open( location, stream, stream_cb );
+  dev = dvdinput_open( location, ctx->priv, stream_cb );
   if( !dev ) {
     fprintf( stderr, "libdvdread: Can't open %s for reading\n", location );
     return NULL;
@@ -337,8 +337,8 @@ static char *bsd_block2char( const char *path )
 }
 #endif
 
-static dvd_reader_t *DVDOpenCommon( const char *ppath,
-                                    void *stream,
+static dvd_reader_t *DVDOpenCommon( void *priv,
+                                    const char *ppath,
                                     dvd_reader_stream_cb *stream_cb )
 {
   struct stat fileinfo;
@@ -349,15 +349,17 @@ static dvd_reader_t *DVDOpenCommon( const char *ppath,
   if(!ctx)
       return NULL;
 
+  ctx->priv = priv;
+
 #if defined(_WIN32) || defined(__OS2__)
       int len;
 #endif
 
   /* Try to open DVD using stream_cb functions */
-  if( stream != NULL && stream_cb != NULL )
+  if( priv != NULL && stream_cb != NULL )
   {
     have_css = dvdinput_setup();
-    ctx->rd = DVDOpenImageFile( NULL, stream, stream_cb, have_css );
+    ctx->rd = DVDOpenImageFile( ctx, NULL, stream_cb, have_css );
     if(!ctx->rd)
     {
         free(ctx);
@@ -393,7 +395,7 @@ static dvd_reader_t *DVDOpenCommon( const char *ppath,
 
     /* maybe "host:port" url? try opening it with acCeSS library */
     if( strchr(path,':') ) {
-      ctx->rd = DVDOpenImageFile( path, NULL, NULL, have_css );
+      ctx->rd = DVDOpenImageFile( ctx, path, NULL, have_css );
       free(path);
       if(!ctx->rd)
       {
@@ -426,7 +428,7 @@ static dvd_reader_t *DVDOpenCommon( const char *ppath,
 #endif
     if(!dev_name)
         goto DVDOpen_error;
-    ctx->rd = DVDOpenImageFile( dev_name, NULL, NULL, have_css );
+    ctx->rd = DVDOpenImageFile( ctx, dev_name, NULL, have_css );
     free( dev_name );
     free(path);
     if(!ctx->rd)
@@ -522,7 +524,7 @@ static dvd_reader_t *DVDOpenCommon( const char *ppath,
                         " mounted on %s for CSS authentication\n",
                         dev_name,
                         s[i].f_mntonname);
-                ctx->rd = DVDOpenImageFile( dev_name, NULL, NULL, have_css );
+                ctx->rd = DVDOpenImageFile( ctx, dev_name, NULL, have_css );
                 break;
             }
         }
@@ -535,7 +537,7 @@ static dvd_reader_t *DVDOpenCommon( const char *ppath,
                " mounted on %s for CSS authentication\n",
                dev_name,
                fe->fs_file );
-      ctx->rd = DVDOpenImageFile( dev_name, NULL, NULL, have_css );
+      ctx->rd = DVDOpenImageFile( ctx, dev_name, NULL, have_css );
     }
 #elif defined(__sun)
     mntfile = fopen( MNTTAB, "r" );
@@ -551,7 +553,7 @@ static dvd_reader_t *DVDOpenCommon( const char *ppath,
                    " mounted on %s for CSS authentication\n",
                    dev_name,
                    mp.mnt_mountp );
-          ctx->rd = DVDOpenImageFile( dev_name, NULL, NULL, have_css );
+          ctx->rd = DVDOpenImageFile( ctx, dev_name, NULL, have_css );
           break;
         }
       }
@@ -575,7 +577,7 @@ static dvd_reader_t *DVDOpenCommon( const char *ppath,
                    " mounted on %s for CSS authentication\n",
                    me->mnt_fsname,
                    me->mnt_dir );
-          ctx->rd = DVDOpenImageFile( me->mnt_fsname, NULL, NULL, have_css );
+          ctx->rd = DVDOpenImageFile( ctx, me->mnt_fsname, NULL, have_css );
           dev_name = strdup(me->mnt_fsname);
           break;
         }
@@ -589,7 +591,7 @@ static dvd_reader_t *DVDOpenCommon( const char *ppath,
         ( !path[2] ||
           ((path[2] == '\\' || path[2] == '/') && !path[3])))
 #endif
-    ctx->rd = DVDOpenImageFile( path, NULL, NULL, have_css );
+    ctx->rd = DVDOpenImageFile( ctx, path, NULL, have_css );
 #endif
 
 #if !defined(_WIN32) && !defined(__OS2__)
@@ -645,13 +647,24 @@ DVDOpen_error:
 
 dvd_reader_t *DVDOpen( const char *ppath )
 {
-    return DVDOpenCommon( ppath, NULL, NULL );
+    return DVDOpenCommon( NULL, ppath, NULL );
 }
 
 dvd_reader_t *DVDOpenStream( void *stream,
                              dvd_reader_stream_cb *stream_cb )
 {
-    return DVDOpenCommon( NULL, stream, stream_cb );
+    return DVDOpenCommon( stream, NULL, stream_cb );
+}
+
+dvd_reader_t *DVDOpen2( void *priv, const char *ppath )
+{
+    return DVDOpenCommon( priv, ppath, NULL );
+}
+
+dvd_reader_t *DVDOpenStream2( void *priv,
+                              dvd_reader_stream_cb *stream_cb )
+{
+    return DVDOpenCommon( priv, NULL, stream_cb );
 }
 
 void DVDClose( dvd_reader_t *dvd )

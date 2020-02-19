@@ -118,6 +118,20 @@ dvd_reader_t *DVDOpen( const char * );
 dvd_reader_t *DVDOpenStream( void *, dvd_reader_stream_cb * );
 
 /**
+ * Same as DVDOpen, but with private handle to be passed back on callbacks
+ *
+ * @param path Specifies the the device, file or directory to be used.
+ * @param priv is a private handle
+ * @param stream_cb is a struct containing seek and read functions
+ * @return If successful a a read handle is returned. Otherwise 0 is returned.
+ *
+ * dvd = DVDOpen2(priv, path);
+ * dvd = DVDOpenStream2(priv, &stream_cb);
+ */
+dvd_reader_t *DVDOpen2( void *, const char * );
+dvd_reader_t *DVDOpenStream2( void *, dvd_reader_stream_cb * );
+
+/**
  * Closes and cleans up the DVD reader object.
  *
  * You must close all open files before calling this function.

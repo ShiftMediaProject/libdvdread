@@ -32,6 +32,7 @@
 
 #include <sys/types.h>
 #include <inttypes.h>
+#include <stdarg.h>
 
 /**
  * The DVD access interface.
@@ -79,6 +80,27 @@ struct dvd_reader_stream_cb
 typedef struct dvd_reader_stream_cb dvd_reader_stream_cb;
 
 /**
+ * Custom logger callback for DVDOpen[Stream]2
+ * @param private Handle as provided in Open functions
+ * @param level Log level
+ * @param fmt Format string
+ * @param args Arguments list
+ * pf_log(priv, level, fmt, args);
+ */
+typedef enum
+{
+    DVD_LOGGER_LEVEL_INFO,
+    DVD_LOGGER_LEVEL_ERROR,
+    DVD_LOGGER_LEVEL_WARN,
+    DVD_LOGGER_LEVEL_DEBUG,
+} dvd_logger_level_t;
+
+typedef struct
+{
+  void ( *pf_log )  ( void *, dvd_logger_level_t, const char *, va_list );
+} dvd_logger_cb;
+
+/**
  * Public type that is used to provide statistics on a handle.
  */
 typedef struct {
@@ -122,14 +144,15 @@ dvd_reader_t *DVDOpenStream( void *, dvd_reader_stream_cb * );
  *
  * @param path Specifies the the device, file or directory to be used.
  * @param priv is a private handle
+ * @param logcb is a custom logger callback struct, or NULL if none needed
  * @param stream_cb is a struct containing seek and read functions
  * @return If successful a a read handle is returned. Otherwise 0 is returned.
  *
- * dvd = DVDOpen2(priv, path);
- * dvd = DVDOpenStream2(priv, &stream_cb);
+ * dvd = DVDOpen2(priv, logcb, path);
+ * dvd = DVDOpenStream2(priv, logcb, &stream_cb);
  */
-dvd_reader_t *DVDOpen2( void *, const char * );
-dvd_reader_t *DVDOpenStream2( void *, dvd_reader_stream_cb * );
+dvd_reader_t *DVDOpen2( void *, const dvd_logger_cb *, const char * );
+dvd_reader_t *DVDOpenStream2( void *, const dvd_logger_cb *, dvd_reader_stream_cb * );
 
 /**
  * Closes and cleans up the DVD reader object.

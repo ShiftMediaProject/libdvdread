@@ -338,6 +338,7 @@ static char *bsd_block2char( const char *path )
 #endif
 
 static dvd_reader_t *DVDOpenCommon( void *priv,
+                                    const dvd_logger_cb *logcb,
                                     const char *ppath,
                                     dvd_reader_stream_cb *stream_cb )
 {
@@ -350,6 +351,8 @@ static dvd_reader_t *DVDOpenCommon( void *priv,
       return NULL;
 
   ctx->priv = priv;
+  if(logcb)
+    ctx->logcb = *logcb;
 
 #if defined(_WIN32) || defined(__OS2__)
       int len;
@@ -647,24 +650,25 @@ DVDOpen_error:
 
 dvd_reader_t *DVDOpen( const char *ppath )
 {
-    return DVDOpenCommon( NULL, ppath, NULL );
+    return DVDOpenCommon( NULL, NULL, ppath, NULL );
 }
 
 dvd_reader_t *DVDOpenStream( void *stream,
                              dvd_reader_stream_cb *stream_cb )
 {
-    return DVDOpenCommon( stream, NULL, stream_cb );
+    return DVDOpenCommon( stream, NULL, NULL, stream_cb );
 }
 
-dvd_reader_t *DVDOpen2( void *priv, const char *ppath )
+dvd_reader_t *DVDOpen2( void *priv, const dvd_logger_cb *logcb,
+                        const char *ppath )
 {
-    return DVDOpenCommon( priv, ppath, NULL );
+    return DVDOpenCommon( priv, logcb, ppath, NULL );
 }
 
-dvd_reader_t *DVDOpenStream2( void *priv,
+dvd_reader_t *DVDOpenStream2( void *priv, const dvd_logger_cb *logcb,
                               dvd_reader_stream_cb *stream_cb )
 {
-    return DVDOpenCommon( priv, NULL, stream_cb );
+    return DVDOpenCommon( priv, logcb, NULL, stream_cb );
 }
 
 void DVDClose( dvd_reader_t *dvd )

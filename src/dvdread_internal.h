@@ -20,6 +20,7 @@
 #define LIBDVDREAD_DVDREAD_INTERNAL_H
 
 #include <stdint.h>
+#include <stddef.h>
 #include <sys/types.h>
 
 #ifdef _WIN32
@@ -27,7 +28,11 @@
 #endif /* _WIN32 */
 
 #include "dvdread/dvd_reader.h"
+#include "dvdread/ifo_types.h"
 #include "logger.h"
+
+#define container_of(ptr, type, member) \
+    ((type *)(((char *)(ptr)) - offsetof(type, member)))
 
 struct dvd_reader_s
 {
@@ -37,6 +42,12 @@ struct dvd_reader_s
     /* Set 100 flags for BUP fallback, most signifiant left
        [0] for upper remaining VTS, [1] for the first Main + 63 VTS */
     uint64_t ifoBUPflags[2];
+};
+
+struct ifo_handle_private_s
+{
+    ifo_handle_t handle;
+    dvd_file_t *file;
 };
 
 enum TagIdentifier {

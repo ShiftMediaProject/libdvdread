@@ -732,8 +732,6 @@ typedef struct {
  * is read in from the VTS_XX_0.[IFO,BUP] files.
  */
 typedef struct {
-  dvd_file_t *file;
-
   /* VMGI */
   vmgi_mat_t     *vmgi_mat;
   tt_srpt_t      *tt_srpt;

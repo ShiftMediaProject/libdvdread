@@ -308,6 +308,7 @@ static ifo_handle_t *ifoOpenFileOrBackup(dvd_reader_t *ctx, int title,
   if(!ifop)
     return NULL;
 
+  ifop->ctx = ctx;
   ifop->file = DVDOpenFile(ctx, title, domain);
   if(!ifop->file)
   {
@@ -415,6 +416,7 @@ ifo_handle_t *ifoOpenVMGI(dvd_reader_t *ctx) {
                                             : DVD_READ_INFO_FILE;
     const char *ext = backup ? "BUP" : "IFO";
 
+    ifop->ctx = ctx;
     ifop->file = DVDOpenFile(ctx, 0, domain);
     if(!ifop->file) { /* Should really catch any error */
       fprintf(stderr, "libdvdread: Can't open file VIDEO_TS.%s.\n", ext);
@@ -449,6 +451,7 @@ ifo_handle_t *ifoOpenVTSI(dvd_reader_t *ctx, int title) {
     const dvd_read_domain_t domain = backup ? DVD_READ_INFO_BACKUP_FILE
                                             : DVD_READ_INFO_FILE;
     const char *ext = backup ? "BUP" : "IFO";
+    ifop->ctx = ctx;
     ifop->file = DVDOpenFile(ctx, title, domain);
     /* Should really catch any error */
     if(!ifop->file) {

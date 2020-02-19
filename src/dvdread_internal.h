@@ -47,6 +47,7 @@ struct dvd_reader_s
 struct ifo_handle_private_s
 {
     ifo_handle_t handle;
+    dvd_reader_t *ctx;
     dvd_file_t *file;
 };
 

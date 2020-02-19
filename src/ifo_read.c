@@ -38,6 +38,13 @@
 #define DVD_BLOCK_LEN 2048
 #endif
 
+#define CHECK_VALUE(arg)\
+  if(!(arg)) {\
+    DVDReadLog(NULL, NULL, DVD_LOGGER_LEVEL_WARN,\
+                "CHECK_VALUE failed in %s:%i for %s",\
+                __FILE__, __LINE__, # arg );\
+  }
+
 #ifndef NDEBUG
 #define CHECK_ZERO0(arg)                                                \
   if(arg != 0) {                                                        \

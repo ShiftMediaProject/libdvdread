@@ -27,13 +27,7 @@
 #endif /* _WIN32 */
 
 #include "dvdread/dvd_reader.h"
-
-#define CHECK_VALUE(arg)                                                \
-  if(!(arg)) {                                                          \
-    fprintf(stderr, "\n*** libdvdread: CHECK_VALUE failed in %s:%i ***" \
-                    "\n*** for %s ***\n\n",                             \
-            __FILE__, __LINE__, # arg );                                \
-  }
+#include "logger.h"
 
 struct dvd_reader_s
 {

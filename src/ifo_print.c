@@ -28,6 +28,8 @@
 #include "dvdread/ifo_types.h"
 #include "dvdread/ifo_read.h"
 #include "dvdread/ifo_print.h"
+#include "dvdread_internal.h"
+#include "logger.h"
 
 /* Put this in some other file / package?  It's used in nav_print too. */
 static void ifo_print_time(dvd_time_t *dtime) {
@@ -1083,7 +1085,7 @@ void ifo_print(dvd_reader_t *dvd, int title) {
   printf("Local ifo_print\n");
   ifohandle = ifoOpen(dvd, title);
   if(!ifohandle) {
-    fprintf(stderr, "Can't open info file for title %d\n", title);
+    Log0(dvd,  "Can't open info file for title %d", title);
     return;
   }
 

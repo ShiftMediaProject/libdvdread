@@ -115,6 +115,9 @@ AS_IF([test "x$ac_cv_c_compiler_gnu" = "xyes"], [
   AC_DEFINE([UNUSED], [], [Unused parameter annotation])
 ])
 
+AC_FUNC_STRERROR_R
+AS_IF([test "x$ac_cv_func_strerror_r" = "xyes"], [], [AC_CHECK_FUNCS([strerror_s])])
+
 dnl export library version number
 DVDREAD_VERSION_MAJOR=dvdread_major()
 DVDREAD_VERSION_MINOR=dvdread_minor()

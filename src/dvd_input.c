@@ -200,8 +200,23 @@ static dvd_input_t file_open(void *priv, dvd_logger_cb *logcb,
 #endif
   if(dev->fd < 0) {
     char buf[256];
+#if defined(HAVE_STRERROR_R) && defined(HAVE_DECL_STRERROR_R)
+  #ifdef STRERROR_R_CHAR_P
+    *buf=0;
+    if(strerror_r(errno, buf, 256) == NULL)
+        *buf=0;
+  #else
     if(strerror_r(errno, buf, 256) != 0)
         *buf=0;
+  #endif
+#else
+ #if defined(HAVE_STRERR_S)
+   if(strerror_s(errno, buf, 256) != 0)
+     *buf=0;
+  #else
+    *buf=0;
+  #endif
+#endif
     DVDReadLog(priv, logcb, DVD_LOGGER_LEVEL_ERROR,
                "Could not open input: %s", buf);
     free(dev);

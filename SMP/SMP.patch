@@ -1,18 +1,5 @@
-diff --git a/src/dvd_input.c b/src/dvd_input.c
-index d28efe7..d0e03b2 100644
---- a/src/dvd_input.c
-+++ b/src/dvd_input.c
-@@ -278,7 +278,7 @@ int dvdinput_setup(void)
- #ifdef __APPLE__
-   #define CSS_LIB "libdvdcss.2.dylib"
- #elif defined(WIN32)
--  #define CSS_LIB "libdvdcss-2.dll"
-+  #define CSS_LIB "dvdcss.dll"
- #elif defined(__OS2__)
-   #define CSS_LIB "dvdcss2.dll"
- #else
 diff --git a/src/dvd_udf.c b/src/dvd_udf.c
-index 68c3a9a..da78a2d 100644
+index 41517fa..177b942 100644
 --- a/src/dvd_udf.c
 +++ b/src/dvd_udf.c
 @@ -32,7 +32,9 @@
@@ -25,15 +12,3 @@ index 68c3a9a..da78a2d 100644
  
  #include <sys/types.h>
  #include <sys/stat.h>
-diff --git a/src/dvdread/dvd_reader.h b/src/dvdread/dvd_reader.h
-index 9c7be9d..37d46ba 100644
---- a/src/dvdread/dvd_reader.h
-+++ b/src/dvdread/dvd_reader.h
-@@ -32,6 +32,7 @@
- 
- #include <sys/types.h>
- #include <inttypes.h>
-+#include <unistd.h>
- 
- /**
-  * The DVD access interface.

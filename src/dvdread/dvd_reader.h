@@ -32,7 +32,12 @@
 
 #include <sys/types.h>
 #include <inttypes.h>
+#ifdef HAVE_UNISTD_H
 #include <unistd.h>
+#elif defined(_MSC_VER)
+#include <BaseTsd.h>
+typedef SSIZE_T ssize_t;
+#endif
 
 /**
  * The DVD access interface.

@@ -38,12 +38,18 @@
 
 #include <sys/types.h>
 #include <sys/stat.h>
+#ifdef HAVE_UNISTD_H
 #include <unistd.h>
+#endif
 #include <inttypes.h>
 
 #include "dvdread_internal.h"
 #include "dvdread/dvd_reader.h"
 #include "dvdread/dvd_udf.h"
+
+#ifdef WIN32
+#define strcasecmp _stricmp
+#endif
 
 /* It's required to either fail or deliver all the blocks asked for. */
 static int DVDReadLBUDF( dvd_reader_t *device, uint32_t lb_number,

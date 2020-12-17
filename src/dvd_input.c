@@ -23,7 +23,11 @@
 #include <stdio.h>                               /* fprintf */
 #include <stdlib.h>                              /* free */
 #include <fcntl.h>                               /* open */
-#include <unistd.h>                              /* lseek */
+#ifdef HAVE_UNISTD_H
+#include <unistd.h>         /* lseek */
+#elif WIN32
+#include <io.h>
+#endif
 
 #include "dvdread/dvd_reader.h"      /* DVD_VIDEO_LB_LEN */
 #include "dvd_input.h"

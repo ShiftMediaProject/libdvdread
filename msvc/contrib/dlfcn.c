@@ -35,11 +35,11 @@ void *dlopen(const char *module_name, int mode)
      * let that dso look in the apache root.
      */
     em = SetErrorMode(SEM_FAILCRITICALERRORS);
-    dsoh = LoadLibraryEx(path, NULL, LOAD_WITH_ALTERED_SEARCH_PATH);
+    dsoh = LoadLibraryExA(path, NULL, LOAD_WITH_ALTERED_SEARCH_PATH);
     if (!dsoh)
     {
         SetLastError(0); // clear the last error
-        dsoh = LoadLibraryEx(path, NULL, 0);
+        dsoh = LoadLibraryExA(path, NULL, 0);
     }
     SetErrorMode(em);
     SetLastError(0); // clear the last error

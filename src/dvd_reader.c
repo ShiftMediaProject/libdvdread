@@ -29,7 +29,9 @@
 #include <stdio.h>          /* fprintf */
 #include <errno.h>          /* errno, EIN* */
 #include <string.h>         /* memcpy, strlen */
+#ifdef HAVE_UNISTD_H
 #include <unistd.h>         /* chdir, getcwd */
+#endif
 #include <limits.h>         /* PATH_MAX */
 #include <dirent.h>         /* opendir, readdir */
 #include <ctype.h>          /* isalpha */
@@ -51,6 +53,8 @@ static inline int _private_gettimeofday( struct timeval *tv, void *tz )
 # endif
 # include <io.h> /* read() */
 # define lseek64 _lseeki64
+# define strcasecmp _stricmp
+# define strncasecmp _strnicmp
 #endif
 
 #if defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__) || defined(__bsdi__) || defined(__APPLE__)

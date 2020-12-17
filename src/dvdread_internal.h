@@ -22,10 +22,6 @@
 #include <stdint.h>
 #include <sys/types.h>
 
-#ifdef _WIN32
-# include <unistd.h>
-#endif /* _WIN32 */
-
 #include "dvdread/dvd_reader.h"
 
 #define CHECK_VALUE(arg)                                                \

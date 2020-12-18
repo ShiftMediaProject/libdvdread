@@ -34,6 +34,13 @@
 #define getbits_init dvdread_getbits_init
 #define getbits dvdread_getbits
 
+#define CHECK_VALUE(arg)\
+  if(!(arg)) {\
+    DVDReadLog(NULL, NULL, DVD_LOGGER_LEVEL_WARN,\
+                "CHECK_VALUE failed in %s:%i for %s",\
+                __FILE__, __LINE__, # arg );\
+  }
+
 void navRead_PCI(pci_t *pci, unsigned char *buffer) {
   int32_t i, j;
   getbits_state_t state;

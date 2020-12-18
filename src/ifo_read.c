@@ -38,20 +38,37 @@
 #define DVD_BLOCK_LEN 2048
 #endif
 
+#define PRIV(a) container_of(a, struct ifo_handle_private_s, handle)
+
+#define CHECK_VALUE(arg)\
+  if(!(arg)) {\
+    Log1(ifop->ctx, "CHECK_VALUE failed in %s:%i for %s",\
+                __FILE__, __LINE__, # arg );\
+  }
+
 #ifndef NDEBUG
+static inline char * makehexdump(const uint8_t *p_CZ, size_t i_CZ)
+{
+  char *alloc = malloc(i_CZ * 2 + 1);
+  if(alloc)
+  {
+    *alloc = 0;
+    for(size_t i = 0; i < i_CZ; i++)
+        sprintf(&alloc[i*2], "%02x", *((uint8_t*)&p_CZ[i]));
+  }
+  return alloc;
+}
 #define CHECK_ZERO0(arg)                                                \
   if(arg != 0) {                                                        \
-    fprintf(stderr, "*** Zero check failed in %s:%i\n    for %s = 0x%x\n", \
+    Log1(ifop->ctx, "Zero check failed in %s:%i\n    for %s = 0x%x",    \
             __FILE__, __LINE__, # arg, arg);                            \
   }
 #define CHECK_ZERO(arg)                                                 \
   if(memcmp(my_friendly_zeros, &arg, sizeof(arg))) {                    \
-    unsigned int i_CZ;                                                  \
-    fprintf(stderr, "*** Zero check failed in %s:%i\n    for %s = 0x",  \
-            __FILE__, __LINE__, # arg );                                \
-    for(i_CZ = 0; i_CZ < sizeof(arg); i_CZ++)                           \
-      fprintf(stderr, "%02x", *((uint8_t *)&arg + i_CZ));               \
-    fprintf(stderr, "\n");                                              \
+    char *dump = makehexdump((const uint8_t *)&arg, sizeof(arg));       \
+    Log0(ifop->ctx, "Zero check failed in %s:%i for %s : 0x%s",         \
+            __FILE__, __LINE__, # arg, dump );                          \
+    free(dump);                                                         \
   }
 static const uint8_t my_friendly_zeros[2048];
 #else
@@ -288,94 +305,37 @@ static void free_ptl_mait(ptl_mait_t* ptl_mait, int num_entries) {
   free(ptl_mait);
 }
 
-ifo_handle_t *ifoOpen(dvd_reader_t *dvd, int title) {
-  ifo_handle_t *ifofile;
-  int bup_file_opened = 0;
+static ifo_handle_t *ifoOpenFileOrBackup(dvd_reader_t *ctx, int title,
+                                         int backup) {
+  struct ifo_handle_private_s *ifop;
+  dvd_read_domain_t domain = backup ? DVD_READ_INFO_BACKUP_FILE
+                                    : DVD_READ_INFO_FILE;
   char ifo_filename[13];
 
-  ifofile = calloc(1, sizeof(ifo_handle_t));
-  if(!ifofile)
+  ifop = calloc(1, sizeof(*ifop));
+  if(!ifop)
     return NULL;
 
-  ifofile->file = DVDOpenFile(dvd, title, DVD_READ_INFO_FILE);
-  if(!ifofile->file) { /* Failed to open IFO, try to open BUP */
-    ifofile->file = DVDOpenFile(dvd, title, DVD_READ_INFO_BACKUP_FILE);
-    bup_file_opened = 1;
+  ifop->ctx = ctx;
+  ifop->file = DVDOpenFile(ctx, title, domain);
+  if(!ifop->file)
+  {
+      free(ifop);
+      return NULL;
   }
 
   if (title)
-    snprintf(ifo_filename, 13, "VTS_%02d_0.%s", title, bup_file_opened ? "BUP" : "IFO");
+    snprintf(ifo_filename, 13, "VTS_%02d_0.%s", title, backup ? "BUP" : "IFO");
   else
-    snprintf(ifo_filename, 13, "VIDEO_TS.%s", bup_file_opened ? "BUP" : "IFO");
+    snprintf(ifo_filename, 13, "VIDEO_TS.%s", backup ? "BUP" : "IFO");
 
-  if(!ifofile->file) {
-    fprintf(stderr, "libdvdread: Can't open file %s.\n", ifo_filename);
-    free(ifofile);
+  if(!ifop->file) {
+    Log1(ctx, "Can't open file %s.", ifo_filename);
+    free(ifop);
     return NULL;
   }
 
-  /* First check if this is a VMGI file. */
-  if(ifoRead_VMG(ifofile)) {
-
-    /* These are both mandatory. */
-    if(!ifoRead_FP_PGC(ifofile) || !ifoRead_TT_SRPT(ifofile))
-      goto ifoOpen_try_bup;
-
-    ifoRead_PGCI_UT(ifofile);
-    ifoRead_PTL_MAIT(ifofile);
-
-    /* This is also mandatory. */
-    if(!ifoRead_VTS_ATRT(ifofile))
-      goto ifoOpen_try_bup;
-
-    ifoRead_TXTDT_MGI(ifofile);
-    ifoRead_C_ADT(ifofile);
-    ifoRead_VOBU_ADMAP(ifofile);
-
-    return ifofile;
-  }
-
-  if(ifoRead_VTS(ifofile)) {
-
-    if(!ifoRead_VTS_PTT_SRPT(ifofile) || !ifoRead_PGCIT(ifofile))
-      goto ifoOpen_try_bup;
-
-    ifoRead_PGCI_UT(ifofile);
-    ifoRead_VTS_TMAPT(ifofile);
-    ifoRead_C_ADT(ifofile);
-    ifoRead_VOBU_ADMAP(ifofile);
-
-    if(!ifoRead_TITLE_C_ADT(ifofile) || !ifoRead_TITLE_VOBU_ADMAP(ifofile))
-      goto ifoOpen_try_bup;
-
-    return ifofile;
-  }
-
-ifoOpen_try_bup:
-  if (bup_file_opened)
-    goto ifoOpen_fail;
-
-  /* Try BUP instead */
-  ifoClose(ifofile);
-
-  ifofile = calloc(1, sizeof(ifo_handle_t));
-  if(!ifofile)
-    return NULL;
-
-  ifofile->file = DVDOpenFile(dvd, title, DVD_READ_INFO_BACKUP_FILE);
-
-  if (title)
-    snprintf(ifo_filename, 13, "VTS_%02d_0.BUP", title);
-  else
-    strncpy(ifo_filename, "VIDEO_TS.BUP", 13);
-
-  if (!ifofile->file) {
-    fprintf(stderr, "libdvdread: Can't open file %s.\n", ifo_filename);
-    free(ifofile);
-    return NULL;
-  }
-  bup_file_opened = 1;
-
+  ifo_handle_t *ifofile = &ifop->handle;
   /* First check if this is a VMGI file. */
   if(ifoRead_VMG(ifofile)) {
 
@@ -414,65 +374,108 @@ ifoOpen_try_bup:
   }
 
 ifoOpen_fail:
-  fprintf(stderr, "libdvdread: Invalid IFO for title %d (%s).\n", title, ifo_filename);
+  Log1(ctx, "Invalid IFO for title %d (%s).", title, ifo_filename);
   ifoClose(ifofile);
   return NULL;
 }
 
+static void ifoSetBupFlag(dvd_reader_t *ctx, int title)
+{
+    if(title > 63)
+        ctx->ifoBUPflags[0] |= 1 << (title - 64);
+    else
+        ctx->ifoBUPflags[1] |= 1 << title;
+}
 
-ifo_handle_t *ifoOpenVMGI(dvd_reader_t *dvd) {
+static int ifoGetBupFlag(const dvd_reader_t *ctx, int title)
+{
+    int bupflag;
+    if(title > 63)
+        bupflag = !! (ctx->ifoBUPflags[0] & (1 << (title - 64)));
+    else
+        bupflag = !! (ctx->ifoBUPflags[1] & (1 << title));
+    return bupflag;
+}
+
+ifo_handle_t *ifoOpen(dvd_reader_t *ctx, int title) {
   ifo_handle_t *ifofile;
+  int bupflag = ifoGetBupFlag(ctx, title);
 
-  ifofile = calloc(1, sizeof(ifo_handle_t));
-  if(!ifofile)
-    return NULL;
-
-  ifofile->file = DVDOpenFile(dvd, 0, DVD_READ_INFO_FILE);
-  if(!ifofile->file) /* Should really catch any error and try to fallback */
-    ifofile->file = DVDOpenFile(dvd, 0, DVD_READ_INFO_BACKUP_FILE);
-  if(!ifofile->file) {
-    fprintf(stderr, "libdvdread: Can't open file VIDEO_TS.IFO.\n");
-    free(ifofile);
-    return NULL;
+  ifofile = ifoOpenFileOrBackup(ctx, title, bupflag);
+  if(!ifofile) /* Try backup */
+  {
+      ifofile = ifoOpenFileOrBackup(ctx, title, 1);
+      if(ifofile && !bupflag)
+          ifoSetBupFlag(ctx, title);
   }
+  return ifofile;
+}
 
-  if(ifoRead_VMG(ifofile))
-    return ifofile;
+ifo_handle_t *ifoOpenVMGI(dvd_reader_t *ctx) {
+  struct ifo_handle_private_s *ifop;
 
-  fprintf(stderr, "libdvdread,ifoOpenVMGI(): Invalid main menu IFO (VIDEO_TS.IFO).\n");
-  ifoClose(ifofile);
+  for(int backup = ifoGetBupFlag(ctx, 0); backup <= 1; backup++)
+  {
+    ifop = calloc(1, sizeof(*ifop));
+    if(!ifop)
+      return NULL;
+
+    const dvd_read_domain_t domain = backup ? DVD_READ_INFO_BACKUP_FILE
+                                            : DVD_READ_INFO_FILE;
+    const char *ext = backup ? "BUP" : "IFO";
+
+    ifop->ctx = ctx;
+    ifop->file = DVDOpenFile(ctx, 0, domain);
+    if(!ifop->file) { /* Should really catch any error */
+      Log1(ctx, "Can't open file VIDEO_TS.%s.", ext);
+      free(ifop);
+      return NULL;
+    }
+
+    if(ifoRead_VMG(&ifop->handle))
+      return &ifop->handle;
+
+    Log1(ctx, "ifoOpenVMGI(): Invalid main menu IFO (VIDEO_TS.%s).", ext);
+    ifoClose(&ifop->handle);
+  }
   return NULL;
 }
 
 
-ifo_handle_t *ifoOpenVTSI(dvd_reader_t *dvd, int title) {
-  ifo_handle_t *ifofile;
-
-  ifofile = calloc(1, sizeof(ifo_handle_t));
-  if(!ifofile)
-    return NULL;
+ifo_handle_t *ifoOpenVTSI(dvd_reader_t *ctx, int title) {
+  struct ifo_handle_private_s *ifop;
 
   if(title <= 0 || title > 99) {
-    fprintf(stderr, "libdvdread: ifoOpenVTSI invalid title (%d).\n", title);
-    free(ifofile);
+    Log1(ctx, "ifoOpenVTSI invalid title (%d).", title);
     return NULL;
   }
 
-  ifofile->file = DVDOpenFile(dvd, title, DVD_READ_INFO_FILE);
-  if(!ifofile->file) /* Should really catch any error and try to fallback */
-    ifofile->file = DVDOpenFile(dvd, title, DVD_READ_INFO_BACKUP_FILE);
-  if(!ifofile->file) {
-    fprintf(stderr, "libdvdread: Can't open file VTS_%02d_0.IFO.\n", title);
-    free(ifofile);
-    return NULL;
+  for(int backup = ifoGetBupFlag(ctx, title); backup <= 1; backup++)
+  {
+    ifop = calloc(1, sizeof(*ifop));
+    if(!ifop)
+      return NULL;
+
+    const dvd_read_domain_t domain = backup ? DVD_READ_INFO_BACKUP_FILE
+                                            : DVD_READ_INFO_FILE;
+    const char *ext = backup ? "BUP" : "IFO";
+    ifop->ctx = ctx;
+    ifop->file = DVDOpenFile(ctx, title, domain);
+    /* Should really catch any error */
+    if(!ifop->file) {
+      Log1(ctx, "Can't open file VTS_%02d_0.%s.", title, ext);
+      free(ifop);
+      continue;
+    }
+
+    if(ifoRead_VTS(&ifop->handle) && ifop->handle.vtsi_mat)
+      return &ifop->handle;
+
+    Log1(ctx, "Invalid IFO for title %d (VTS_%02d_0.%s).",
+            title, title, ext);
+    ifoClose(&ifop->handle);
   }
 
-  if(ifoRead_VTS(ifofile) && ifofile->vtsi_mat)
-    return ifofile;
-
-  fprintf(stderr, "libdvdread: Invalid IFO for title %d (VTS_%02d_0.IFO).\n",
-          title, title);
-  ifoClose(ifofile);
   return NULL;
 }
 
@@ -501,14 +504,14 @@ void ifoClose(ifo_handle_t *ifofile) {
   if(ifofile->vtsi_mat)
     free(ifofile->vtsi_mat);
 
-  DVDCloseFile(ifofile->file);
-  ifofile->file = 0;
-  free(ifofile);
-  ifofile = 0;
+  struct ifo_handle_private_s *ifop = PRIV(ifofile);
+  DVDCloseFile(ifop->file);
+  free(ifop);
 }
 
 
 static int ifoRead_VMG(ifo_handle_t *ifofile) {
+  struct ifo_handle_private_s *ifop = PRIV(ifofile);
   vmgi_mat_t *vmgi_mat;
 
   vmgi_mat = calloc(1, sizeof(vmgi_mat_t));
@@ -517,13 +520,13 @@ static int ifoRead_VMG(ifo_handle_t *ifofile) {
 
   ifofile->vmgi_mat = vmgi_mat;
 
-  if(!DVDFileSeek_(ifofile->file, 0)) {
+  if(!DVDFileSeek_(ifop->file, 0)) {
     free(ifofile->vmgi_mat);
     ifofile->vmgi_mat = NULL;
     return 0;
   }
 
-  if(!DVDReadBytes(ifofile->file, vmgi_mat, sizeof(vmgi_mat_t))) {
+  if(!DVDReadBytes(ifop->file, vmgi_mat, sizeof(vmgi_mat_t))) {
     free(ifofile->vmgi_mat);
     ifofile->vmgi_mat = NULL;
     return 0;
@@ -602,6 +605,7 @@ static int ifoRead_VMG(ifo_handle_t *ifofile) {
 
 
 static int ifoRead_VTS(ifo_handle_t *ifofile) {
+  struct ifo_handle_private_s *ifop = PRIV(ifofile);
   vtsi_mat_t *vtsi_mat;
   int i;
 
@@ -611,13 +615,13 @@ static int ifoRead_VTS(ifo_handle_t *ifofile) {
 
   ifofile->vtsi_mat = vtsi_mat;
 
-  if(!DVDFileSeek_(ifofile->file, 0)) {
+  if(!DVDFileSeek_(ifop->file, 0)) {
     free(ifofile->vtsi_mat);
     ifofile->vtsi_mat = NULL;
     return 0;
   }
 
-  if(!(DVDReadBytes(ifofile->file, vtsi_mat, sizeof(vtsi_mat_t)))) {
+  if(!(DVDReadBytes(ifop->file, vtsi_mat, sizeof(vtsi_mat_t)))) {
     free(ifofile->vtsi_mat);
     ifofile->vtsi_mat = NULL;
     return 0;
@@ -719,11 +723,11 @@ static int ifoRead_VTS(ifo_handle_t *ifofile) {
 static int ifoRead_PGC_COMMAND_TBL(ifo_handle_t *ifofile,
                                    pgc_command_tbl_t *cmd_tbl,
                                    unsigned int offset) {
-
-  if(!DVDFileSeek_(ifofile->file, offset))
+  struct ifo_handle_private_s *ifop = PRIV(ifofile);
+  if(!DVDFileSeek_(ifop->file, offset))
     return 0;
 
-  if(!(DVDReadBytes(ifofile->file, cmd_tbl, PGC_COMMAND_TBL_SIZE)))
+  if(!(DVDReadBytes(ifop->file, cmd_tbl, PGC_COMMAND_TBL_SIZE)))
     return 0;
 
   B2N_16(cmd_tbl->nr_of_pre);
@@ -738,7 +742,7 @@ static int ifoRead_PGC_COMMAND_TBL(ifo_handle_t *ifofile,
     if(!cmd_tbl->pre_cmds)
       return 0;
 
-    if(!(DVDReadBytes(ifofile->file, cmd_tbl->pre_cmds, pre_cmds_size))) {
+    if(!(DVDReadBytes(ifop->file, cmd_tbl->pre_cmds, pre_cmds_size))) {
       free(cmd_tbl->pre_cmds);
       return 0;
     }
@@ -752,7 +756,7 @@ static int ifoRead_PGC_COMMAND_TBL(ifo_handle_t *ifofile,
         free(cmd_tbl->pre_cmds);
       return 0;
     }
-    if(!(DVDReadBytes(ifofile->file, cmd_tbl->post_cmds, post_cmds_size))) {
+    if(!(DVDReadBytes(ifop->file, cmd_tbl->post_cmds, post_cmds_size))) {
       if(cmd_tbl->pre_cmds)
         free(cmd_tbl->pre_cmds);
       free(cmd_tbl->post_cmds);
@@ -770,7 +774,7 @@ static int ifoRead_PGC_COMMAND_TBL(ifo_handle_t *ifofile,
         free(cmd_tbl->post_cmds);
       return 0;
     }
-    if(!(DVDReadBytes(ifofile->file, cmd_tbl->cell_cmds, cell_cmds_size))) {
+    if(!(DVDReadBytes(ifop->file, cmd_tbl->cell_cmds, cell_cmds_size))) {
       if(cmd_tbl->pre_cmds)
         free(cmd_tbl->pre_cmds);
       if(cmd_tbl->post_cmds)
@@ -802,12 +806,13 @@ static void ifoFree_PGC_COMMAND_TBL(pgc_command_tbl_t *cmd_tbl) {
 static int ifoRead_PGC_PROGRAM_MAP(ifo_handle_t *ifofile,
                                    pgc_program_map_t *program_map,
                                    unsigned int nr, unsigned int offset) {
+  struct ifo_handle_private_s *ifop = PRIV(ifofile);
   unsigned int size = nr * sizeof(pgc_program_map_t);
 
-  if(!DVDFileSeek_(ifofile->file, offset))
+  if(!DVDFileSeek_(ifop->file, offset))
     return 0;
 
-  if(!(DVDReadBytes(ifofile->file, program_map, size)))
+  if(!(DVDReadBytes(ifop->file, program_map, size)))
     return 0;
 
   return 1;
@@ -816,13 +821,14 @@ static int ifoRead_PGC_PROGRAM_MAP(ifo_handle_t *ifofile,
 static int ifoRead_CELL_PLAYBACK_TBL(ifo_handle_t *ifofile,
                                      cell_playback_t *cell_playback,
                                      unsigned int nr, unsigned int offset) {
+  struct ifo_handle_private_s *ifop = PRIV(ifofile);
   unsigned int i;
   unsigned int size = nr * sizeof(cell_playback_t);
 
-  if(!DVDFileSeek_(ifofile->file, offset))
+  if(!DVDFileSeek_(ifop->file, offset))
     return 0;
 
-  if(!(DVDReadBytes(ifofile->file, cell_playback, size)))
+  if(!(DVDReadBytes(ifop->file, cell_playback, size)))
     return 0;
 
   for(i = 0; i < nr; i++) {
@@ -841,13 +847,14 @@ static int ifoRead_CELL_PLAYBACK_TBL(ifo_handle_t *ifofile,
 static int ifoRead_CELL_POSITION_TBL(ifo_handle_t *ifofile,
                                      cell_position_t *cell_position,
                                      unsigned int nr, unsigned int offset) {
+  struct ifo_handle_private_s *ifop = PRIV(ifofile);
   unsigned int i;
   unsigned int size = nr * sizeof(cell_position_t);
 
-  if(!DVDFileSeek_(ifofile->file, offset))
+  if(!DVDFileSeek_(ifop->file, offset))
     return 0;
 
-  if(!(DVDReadBytes(ifofile->file, cell_position, size)))
+  if(!(DVDReadBytes(ifop->file, cell_position, size)))
     return 0;
 
   for(i = 0; i < nr; i++) {
@@ -859,12 +866,13 @@ static int ifoRead_CELL_POSITION_TBL(ifo_handle_t *ifofile,
 }
 
 static int ifoRead_PGC(ifo_handle_t *ifofile, pgc_t *pgc, unsigned int offset) {
+  struct ifo_handle_private_s *ifop = PRIV(ifofile);
   unsigned int i;
 
-  if(!DVDFileSeek_(ifofile->file, offset))
+  if(!DVDFileSeek_(ifop->file, offset))
     return 0;
 
-  if(!(DVDReadBytes(ifofile->file, pgc, PGC_SIZE)))
+  if(!(DVDReadBytes(ifop->file, pgc, PGC_SIZE)))
     return 0;
 
   read_user_ops(&pgc->prohibited_ops);
@@ -1018,6 +1026,7 @@ void ifoFree_FP_PGC(ifo_handle_t *ifofile) {
 
 
 int ifoRead_TT_SRPT(ifo_handle_t *ifofile) {
+  struct ifo_handle_private_s *ifop = PRIV(ifofile);
   tt_srpt_t *tt_srpt;
   unsigned int i;
   size_t info_length;
@@ -1031,7 +1040,7 @@ int ifoRead_TT_SRPT(ifo_handle_t *ifofile) {
   if(ifofile->vmgi_mat->tt_srpt == 0) /* mandatory */
     return 0;
 
-  if(!DVDFileSeek_(ifofile->file, ifofile->vmgi_mat->tt_srpt * DVD_BLOCK_LEN))
+  if(!DVDFileSeek_(ifop->file, ifofile->vmgi_mat->tt_srpt * DVD_BLOCK_LEN))
     return 0;
 
   tt_srpt = calloc(1, sizeof(tt_srpt_t));
@@ -1040,8 +1049,8 @@ int ifoRead_TT_SRPT(ifo_handle_t *ifofile) {
 
   ifofile->tt_srpt = tt_srpt;
 
-  if(!(DVDReadBytes(ifofile->file, tt_srpt, TT_SRPT_SIZE))) {
-    fprintf(stderr, "libdvdread: Unable to read read TT_SRPT.\n");
+  if(!(DVDReadBytes(ifop->file, tt_srpt, TT_SRPT_SIZE))) {
+    Log0(ifop->ctx, "Unable to read read TT_SRPT.");
     free(tt_srpt);
     return 0;
   }
@@ -1061,14 +1070,14 @@ int ifoRead_TT_SRPT(ifo_handle_t *ifofile) {
     ifofile->tt_srpt = NULL;
     return 0;
   }
-  if(!(DVDReadBytes(ifofile->file, tt_srpt->title, info_length))) {
-    fprintf(stderr, "libdvdread: Unable to read read TT_SRPT.\n");
+  if(!(DVDReadBytes(ifop->file, tt_srpt->title, info_length))) {
+    Log0(ifop->ctx, "libdvdread: Unable to read read TT_SRPT.");
     ifoFree_TT_SRPT(ifofile);
     return 0;
   }
 
   if(tt_srpt->nr_of_srpts>info_length/sizeof(title_info_t)){
-    fprintf(stderr,"libdvdread: data mismatch: info_length (%zd)!= nr_of_srpts (%d). Truncating.\n",
+    Log1(ifop->ctx, "data mismatch: info_length (%zd)!= nr_of_srpts (%d). Truncating.",
             info_length/sizeof(title_info_t),tt_srpt->nr_of_srpts);
     tt_srpt->nr_of_srpts=info_length/sizeof(title_info_t);
   }
@@ -1106,7 +1115,7 @@ int ifoRead_TT_SRPT(ifo_handle_t *ifofile) {
             tt_srpt->nr_of_srpts * sizeof(title_info_t),
             my_friendly_zeros,
             info_length - tt_srpt->nr_of_srpts * sizeof(title_info_t))) {
-    fprintf(stderr, "VMG_PTT_SRPT slack is != 0, ");
+    Log1(ifop->ctx, "VMG_PTT_SRPT slack is != 0, ");
     hexdump((uint8_t *)tt_srpt->title +
             tt_srpt->nr_of_srpts * sizeof(title_info_t),
             info_length - tt_srpt->nr_of_srpts * sizeof(title_info_t));
@@ -1131,6 +1140,7 @@ void ifoFree_TT_SRPT(ifo_handle_t *ifofile) {
 
 
 int ifoRead_VTS_PTT_SRPT(ifo_handle_t *ifofile) {
+  struct ifo_handle_private_s *ifop = PRIV(ifofile);
   vts_ptt_srpt_t *vts_ptt_srpt = NULL;
   int info_length, i, j;
   uint32_t *data = NULL;
@@ -1144,7 +1154,7 @@ int ifoRead_VTS_PTT_SRPT(ifo_handle_t *ifofile) {
   if(ifofile->vtsi_mat->vts_ptt_srpt == 0) /* mandatory */
     return 0;
 
-  if(!DVDFileSeek_(ifofile->file,
+  if(!DVDFileSeek_(ifop->file,
                    ifofile->vtsi_mat->vts_ptt_srpt * DVD_BLOCK_LEN))
     return 0;
 
@@ -1155,8 +1165,8 @@ int ifoRead_VTS_PTT_SRPT(ifo_handle_t *ifofile) {
   vts_ptt_srpt->title = NULL;
   ifofile->vts_ptt_srpt = vts_ptt_srpt;
 
-  if(!(DVDReadBytes(ifofile->file, vts_ptt_srpt, VTS_PTT_SRPT_SIZE))) {
-    fprintf(stderr, "libdvdread: Unable to read PTT search table.\n");
+  if(!(DVDReadBytes(ifop->file, vts_ptt_srpt, VTS_PTT_SRPT_SIZE))) {
+    Log0(ifop->ctx, "Unable to read PTT search table.");
     goto fail;
   }
 
@@ -1176,18 +1186,18 @@ int ifoRead_VTS_PTT_SRPT(ifo_handle_t *ifofile) {
   if(!data)
     goto fail;
 
-  if(!(DVDReadBytes(ifofile->file, data, info_length))) {
-    fprintf(stderr, "libdvdread: Unable to read PTT search table.\n");
+  if(!(DVDReadBytes(ifop->file, data, info_length))) {
+    Log0(ifop->ctx, "Unable to read PTT search table.");
     goto fail;
   }
 
   if(vts_ptt_srpt->nr_of_srpts > info_length / sizeof(*data)) {
-    fprintf(stderr, "libdvdread: PTT search table too small.\n");
+    Log0(ifop->ctx, "PTT search table too small.");
     goto fail;
   }
 
   if(vts_ptt_srpt->nr_of_srpts == 0) {
-    fprintf(stderr, "libdvdread: Zero entries in PTT search table.\n");
+    Log0(ifop->ctx, "Zero entries in PTT search table.");
     goto fail;
   }
 
@@ -1293,6 +1303,7 @@ void ifoFree_VTS_PTT_SRPT(ifo_handle_t *ifofile) {
 
 
 int ifoRead_PTL_MAIT(ifo_handle_t *ifofile) {
+  struct ifo_handle_private_s *ifop = PRIV(ifofile);
   ptl_mait_t *ptl_mait;
   int info_length;
   unsigned int i, j;
@@ -1306,7 +1317,7 @@ int ifoRead_PTL_MAIT(ifo_handle_t *ifofile) {
   if(!ifofile->vmgi_mat->ptl_mait)
     return 1;
 
-  if(!DVDFileSeek_(ifofile->file, ifofile->vmgi_mat->ptl_mait * DVD_BLOCK_LEN))
+  if(!DVDFileSeek_(ifop->file, ifofile->vmgi_mat->ptl_mait * DVD_BLOCK_LEN))
     return 0;
 
   ptl_mait = calloc(1, sizeof(ptl_mait_t));
@@ -1315,7 +1326,7 @@ int ifoRead_PTL_MAIT(ifo_handle_t *ifofile) {
 
   ifofile->ptl_mait = ptl_mait;
 
-  if(!(DVDReadBytes(ifofile->file, ptl_mait, PTL_MAIT_SIZE))) {
+  if(!(DVDReadBytes(ifop->file, ptl_mait, PTL_MAIT_SIZE))) {
     free(ptl_mait);
     ifofile->ptl_mait = NULL;
     return 0;
@@ -1344,8 +1355,8 @@ int ifoRead_PTL_MAIT(ifo_handle_t *ifofile) {
   }
 
   for(i = 0; i < ptl_mait->nr_of_countries; i++) {
-    if(!(DVDReadBytes(ifofile->file, &ptl_mait->countries[i], PTL_MAIT_COUNTRY_SIZE))) {
-      fprintf(stderr, "libdvdread: Unable to read PTL_MAIT.\n");
+    if(!(DVDReadBytes(ifop->file, &ptl_mait->countries[i], PTL_MAIT_COUNTRY_SIZE))) {
+      Log0(ifop->ctx, "Unable to read PTL_MAIT.");
       free(ptl_mait->countries);
       free(ptl_mait);
       ifofile->ptl_mait = NULL;
@@ -1368,10 +1379,10 @@ int ifoRead_PTL_MAIT(ifo_handle_t *ifofile) {
   for(i = 0; i < ptl_mait->nr_of_countries; i++) {
     uint16_t *pf_temp;
 
-    if(!DVDFileSeek_(ifofile->file,
+    if(!DVDFileSeek_(ifop->file,
                      ifofile->vmgi_mat->ptl_mait * DVD_BLOCK_LEN
                      + ptl_mait->countries[i].pf_ptl_mai_start_byte)) {
-      fprintf(stderr, "libdvdread: Unable to seek PTL_MAIT table at index %d.\n",i);
+      Log0(ifop->ctx, "Unable to seek PTL_MAIT table at index %d.",i);
       free(ptl_mait->countries);
       free(ptl_mait);
       ifofile->ptl_mait = NULL;
@@ -1384,8 +1395,8 @@ int ifoRead_PTL_MAIT(ifo_handle_t *ifofile) {
       ifofile->ptl_mait = NULL;
       return 0;
     }
-    if(!(DVDReadBytes(ifofile->file, pf_temp, info_length))) {
-      fprintf(stderr, "libdvdread: Unable to read PTL_MAIT table at index %d.\n",i);
+    if(!(DVDReadBytes(ifop->file, pf_temp, info_length))) {
+      Log0(ifop->ctx, "Unable to read PTL_MAIT table at index %d.",i);
       free(pf_temp);
       free_ptl_mait(ptl_mait, i);
       ifofile->ptl_mait = NULL;
@@ -1432,6 +1443,7 @@ void ifoFree_PTL_MAIT(ifo_handle_t *ifofile) {
 }
 
 int ifoRead_VTS_TMAPT(ifo_handle_t *ifofile) {
+  struct ifo_handle_private_s *ifop = PRIV(ifofile);
   vts_tmapt_t *vts_tmapt;
   uint32_t *vts_tmap_srp;
   unsigned int offset;
@@ -1451,7 +1463,7 @@ int ifoRead_VTS_TMAPT(ifo_handle_t *ifofile) {
 
   offset = ifofile->vtsi_mat->vts_tmapt * DVD_BLOCK_LEN;
 
-  if(!DVDFileSeek_(ifofile->file, offset))
+  if(!DVDFileSeek_(ifop->file, offset))
     return 0;
 
   vts_tmapt = calloc(1, sizeof(vts_tmapt_t));
@@ -1460,8 +1472,8 @@ int ifoRead_VTS_TMAPT(ifo_handle_t *ifofile) {
 
   ifofile->vts_tmapt = vts_tmapt;
 
-  if(!(DVDReadBytes(ifofile->file, vts_tmapt, VTS_TMAPT_SIZE))) {
-    fprintf(stderr, "libdvdread: Unable to read VTS_TMAPT.\n");
+  if(!(DVDReadBytes(ifop->file, vts_tmapt, VTS_TMAPT_SIZE))) {
+    Log0(ifop->ctx, "Unable to read VTS_TMAPT.");
     free(vts_tmapt);
     ifofile->vts_tmapt = NULL;
     return 0;
@@ -1483,8 +1495,8 @@ int ifoRead_VTS_TMAPT(ifo_handle_t *ifofile) {
 
   vts_tmapt->tmap_offset = vts_tmap_srp;
 
-  if(!(DVDReadBytes(ifofile->file, vts_tmap_srp, info_length))) {
-    fprintf(stderr, "libdvdread: Unable to read VTS_TMAPT.\n");
+  if(!(DVDReadBytes(ifop->file, vts_tmap_srp, info_length))) {
+    Log0(ifop->ctx, "Unable to read VTS_TMAPT.");
     free(vts_tmap_srp);
     free(vts_tmapt);
     ifofile->vts_tmapt = NULL;
@@ -1507,13 +1519,13 @@ int ifoRead_VTS_TMAPT(ifo_handle_t *ifofile) {
   }
 
   for(i = 0; i < vts_tmapt->nr_of_tmaps; i++) {
-    if(!DVDFileSeek_(ifofile->file, offset + vts_tmap_srp[i])) {
+    if(!DVDFileSeek_(ifop->file, offset + vts_tmap_srp[i])) {
       ifoFree_VTS_TMAPT(ifofile);
       return 0;
     }
 
-    if(!(DVDReadBytes(ifofile->file, &vts_tmapt->tmap[i], VTS_TMAP_SIZE))) {
-      fprintf(stderr, "libdvdread: Unable to read VTS_TMAP.\n");
+    if(!(DVDReadBytes(ifop->file, &vts_tmapt->tmap[i], VTS_TMAP_SIZE))) {
+      Log0(ifop->ctx, "Unable to read VTS_TMAP.");
       ifoFree_VTS_TMAPT(ifofile);
       return 0;
     }
@@ -1534,8 +1546,8 @@ int ifoRead_VTS_TMAPT(ifo_handle_t *ifofile) {
       return 0;
     }
 
-    if(!(DVDReadBytes(ifofile->file, vts_tmapt->tmap[i].map_ent, info_length))) {
-      fprintf(stderr, "libdvdread: Unable to read VTS_TMAP_ENT.\n");
+    if(!(DVDReadBytes(ifop->file, vts_tmapt->tmap[i].map_ent, info_length))) {
+      Log0(ifop->ctx, "Unable to read VTS_TMAP_ENT.");
       ifoFree_VTS_TMAPT(ifofile);
       return 0;
     }
@@ -1623,12 +1635,13 @@ int ifoRead_C_ADT(ifo_handle_t *ifofile) {
 
 static int ifoRead_C_ADT_internal(ifo_handle_t *ifofile,
                                   c_adt_t *c_adt, unsigned int sector) {
+  struct ifo_handle_private_s *ifop = PRIV(ifofile);
   size_t i, info_length;
 
-  if(!DVDFileSeek_(ifofile->file, sector * DVD_BLOCK_LEN))
+  if(!DVDFileSeek_(ifop->file, sector * DVD_BLOCK_LEN))
     return 0;
 
-  if(!(DVDReadBytes(ifofile->file, c_adt, C_ADT_SIZE)))
+  if(!(DVDReadBytes(ifop->file, c_adt, C_ADT_SIZE)))
     return 0;
 
   B2N_16(c_adt->nr_of_vobs);
@@ -1649,7 +1662,7 @@ static int ifoRead_C_ADT_internal(ifo_handle_t *ifofile,
      Enemy of the State region 2 (de) has Titles where nr_of_vobs field
      is to high, they high ones are never referenced though. */
   if(info_length / sizeof(cell_adr_t) < c_adt->nr_of_vobs) {
-    fprintf(stderr, "libdvdread: *C_ADT nr_of_vobs > available info entries\n");
+    Log1(ifop->ctx, "C_ADT nr_of_vobs > available info entries");
     c_adt->nr_of_vobs = info_length / sizeof(cell_adr_t);
   }
 
@@ -1658,7 +1671,7 @@ static int ifoRead_C_ADT_internal(ifo_handle_t *ifofile,
     return 0;
 
   if(info_length &&
-     !(DVDReadBytes(ifofile->file, c_adt->cell_adr_table, info_length))) {
+     !(DVDReadBytes(ifop->file, c_adt->cell_adr_table, info_length))) {
     free(c_adt->cell_adr_table);
     return 0;
   }
@@ -1761,13 +1774,14 @@ int ifoRead_VOBU_ADMAP(ifo_handle_t *ifofile) {
 static int ifoRead_VOBU_ADMAP_internal(ifo_handle_t *ifofile,
                                        vobu_admap_t *vobu_admap,
                                        unsigned int sector) {
+  struct ifo_handle_private_s *ifop = PRIV(ifofile);
   unsigned int i;
   int info_length;
 
-  if(!DVDFileSeekForce_(ifofile->file, sector * DVD_BLOCK_LEN, sector))
+  if(!DVDFileSeekForce_(ifop->file, sector * DVD_BLOCK_LEN, sector))
     return 0;
 
-  if(!(DVDReadBytes(ifofile->file, vobu_admap, VOBU_ADMAP_SIZE)))
+  if(!(DVDReadBytes(ifop->file, vobu_admap, VOBU_ADMAP_SIZE)))
     return 0;
 
   B2N_32(vobu_admap->last_byte);
@@ -1783,7 +1797,7 @@ static int ifoRead_VOBU_ADMAP_internal(ifo_handle_t *ifofile,
     return 0;
   }
   if(info_length &&
-     !(DVDReadBytes(ifofile->file,
+     !(DVDReadBytes(ifop->file,
                     vobu_admap->vobu_start_sectors, info_length))) {
     free(vobu_admap->vobu_start_sectors);
     return 0;
@@ -1858,13 +1872,14 @@ static int find_dup_pgc(pgci_srp_t *pgci_srp, uint32_t start_byte, int count) {
 
 static int ifoRead_PGCIT_internal(ifo_handle_t *ifofile, pgcit_t *pgcit,
                                   unsigned int offset) {
+  struct ifo_handle_private_s *ifop = PRIV(ifofile);
   int i, info_length;
   uint8_t *data, *ptr;
 
-  if(!DVDFileSeek_(ifofile->file, offset))
+  if(!DVDFileSeek_(ifop->file, offset))
     return 0;
 
-  if(!(DVDReadBytes(ifofile->file, pgcit, PGCIT_SIZE)))
+  if(!(DVDReadBytes(ifop->file, pgcit, PGCIT_SIZE)))
     return 0;
 
   B2N_16(pgcit->nr_of_pgci_srp);
@@ -1881,7 +1896,7 @@ static int ifoRead_PGCIT_internal(ifo_handle_t *ifofile, pgcit_t *pgcit,
   if(!data)
     return 0;
 
-  if(info_length && !(DVDReadBytes(ifofile->file, data, info_length))) {
+  if(info_length && !(DVDReadBytes(ifop->file, data, info_length))) {
     free(data);
     return 0;
   }
@@ -1921,7 +1936,7 @@ static int ifoRead_PGCIT_internal(ifo_handle_t *ifofile, pgcit_t *pgcit,
     pgcit->pgci_srp[i].pgc->ref_count = 1;
     if(!ifoRead_PGC(ifofile, pgcit->pgci_srp[i].pgc,
                     offset + pgcit->pgci_srp[i].pgc_start_byte)) {
-      fprintf(stderr, "libdvdread: Unable to read invalid PCG\n");
+      Log0(ifop->ctx, "Unable to read invalid PCG");
       //E-One releases provide boggus PGC, ie: out of bound start_byte
       free(pgcit->pgci_srp[i].pgc);
       pgcit->pgci_srp[i].pgc = NULL;
@@ -1970,6 +1985,7 @@ static int find_dup_lut(pgci_lu_t *lu, uint32_t start_byte, int count) {
 }
 
 int ifoRead_PGCI_UT(ifo_handle_t *ifofile) {
+  struct ifo_handle_private_s *ifop = PRIV(ifofile);
   pgci_ut_t *pgci_ut;
   unsigned int sector;
   unsigned int i;
@@ -1995,13 +2011,13 @@ int ifoRead_PGCI_UT(ifo_handle_t *ifofile) {
   if(!ifofile->pgci_ut)
     return 0;
 
-  if(!DVDFileSeek_(ifofile->file, sector * DVD_BLOCK_LEN)) {
+  if(!DVDFileSeek_(ifop->file, sector * DVD_BLOCK_LEN)) {
     free(ifofile->pgci_ut);
     ifofile->pgci_ut = NULL;
     return 0;
   }
 
-  if(!(DVDReadBytes(ifofile->file, ifofile->pgci_ut, PGCI_UT_SIZE))) {
+  if(!(DVDReadBytes(ifop->file, ifofile->pgci_ut, PGCI_UT_SIZE))) {
     free(ifofile->pgci_ut);
     ifofile->pgci_ut = NULL;
     return 0;
@@ -2024,7 +2040,7 @@ int ifoRead_PGCI_UT(ifo_handle_t *ifofile) {
     ifofile->pgci_ut = NULL;
     return 0;
   }
-  if(!(DVDReadBytes(ifofile->file, data, info_length))) {
+  if(!(DVDReadBytes(ifop->file, data, info_length))) {
     free(data);
     free(pgci_ut);
     ifofile->pgci_ut = NULL;
@@ -2118,12 +2134,13 @@ void ifoFree_PGCI_UT(ifo_handle_t *ifofile) {
 static int ifoRead_VTS_ATTRIBUTES(ifo_handle_t *ifofile,
                                   vts_attributes_t *vts_attributes,
                                   unsigned int offset) {
+  struct ifo_handle_private_s *ifop = PRIV(ifofile);
   unsigned int i;
 
-  if(!DVDFileSeek_(ifofile->file, offset))
+  if(!DVDFileSeek_(ifop->file, offset))
     return 0;
 
-  if(!(DVDReadBytes(ifofile->file, vts_attributes, sizeof(vts_attributes_t))))
+  if(!(DVDReadBytes(ifop->file, vts_attributes, sizeof(vts_attributes_t))))
     return 0;
 
   read_video_attr(&vts_attributes->vtsm_vobs_attr);
@@ -2169,6 +2186,7 @@ static int ifoRead_VTS_ATTRIBUTES(ifo_handle_t *ifofile,
 
 
 int ifoRead_VTS_ATRT(ifo_handle_t *ifofile) {
+  struct ifo_handle_private_s *ifop = PRIV(ifofile);
   vts_atrt_t *vts_atrt;
   unsigned int i, info_length, sector;
   uint32_t *data;
@@ -2183,7 +2201,7 @@ int ifoRead_VTS_ATRT(ifo_handle_t *ifofile) {
     return 0;
 
   sector = ifofile->vmgi_mat->vts_atrt;
-  if(!DVDFileSeek_(ifofile->file, sector * DVD_BLOCK_LEN))
+  if(!DVDFileSeek_(ifop->file, sector * DVD_BLOCK_LEN))
     return 0;
 
   vts_atrt = calloc(1, sizeof(vts_atrt_t));
@@ -2192,7 +2210,7 @@ int ifoRead_VTS_ATRT(ifo_handle_t *ifofile) {
 
   ifofile->vts_atrt = vts_atrt;
 
-  if(!(DVDReadBytes(ifofile->file, vts_atrt, VTS_ATRT_SIZE))) {
+  if(!(DVDReadBytes(ifop->file, vts_atrt, VTS_ATRT_SIZE))) {
     free(vts_atrt);
     ifofile->vts_atrt = NULL;
     return 0;
@@ -2217,7 +2235,7 @@ int ifoRead_VTS_ATRT(ifo_handle_t *ifofile) {
 
   vts_atrt->vts_atrt_offsets = data;
 
-  if(!(DVDReadBytes(ifofile->file, data, info_length))) {
+  if(!(DVDReadBytes(ifop->file, data, info_length))) {
     free(data);
     free(vts_atrt);
     ifofile->vts_atrt = NULL;
@@ -2270,6 +2288,7 @@ void ifoFree_VTS_ATRT(ifo_handle_t *ifofile) {
 
 
 int ifoRead_TXTDT_MGI(ifo_handle_t *ifofile) {
+  struct ifo_handle_private_s *ifop = PRIV(ifofile);
   txtdt_mgi_t *txtdt_mgi;
 
   if(!ifofile)
@@ -2282,7 +2301,7 @@ int ifoRead_TXTDT_MGI(ifo_handle_t *ifofile) {
   if(ifofile->vmgi_mat->txtdt_mgi == 0)
     return 1;
 
-  if(!DVDFileSeek_(ifofile->file,
+  if(!DVDFileSeek_(ifop->file,
                    ifofile->vmgi_mat->txtdt_mgi * DVD_BLOCK_LEN))
     return 0;
 
@@ -2292,14 +2311,14 @@ int ifoRead_TXTDT_MGI(ifo_handle_t *ifofile) {
   }
   ifofile->txtdt_mgi = txtdt_mgi;
 
-  if(!(DVDReadBytes(ifofile->file, txtdt_mgi, TXTDT_MGI_SIZE))) {
-    fprintf(stderr, "libdvdread: Unable to read TXTDT_MGI.\n");
+  if(!(DVDReadBytes(ifop->file, txtdt_mgi, TXTDT_MGI_SIZE))) {
+    Log0(ifop->ctx, "Unable to read TXTDT_MGI.");
     free(txtdt_mgi);
     ifofile->txtdt_mgi = NULL;
     return 0;
   }
 
-  /* fprintf(stderr, "-- Not done yet --\n"); */
+  /* Log1(ifop->ctx, "-- Not done yet --\n"); */
   return 1;
 }
 

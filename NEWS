@@ -1,3 +1,10 @@
+libdvdread (6.1.0)
+ * Introduce DVDOpen2 and DVDOpenStream2 API to provide logger context
+ * fix playback of broken discs with broken ifo files
+ * improve getmntent_r detection
+ * fix crashes in some disc, with empty contiguous ShortAD
+ * clean obsolete code
+
 libdvdread (6.0.2)
  * use reentrant getmntent_r
  * fix playback of some discs, by fixing pgc_t structure

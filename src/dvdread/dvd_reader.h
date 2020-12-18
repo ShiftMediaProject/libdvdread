@@ -28,16 +28,13 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <BaseTsd.h>
+typedef SSIZE_T ssize_t;
 #endif
 
 #include <sys/types.h>
 #include <inttypes.h>
-#ifdef HAVE_UNISTD_H
-#include <unistd.h>
-#elif defined(_MSC_VER)
-#include <BaseTsd.h>
-typedef SSIZE_T ssize_t;
-#endif
+#include <stdarg.h>
 
 /**
  * The DVD access interface.
@@ -69,6 +66,7 @@ extern "C" {
  * Opaque type that is used as a handle for one instance of an opened DVD.
  */
 typedef struct dvd_reader_s dvd_reader_t;
+typedef struct dvd_reader_device_s dvd_reader_device_t;
 
 /**
  * Opaque type for a file read handle, much like a normal fd or FILE *.
@@ -82,6 +80,27 @@ struct dvd_reader_stream_cb
     int ( *pf_readv ) ( void *p_stream, void *p_iovec, int i_blocks);
 };
 typedef struct dvd_reader_stream_cb dvd_reader_stream_cb;
+
+/**
+ * Custom logger callback for DVDOpen[Stream]2
+ * @param private Handle as provided in Open functions
+ * @param level Log level
+ * @param fmt Format string
+ * @param args Arguments list
+ * pf_log(priv, level, fmt, args);
+ */
+typedef enum
+{
+    DVD_LOGGER_LEVEL_INFO,
+    DVD_LOGGER_LEVEL_ERROR,
+    DVD_LOGGER_LEVEL_WARN,
+    DVD_LOGGER_LEVEL_DEBUG,
+} dvd_logger_level_t;
+
+typedef struct
+{
+  void ( *pf_log )  ( void *, dvd_logger_level_t, const char *, va_list );
+} dvd_logger_cb;
 
 /**
  * Public type that is used to provide statistics on a handle.
@@ -121,6 +140,21 @@ typedef struct {
  */
 dvd_reader_t *DVDOpen( const char * );
 dvd_reader_t *DVDOpenStream( void *, dvd_reader_stream_cb * );
+
+/**
+ * Same as DVDOpen, but with private handle to be passed back on callbacks
+ *
+ * @param path Specifies the the device, file or directory to be used.
+ * @param priv is a private handle
+ * @param logcb is a custom logger callback struct, or NULL if none needed
+ * @param stream_cb is a struct containing seek and read functions
+ * @return If successful a a read handle is returned. Otherwise 0 is returned.
+ *
+ * dvd = DVDOpen2(priv, logcb, path);
+ * dvd = DVDOpenStream2(priv, logcb, &stream_cb);
+ */
+dvd_reader_t *DVDOpen2( void *, const dvd_logger_cb *, const char * );
+dvd_reader_t *DVDOpenStream2( void *, const dvd_logger_cb *, dvd_reader_stream_cb * );
 
 /**
  * Closes and cleans up the DVD reader object.

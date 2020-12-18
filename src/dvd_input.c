@@ -24,17 +24,22 @@
 #include <stdlib.h>                              /* free */
 #include <fcntl.h>                               /* open */
 #ifdef HAVE_UNISTD_H
-#include <unistd.h>         /* lseek */
+#include <unistd.h>								 /* lseek */
 #elif WIN32
 #include <io.h>
 #endif
+#include <string.h>                  /* strerror */
+#include <errno.h>
 
 #include "dvdread/dvd_reader.h"      /* DVD_VIDEO_LB_LEN */
+#include "dvdread_internal.h"
 #include "dvd_input.h"
+#include "logger.h"
 
 
 /* The function pointers that is the exported interface of this file. */
-dvd_input_t (*dvdinput_open)  (const char *, void *, dvd_reader_stream_cb *);
+dvd_input_t (*dvdinput_open)  (void *, dvd_logger_cb *,
+                               const char *,dvd_reader_stream_cb *);
 int         (*dvdinput_close) (dvd_input_t);
 int         (*dvdinput_seek)  (dvd_input_t, int);
 int         (*dvdinput_title) (dvd_input_t, int);
@@ -55,7 +60,7 @@ int         (*dvdinput_read)  (dvd_input_t, void *, int, int);
 # if defined(HAVE_DLFCN_H) && !defined(USING_BUILTIN_DLFCN)
 #  include <dlfcn.h>
 # else
-#   if defined(WIN32)
+#   if defined(_WIN32)
 /* Only needed on MINGW at the moment */
 #    include "../msvc/contrib/dlfcn.c"
 #   endif
@@ -75,41 +80,57 @@ static int      (*DVDcss_read)  (dvdcss_t, void *, int, int);
 struct dvd_input_s {
   /* libdvdcss handle */
   dvdcss_t dvdcss;
+  /* */
+  void *priv;
+  dvd_logger_cb *logcb;
 
   /* dummy file input */
   int fd;
 };
 
+static dvd_input_t dvd_input_New(void *priv, dvd_logger_cb *logcb)
+{
+  dvd_input_t dev = calloc(1, sizeof(*dev));
+  if(dev)
+  {
+      dev->priv = priv;
+      dev->logcb = logcb;
+  }
+  return dev;
+}
 
 /**
  * initialize and open a DVD (device or file or stream_cb)
  */
-static dvd_input_t css_open(const char *target,
-                            void *stream, dvd_reader_stream_cb *stream_cb)
+static dvd_input_t css_open(void *priv, dvd_logger_cb *logcb,
+                            const char *target,
+                            dvd_reader_stream_cb *stream_cb)
 {
   dvd_input_t dev;
 
   /* Allocate the handle structure */
-  dev = malloc(sizeof(*dev));
+  dev = dvd_input_New(priv, logcb);
   if(dev == NULL) {
-    fprintf(stderr, "libdvdread: Could not allocate memory.\n");
+    DVDReadLog(priv, logcb, DVD_LOGGER_LEVEL_ERROR,
+               "Could not allocate memory.");
     return NULL;
   }
 
   /* Really open it with libdvdcss */
   if(target)
       dev->dvdcss = DVDcss_open(target);
-  else if(stream && stream_cb) {
+  else if(priv && stream_cb) {
 #ifdef HAVE_DVDCSS_DVDCSS_H
-      dev->dvdcss = DVDcss_open_stream(stream, (dvdcss_stream_cb *)stream_cb);
+      dev->dvdcss = DVDcss_open_stream(priv, (dvdcss_stream_cb *)stream_cb);
 #else
       dev->dvdcss = DVDcss_open_stream ?
-                    DVDcss_open_stream(stream, (dvdcss_stream_cb *)stream_cb) :
+                    DVDcss_open_stream(priv, (dvdcss_stream_cb *)stream_cb) :
                     NULL;
 #endif
   }
   if(dev->dvdcss == NULL) {
-    fprintf(stderr, "libdvdread: Could not open %s with libdvdcss.\n", target);
+    DVDReadLog(priv, logcb, DVD_LOGGER_LEVEL_ERROR,
+               "Could not open %s with libdvdcss.", target);
     free(dev);
     return NULL;
   }
@@ -159,8 +180,8 @@ static int css_close(dvd_input_t dev)
 /**
  * initialize and open a DVD device or file.
  */
-static dvd_input_t file_open(const char *target,
-                             void *stream UNUSED,
+static dvd_input_t file_open(void *priv, dvd_logger_cb *logcb,
+                             const char *target,
                              dvd_reader_stream_cb *stream_cb UNUSED)
 {
   dvd_input_t dev;
@@ -168,20 +189,40 @@ static dvd_input_t file_open(const char *target,
   if(target == NULL)
     return NULL;
   /* Allocate the library structure */
-  dev = malloc(sizeof(*dev));
+  dev = dvd_input_New(priv, logcb);
   if(dev == NULL) {
-    fprintf(stderr, "libdvdread: Could not allocate memory.\n");
+    DVDReadLog(priv, logcb, DVD_LOGGER_LEVEL_ERROR,
+               "Could not allocate memory.");
     return NULL;
   }
 
   /* Open the device */
-#if !defined(WIN32) && !defined(__OS2__)
+#if !defined(_WIN32) && !defined(__OS2__)
   dev->fd = open(target, O_RDONLY);
 #else
   dev->fd = open(target, O_RDONLY | O_BINARY);
 #endif
   if(dev->fd < 0) {
-    perror("libdvdread: Could not open input");
+    char buf[256];
+#if defined(HAVE_STRERROR_R) && defined(HAVE_DECL_STRERROR_R)
+  #ifdef STRERROR_R_CHAR_P
+    *buf=0;
+    if(strerror_r(errno, buf, 256) == NULL)
+        *buf=0;
+  #else
+    if(strerror_r(errno, buf, 256) != 0)
+        *buf=0;
+  #endif
+#else
+ #if defined(HAVE_STRERR_S)
+   if(strerror_s(buf, 256, errno) != 0)
+     *buf=0;
+  #else
+    *buf=0;
+  #endif
+#endif
+    DVDReadLog(priv, logcb, DVD_LOGGER_LEVEL_ERROR,
+               "Could not open input: %s", buf);
     free(dev);
     return NULL;
   }
@@ -239,7 +280,8 @@ static int file_read(dvd_input_t dev, void *buffer, int blocks,
       off_t over_read = -(bytes % DVD_VIDEO_LB_LEN);
       off_t pos = lseek(dev->fd, over_read, SEEK_CUR);
       if(pos % 2048 != 0)
-        fprintf( stderr, "libdvdread: lseek not multiple of 2048! Something is wrong!\n" );
+          DVDReadLog(dev->priv, dev->logcb, DVD_LOGGER_LEVEL_WARN,
+                     "lseek not multiple of 2048! Something is wrong!");
       return (int) (bytes / DVD_VIDEO_LB_LEN);
     }
 
@@ -268,7 +310,7 @@ static int file_close(dvd_input_t dev)
 /**
  * Setup read functions with either libdvdcss or minimal DVD access.
  */
-int dvdinput_setup(void)
+int dvdinput_setup(void *priv, dvd_logger_cb *logcb)
 {
   void *dvdcss_library = NULL;
 
@@ -281,8 +323,8 @@ int dvdinput_setup(void)
 
 #ifdef __APPLE__
   #define CSS_LIB "libdvdcss.2.dylib"
-#elif defined(WIN32)
-  #define CSS_LIB "dvdcss.dll"
+#elif defined(_WIN32)
+  #define CSS_LIB "libdvdcss-2.dll"
 #elif defined(__OS2__)
   #define CSS_LIB "dvdcss2.dll"
 #else
@@ -308,16 +350,17 @@ int dvdinput_setup(void)
       dlsym(dvdcss_library, U_S "dvdcss_read");
 
     if(dlsym(dvdcss_library, U_S "dvdcss_crack")) {
-      fprintf(stderr,
-              "libdvdread: Old (pre-0.0.2) version of libdvdcss found.\n"
-              "libdvdread: You should get the latest version from "
-              "http://www.videolan.org/\n" );
+      DVDReadLog(priv, logcb, DVD_LOGGER_LEVEL_ERROR,
+                 "Old (pre-0.0.2) version of libdvdcss found. "
+                "libdvdread: You should get the latest version from "
+                "http://www.videolan.org/" );
       dlclose(dvdcss_library);
       dvdcss_library = NULL;
     } else if(!DVDcss_open || !DVDcss_close || !DVDcss_seek
               || !DVDcss_read) {
-      fprintf(stderr,  "libdvdread: Missing symbols in %s, "
-              "this shouldn't happen !\n", CSS_LIB);
+      DVDReadLog(priv, logcb, DVD_LOGGER_LEVEL_ERROR,
+                 "Missing symbols in %s, "
+                "this shouldn't happen !", CSS_LIB);
       dlclose(dvdcss_library);
       dvdcss_library = NULL;
     }
@@ -341,7 +384,8 @@ int dvdinput_setup(void)
     return 1;
 
   } else {
-    fprintf(stderr, "libdvdread: Encrypted DVD support unavailable.\n");
+    DVDReadLog(priv, logcb, DVD_LOGGER_LEVEL_WARN,
+               "Encrypted DVD support unavailable.");
 
     /* libdvdcss replacement functions */
     dvdinput_open  = file_open;

@@ -20,16 +20,32 @@
 #define LIBDVDREAD_DVDREAD_INTERNAL_H
 
 #include <stdint.h>
+#include <stddef.h>
 #include <sys/types.h>
 
 #include "dvdread/dvd_reader.h"
+#include "dvdread/ifo_types.h"
+#include "logger.h"
 
-#define CHECK_VALUE(arg)                                                \
-  if(!(arg)) {                                                          \
-    fprintf(stderr, "\n*** libdvdread: CHECK_VALUE failed in %s:%i ***" \
-                    "\n*** for %s ***\n\n",                             \
-            __FILE__, __LINE__, # arg );                                \
-  }
+#define container_of(ptr, type, member) \
+    ((type *)(((char *)(ptr)) - offsetof(type, member)))
+
+struct dvd_reader_s
+{
+    dvd_reader_device_t *rd;
+    void *priv; /* User provided context */
+    dvd_logger_cb logcb;
+    /* Set 100 flags for BUP fallback, most signifiant left
+       [0] for upper remaining VTS, [1] for the first Main + 63 VTS */
+    uint64_t ifoBUPflags[2];
+};
+
+struct ifo_handle_private_s
+{
+    ifo_handle_t handle;
+    dvd_reader_t *ctx;
+    dvd_file_t *file;
+};
 
 enum TagIdentifier {
   /* ECMA 167 3/7.2.1 */
@@ -56,11 +72,11 @@ enum TagIdentifier {
   ExtendedFileEntry                 = 266,
 };
 
-int InternalUDFReadBlocksRaw(const dvd_reader_t *device, uint32_t lb_number,
+int InternalUDFReadBlocksRaw(const dvd_reader_t *, uint32_t lb_number,
                      size_t block_count, unsigned char *data, int encrypted);
 
-void *GetUDFCacheHandle(dvd_reader_t *device);
-void SetUDFCacheHandle(dvd_reader_t *device, void *cache);
+void *GetUDFCacheHandle(dvd_reader_t *);
+void SetUDFCacheHandle(dvd_reader_t *, void *cache);
 void FreeUDFCache(void *cache);
 
 #endif /* LIBDVDREAD_DVDREAD_INTERNAL_H */

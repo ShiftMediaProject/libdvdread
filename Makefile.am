@@ -26,6 +26,8 @@ libdvdread_la_SOURCES = \
 	src/dvdread_internal.h \
 	src/ifo_print.c \
 	src/ifo_read.c \
+	src/logger.c \
+	src/logger.h \
 	src/md5.c \
 	src/md5.h \
 	src/nav_print.c \

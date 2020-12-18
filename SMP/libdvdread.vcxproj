@@ -12,7 +12,7 @@
     <ClCompile>
       <PreprocessorDefinitions>NO_DVDCSS_LINK;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>.\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <DisableSpecificWarnings>4996;4267;4244;4146;4101;4090;4018;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4996;4267;4244;4146;4101;4090;4018;4334;%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
     <PostBuildEvent>
       <Command>mkdir "$(OutDir)"\include
@@ -48,7 +48,7 @@ del /f /q $(OutDir)\licenses\libdvdread.txt
     <ClCompile>
       <PreprocessorDefinitions>NO_DVDCSS_LINK;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>.\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <DisableSpecificWarnings>4996;4267;4244;4146;4101;4090;4018;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4996;4267;4244;4146;4101;4090;4018;4334;%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
     <PostBuildEvent>
       <Command>mkdir "$(OutDir)"\include
@@ -84,7 +84,7 @@ del /f /q $(OutDir)\licenses\libdvdread.txt
     <ClCompile>
       <PreprocessorDefinitions>NO_DVDCSS_LINK;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>.\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <DisableSpecificWarnings>4996;4267;4244;4146;4101;4090;4018;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4996;4267;4244;4146;4101;4090;4018;4334;%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <ModuleDefinitionFile>libdvdread.def</ModuleDefinitionFile>
@@ -123,7 +123,7 @@ del /f /q $(OutDir)\licenses\libdvdread.txt
     <ClCompile>
       <PreprocessorDefinitions>NO_DVDCSS_LINK;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>.\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <DisableSpecificWarnings>4996;4267;4244;4146;4101;4090;4018;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4996;4267;4244;4146;4101;4090;4018;4334;%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <ModuleDefinitionFile>libdvdread.def</ModuleDefinitionFile>
@@ -162,7 +162,7 @@ del /f /q $(OutDir)\licenses\libdvdread.txt
     <ClCompile>
       <PreprocessorDefinitions>NO_DVDCSS_LINK;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>.\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <DisableSpecificWarnings>4996;4267;4244;4146;4101;4090;4018;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4996;4267;4244;4146;4101;4090;4018;4334;%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
     <PostBuildEvent>
       <Command>mkdir "$(OutDir)"\include
@@ -198,7 +198,7 @@ del /f /q $(OutDir)\licenses\libdvdread.txt
     <ClCompile>
       <PreprocessorDefinitions>NO_DVDCSS_LINK;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>.\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <DisableSpecificWarnings>4996;4267;4244;4146;4101;4090;4018;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4996;4267;4244;4146;4101;4090;4018;4334;%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
     <PostBuildEvent>
       <Command>mkdir "$(OutDir)"\include
@@ -234,7 +234,7 @@ del /f /q $(OutDir)\licenses\libdvdread.txt
     <ClCompile>
       <PreprocessorDefinitions>NO_DVDCSS_LINK;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>.\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <DisableSpecificWarnings>4996;4267;4244;4146;4101;4090;4018;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4996;4267;4244;4146;4101;4090;4018;4334;%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <ModuleDefinitionFile>libdvdread.def</ModuleDefinitionFile>
@@ -273,7 +273,7 @@ del /f /q $(OutDir)\licenses\libdvdread.txt
     <ClCompile>
       <PreprocessorDefinitions>NO_DVDCSS_LINK;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>.\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <DisableSpecificWarnings>4996;4267;4244;4146;4101;4090;4018;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4996;4267;4244;4146;4101;4090;4018;4334;%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <ModuleDefinitionFile>libdvdread.def</ModuleDefinitionFile>

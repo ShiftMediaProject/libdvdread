@@ -3,7 +3,9 @@ EXPORTS
     dvdread_getbits
 
     DVDOpen
+    DVDOpen2
     DVDOpenStream
+    DVDOpenStream2
     DVDClose
     DVDFileStat
     DVDOpenFile

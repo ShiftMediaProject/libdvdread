@@ -1,8 +1,66 @@
+diff --git a/msvc/contrib/dlfcn.c b/msvc/contrib/dlfcn.c
+index 15f9ec6..a5abd73 100644
+--- a/msvc/contrib/dlfcn.c
++++ b/msvc/contrib/dlfcn.c
+@@ -35,11 +35,11 @@ void *dlopen(const char *module_name, int mode)
+      * let that dso look in the apache root.
+      */
+     em = SetErrorMode(SEM_FAILCRITICALERRORS);
+-    dsoh = LoadLibraryEx(path, NULL, LOAD_WITH_ALTERED_SEARCH_PATH);
++    dsoh = LoadLibraryExA(path, NULL, LOAD_WITH_ALTERED_SEARCH_PATH);
+     if (!dsoh)
+     {
+         SetLastError(0); // clear the last error
+-        dsoh = LoadLibraryEx(path, NULL, 0);
++        dsoh = LoadLibraryExA(path, NULL, 0);
+     }
+     SetErrorMode(em);
+     SetLastError(0); // clear the last error
+diff --git a/src/dvd_input.c b/src/dvd_input.c
+index 0c44387..828658c 100644
+--- a/src/dvd_input.c
++++ b/src/dvd_input.c
+@@ -23,7 +23,11 @@
+ #include <stdio.h>                               /* fprintf */
+ #include <stdlib.h>                              /* free */
+ #include <fcntl.h>                               /* open */
+-#include <unistd.h>                              /* lseek */
++#ifdef HAVE_UNISTD_H
++#include <unistd.h>								 /* lseek */
++#elif WIN32
++#include <io.h>
++#endif
+ #include <string.h>                  /* strerror */
+ #include <errno.h>
+ 
+diff --git a/src/dvd_reader.c b/src/dvd_reader.c
+index 8093450..8a1c697 100644
+--- a/src/dvd_reader.c
++++ b/src/dvd_reader.c
+@@ -29,7 +29,9 @@
+ #include <stdio.h>          /* fprintf */
+ #include <errno.h>          /* errno, EIN* */
+ #include <string.h>         /* memcpy, strlen */
++#ifdef HAVE_UNISTD_H
+ #include <unistd.h>         /* chdir, getcwd */
++#endif
+ #include <limits.h>         /* PATH_MAX */
+ #include <dirent.h>         /* opendir, readdir */
+ #include <ctype.h>          /* isalpha */
+@@ -51,6 +53,8 @@ static inline int _private_gettimeofday( struct timeval *tv, void *tz )
+ # endif
+ # include <io.h> /* read() */
+ # define lseek64 _lseeki64
++# define strcasecmp _stricmp
++# define strncasecmp _strnicmp
+ #endif
+ 
+ #if defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__) || defined(__bsdi__) || defined(__APPLE__)
 diff --git a/src/dvd_udf.c b/src/dvd_udf.c
-index 41517fa..177b942 100644
+index 41517fa..45f682e 100644
 --- a/src/dvd_udf.c
 +++ b/src/dvd_udf.c
-@@ -32,7 +32,9 @@
+@@ -32,17 +32,25 @@
  #include <stdio.h>
  #include <stdlib.h>
  #include <string.h>
@@ -12,3 +70,61 @@ index 41517fa..177b942 100644
  
  #include <sys/types.h>
  #include <sys/stat.h>
++#ifdef HAVE_UNISTD_H
+ #include <unistd.h>
++#endif
+ #include <inttypes.h>
+ 
+ #include "dvdread_internal.h"
+ #include "dvdread/dvd_reader.h"
+ #include "dvdread/dvd_udf.h"
+ 
++#ifdef WIN32
++#define strcasecmp _stricmp
++#endif
++
+ /* It's required to either fail or deliver all the blocks asked for. */
+ static int DVDReadLBUDF( dvd_reader_t *ctx, uint32_t lb_number,
+                          size_t block_count, unsigned char *data,
+diff --git a/src/dvdread/dvd_reader.h b/src/dvdread/dvd_reader.h
+index 208259b..00a20a0 100644
+--- a/src/dvdread/dvd_reader.h
++++ b/src/dvdread/dvd_reader.h
+@@ -28,6 +28,8 @@
+ 
+ #include <stdio.h>
+ #include <stdlib.h>
++#include <BaseTsd.h>
++typedef SSIZE_T ssize_t;
+ #endif
+ 
+ #include <sys/types.h>
+diff --git a/src/dvdread_internal.h b/src/dvdread_internal.h
+index bf4e2e1..4d0d796 100644
+--- a/src/dvdread_internal.h
++++ b/src/dvdread_internal.h
+@@ -23,10 +23,6 @@
+ #include <stddef.h>
+ #include <sys/types.h>
+ 
+-#ifdef _WIN32
+-# include <unistd.h>
+-#endif /* _WIN32 */
+-
+ #include "dvdread/dvd_reader.h"
+ #include "dvdread/ifo_types.h"
+ #include "logger.h"
+diff --git a/src/ifo_print.c b/src/ifo_print.c
+index f61a2b3..2c0e6be 100644
+--- a/src/ifo_print.c
++++ b/src/ifo_print.c
+@@ -19,7 +19,9 @@
+ #include "config.h"
+ #include <stdio.h>
+ #include <stdlib.h>
++#ifdef HAVE_UNISTD_H
+ #include <unistd.h>
++#endif
+ #include <inttypes.h>
+ #include <string.h>
+ #include <ctype.h>

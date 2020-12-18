@@ -13,6 +13,7 @@
     <ClInclude Include="..\src\dvdread\nav_types.h" />
     <ClInclude Include="..\src\dvdread_internal.h" />
     <ClInclude Include="..\src\dvd_input.h" />
+    <ClInclude Include="..\src\logger.h" />
     <ClInclude Include="..\src\md5.h" />
     <ClInclude Include="config.h" />
   </ItemGroup>
@@ -23,6 +24,7 @@
     <ClCompile Include="..\src\dvd_udf.c" />
     <ClCompile Include="..\src\ifo_print.c" />
     <ClCompile Include="..\src\ifo_read.c" />
+    <ClCompile Include="..\src\logger.c" />
     <ClCompile Include="..\src\md5.c" />
     <ClCompile Include="..\src\nav_print.c" />
     <ClCompile Include="..\src\nav_read.c" />

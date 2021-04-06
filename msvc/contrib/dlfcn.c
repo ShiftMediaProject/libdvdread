@@ -27,6 +27,7 @@ void *dlopen(const char *module_name, int mode)
      * Transpose '\' for '/' in the filename.
      */
     (void)strncpy(path, module_name, MAX_PATH);
+    path[MAX_PATH - 1] = 0;
     p = path;
     while ((p = strchr(p, '/')))
         *p = '\\';

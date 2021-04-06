@@ -17,6 +17,7 @@ void *dlopen(const char *module_name, int mode)
     UINT em;
     HINSTANCE dsoh;
     char path[MAX_PATH], *p;
+    (void)mode;
     /* Load the module...
      * per PR2555, the LoadLibraryEx function is very picky about slashes.
      * Debugging on NT 4 SP 6a reveals First Chance Exception within NTDLL.
@@ -27,7 +28,7 @@ void *dlopen(const char *module_name, int mode)
      */
     (void)strncpy(path, module_name, MAX_PATH);
     p = path;
-    while (p = strchr(p, '/'))
+    while ((p = strchr(p, '/')))
         *p = '\\';
 
     /* First assume the dso/dll's required by -this- dso are sitting in the

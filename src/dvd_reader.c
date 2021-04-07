@@ -49,8 +49,6 @@ static inline int _private_gettimeofday( struct timeval *tv, void *tz )
 }
 #  define gettimeofday(TV, TZ) _private_gettimeofday((TV), (TZ))
 # endif
-# include <io.h> /* read() */
-# define lseek64 _lseeki64
 #endif
 
 #if defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__) || defined(__bsdi__) || defined(__APPLE__)

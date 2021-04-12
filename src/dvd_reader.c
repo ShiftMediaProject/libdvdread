@@ -34,23 +34,6 @@
 #include <dirent.h>         /* opendir, readdir */
 #include <ctype.h>          /* isalpha */
 
-/* misc win32 helpers */
-#ifdef _WIN32
-# ifndef HAVE_GETTIMEOFDAY
-   /* replacement gettimeofday implementation */
-#  include <sys/timeb.h>
-static inline int _private_gettimeofday( struct timeval *tv, void *tz )
-{
-  struct timeb t;
-  ftime( &t );
-  tv->tv_sec = t.time;
-  tv->tv_usec = t.millitm * 1000;
-  return 0;
-}
-#  define gettimeofday(TV, TZ) _private_gettimeofday((TV), (TZ))
-# endif
-#endif
-
 #if defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__) || defined(__bsdi__) || defined(__APPLE__)
 # define SYS_BSD 1
 #endif
@@ -79,6 +62,24 @@ static inline int _private_gettimeofday( struct timeval *tv, void *tz )
 # include <windows.h>
 # include "msvc/contrib/win32_cs.h"
 #endif
+
+/* misc win32 helpers */
+
+#ifdef _WIN32
+# ifndef HAVE_GETTIMEOFDAY
+   /* replacement gettimeofday implementation */
+#  include <sys/timeb.h>
+static inline int _private_gettimeofday( struct timeval *tv, void *tz )
+{
+  struct timeb t;
+  ftime( &t );
+  tv->tv_sec = t.time;
+  tv->tv_usec = t.millitm * 1000;
+  return 0;
+}
+#  define gettimeofday(TV, TZ) _private_gettimeofday((TV), (TZ))
+# endif
+#endif /* _WIN32 */
 
 /* Compat wrapper for stat() */
 

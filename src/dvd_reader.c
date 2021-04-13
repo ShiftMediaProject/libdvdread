@@ -286,7 +286,7 @@ static int initAllCSSKeys( dvd_reader_t *ctx )
   for( title = 0; title < 100; title++ ) {
     gettimeofday( &t_s, NULL );
     if( title == 0 ) {
-      sprintf( filename, "/VIDEO_TS/VIDEO_TS.VOB" );
+      strcpy( filename, "/VIDEO_TS/VIDEO_TS.VOB" );
     } else {
       sprintf( filename, "/VIDEO_TS/VTS_%02d_%d.VOB", title, 0 );
     }

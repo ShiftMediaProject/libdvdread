@@ -75,7 +75,6 @@ static int DVDReadLBUDF( dvd_reader_t *ctx, uint32_t lb_number,
 
 struct Partition {
   int valid;
-  char VolumeDesc[128];
   uint16_t Flags;
   uint16_t Number;
   char Contents[32];
@@ -414,10 +413,9 @@ static int UDFPartition( uint8_t *data, uint16_t *Flags, uint16_t *Number,
  * Reads the volume descriptor and checks the parameters.  Returns 0 on OK, 1
  * on error.
  */
-static int UDFLogVolume( uint8_t *data, char *VolumeDescriptor )
+static int UDFLogVolume( uint8_t *data )
 {
   uint32_t lbsize;
-  Unicodedecode(&data[84], 128, VolumeDescriptor);
   lbsize = GETN4(212);  /* should be 2048 */
   /* MT_L = GETN4(264);  */  /* should be 6 */
   /* N_PM = GETN4(268);  */  /* should be 1 */
@@ -774,7 +772,6 @@ static int UDFFindPartition( dvd_reader_t *ctx, int partnum,
 
   part->valid = 0;
   volvalid = 0;
-  part->VolumeDesc[ 0 ] = '\0';
   i = 1;
   do {
     /* Find Volume Descriptor */
@@ -799,7 +796,7 @@ static int UDFFindPartition( dvd_reader_t *ctx, int partnum,
         part->valid = ( partnum == part->Number );
       } else if( ( TagID == LogicalVolumeDescriptor ) && ( !volvalid ) ) {
         /* Logical Volume Descriptor */
-        if( UDFLogVolume( LogBlock, part->VolumeDesc ) ) {
+        if( UDFLogVolume( LogBlock ) ) {
           /* TODO: sector size wrong! */
         } else
           volvalid = 1;

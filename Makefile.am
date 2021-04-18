@@ -31,7 +31,8 @@ libdvdread_la_SOURCES = \
 	src/md5.c \
 	src/md5.h \
 	src/nav_print.c \
-	src/nav_read.c
+	src/nav_read.c \
+	msvc/contrib/win32_cs.h
 
 libdvdread_la_LIBADD = $(CSS_LIBS)
 

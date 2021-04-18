@@ -1,3 +1,7 @@
+libdvdread (6.1.2)
+ * Fix Win32 Unicode paths opening
+ * Fix warnings and build improvements
+
 libdvdread (6.1.1)
  * Fix the soversion following ABI breakage
 

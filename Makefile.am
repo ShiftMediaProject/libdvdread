@@ -12,7 +12,7 @@ ChangeLog: $(wildcard $(srcdir)/.git/logs/HEAD)
 	-rm -f $(@)-tmp
 	test -e $(@) || touch $(@)
 
-EXTRA_DIST = msvc/ doc/footer.html doc/header.html
+EXTRA_DIST = msvc doc/footer.html doc/header.html
 
 lib_LTLIBRARIES = libdvdread.la
 

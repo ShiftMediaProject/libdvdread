@@ -16,6 +16,12 @@
     <Filter Include="Header Files\src\dvdread">
       <UniqueIdentifier>{2b416691-1a02-463e-ac5d-a8668090d94f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\msvc">
+      <UniqueIdentifier>{6f6a2aa3-bf5d-4c20-8fb9-6f2d5a99741f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\msvc\contrib">
+      <UniqueIdentifier>{3ebb23f5-ef31-4a7b-a547-fe744c09b385}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="config.h">
@@ -60,6 +66,12 @@
     <ClInclude Include="..\src\dvdread\dvd_udf.h">
       <Filter>Header Files\src\dvdread</Filter>
     </ClInclude>
+    <ClInclude Include="..\msvc\contrib\win32_cs.h">
+      <Filter>Header Files\msvc\contrib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\logger.h">
+      <Filter>Header Files\src</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\nav_read.c">
@@ -87,6 +99,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\src\nav_print.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\logger.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -1,8 +1,8 @@
 diff --git a/msvc/contrib/dlfcn.c b/msvc/contrib/dlfcn.c
-index 15f9ec6..a5abd73 100644
+index 01b5781..2ba939e 100644
 --- a/msvc/contrib/dlfcn.c
 +++ b/msvc/contrib/dlfcn.c
-@@ -35,11 +35,11 @@ void *dlopen(const char *module_name, int mode)
+@@ -37,11 +37,11 @@ void *dlopen(const char *module_name, int mode)
       * let that dso look in the apache root.
       */
      em = SetErrorMode(SEM_FAILCRITICALERRORS);
@@ -17,7 +17,7 @@ index 15f9ec6..a5abd73 100644
      SetErrorMode(em);
      SetLastError(0); // clear the last error
 diff --git a/src/dvd_input.c b/src/dvd_input.c
-index 0c44387..828658c 100644
+index b4b11ae..1ec0c63 100644
 --- a/src/dvd_input.c
 +++ b/src/dvd_input.c
 @@ -23,7 +23,11 @@
@@ -34,7 +34,7 @@ index 0c44387..828658c 100644
  #include <errno.h>
  
 diff --git a/src/dvd_reader.c b/src/dvd_reader.c
-index 8093450..8a1c697 100644
+index 5e97893..3b35ebe 100644
 --- a/src/dvd_reader.c
 +++ b/src/dvd_reader.c
 @@ -29,7 +29,9 @@
@@ -47,15 +47,15 @@ index 8093450..8a1c697 100644
  #include <limits.h>         /* PATH_MAX */
  #include <dirent.h>         /* opendir, readdir */
  #include <ctype.h>          /* isalpha */
-@@ -51,6 +53,8 @@ static inline int _private_gettimeofday( struct timeval *tv, void *tz )
- # endif
- # include <io.h> /* read() */
- # define lseek64 _lseeki64
+@@ -61,6 +63,8 @@
+ #if defined(_WIN32)
+ # include <windows.h>
+ # include "msvc/contrib/win32_cs.h"
 +# define strcasecmp _stricmp
 +# define strncasecmp _strnicmp
  #endif
  
- #if defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__) || defined(__bsdi__) || defined(__APPLE__)
+ /* misc win32 helpers */
 diff --git a/src/dvd_udf.c b/src/dvd_udf.c
 index 41517fa..45f682e 100644
 --- a/src/dvd_udf.c

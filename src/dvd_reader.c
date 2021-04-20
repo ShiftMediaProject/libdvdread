@@ -63,6 +63,8 @@
 #if defined(_WIN32)
 # include <windows.h>
 # include "msvc/contrib/win32_cs.h"
+# define strcasecmp _stricmp
+# define strncasecmp _strnicmp
 #endif
 
 /* misc win32 helpers */

@@ -36,27 +36,6 @@
 #include <dirent.h>         /* opendir, readdir */
 #include <ctype.h>          /* isalpha */
 
-/* misc win32 helpers */
-#ifdef _WIN32
-# ifndef HAVE_GETTIMEOFDAY
-   /* replacement gettimeofday implementation */
-#  include <sys/timeb.h>
-static inline int _private_gettimeofday( struct timeval *tv, void *tz )
-{
-  struct timeb t;
-  ftime( &t );
-  tv->tv_sec = t.time;
-  tv->tv_usec = t.millitm * 1000;
-  return 0;
-}
-#  define gettimeofday(TV, TZ) _private_gettimeofday((TV), (TZ))
-# endif
-# include <io.h> /* read() */
-# define lseek64 _lseeki64
-# define strcasecmp _stricmp
-# define strncasecmp _strnicmp
-#endif
-
 #if defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__) || defined(__bsdi__) || defined(__APPLE__)
 # define SYS_BSD 1
 #endif
@@ -80,6 +59,130 @@ static inline int _private_gettimeofday( struct timeval *tv, void *tz )
 #include "dvdread_internal.h"
 #include "md5.h"
 #include "dvdread/ifo_read.h"
+
+#if defined(_WIN32)
+# include <windows.h>
+# include "msvc/contrib/win32_cs.h"
+#endif
+
+/* misc win32 helpers */
+
+#ifdef _WIN32
+# ifndef HAVE_GETTIMEOFDAY
+   /* replacement gettimeofday implementation */
+#  include <sys/timeb.h>
+static inline int _private_gettimeofday( struct timeval *tv, void *tz )
+{
+  struct timeb t;
+  ftime( &t );
+  tv->tv_sec = t.time;
+  tv->tv_usec = t.millitm * 1000;
+  return 0;
+}
+#  define gettimeofday(TV, TZ) _private_gettimeofday((TV), (TZ))
+# endif
+#endif /* _WIN32 */
+
+/* Compat wrapper for stat() */
+
+#if defined(_WIN32)
+/* can't re-define stat (used in both function name and struct name) */
+typedef struct _stat64 dvdstat_t;
+static inline int dvdstat(const char *path, dvdstat_t *st)
+{
+  wchar_t *wpath, *it;
+  int ret;
+
+  wpath = _utf8_to_wchar(path);
+  if (!wpath) {
+    return -1;
+  }
+
+  /* need to strip possible trailing \\ */
+  for (it = wpath; *it; it++)
+    if ((*it == '\\' || *it == '/') && *(it+1) == 0)
+      *it = 0;
+
+  ret = _wstat64(wpath, st);
+  free(wpath);
+  return ret;
+}
+#else
+typedef struct stat dvdstat_t;
+static inline int dvdstat(const char *file, dvdstat_t *st) {
+  return stat(file, st);
+}
+#endif
+
+#if defined(_WIN32)
+/* UTF-8 aware version of opendir()/readdir() */
+
+#include <io.h>
+
+typedef struct {
+  intptr_t handle;
+  struct _wfinddata_t went;
+  struct dirent ent;
+} win32_dir_t;
+
+win32_dir_t *win32_opendir(const char *path)
+{
+  char    *filespec;
+  wchar_t *wfilespec;
+  win32_dir_t *d;
+
+  d = calloc(1, sizeof(*d));
+  if (!d)
+    return NULL;
+
+  filespec = malloc(strlen(path) + 3);
+  if (!filespec) {
+    goto fail;
+  }
+  sprintf(filespec, "%s\\*", path);
+
+  wfilespec = _utf8_to_wchar(filespec);
+  free(filespec);
+  if (!wfilespec) {
+    goto fail;
+  }
+
+  d->handle = _wfindfirst(wfilespec, &d->went);
+  free(wfilespec);
+  if (d->handle != -1) {
+    return d;
+  }
+
+ fail:
+  free(d);
+  return NULL;
+}
+
+static struct dirent *win32_readdir(win32_dir_t *dir)
+{
+  if (dir->went.name[0]) {
+    if (!WideCharToMultiByte(CP_UTF8, 0, dir->went.name, -1, dir->ent.d_name, sizeof(dir->ent.d_name), NULL, NULL))
+      dir->ent.d_name[0] = 0; /* allow reading next */
+    dir->went.name[0] = 0;
+    _wfindnext(dir->handle, &dir->went);
+    return &dir->ent;
+  }
+
+  return NULL;
+}
+
+static void win32_closedir(win32_dir_t *dir)
+{
+  _findclose(dir->handle);
+  free(dir);
+}
+
+#define DIR       win32_dir_t
+#define opendir   win32_opendir
+#define readdir   win32_readdir
+#define closedir  win32_closedir
+
+#endif /* _WIN32 */
 
 #define DEFAULT_UDF_CACHE_LEVEL 1
 
@@ -339,8 +442,8 @@ static dvd_reader_t *DVDOpenCommon( void *priv,
                                     const char *ppath,
                                     dvd_reader_stream_cb *stream_cb )
 {
-  struct stat fileinfo;
-  int ret, have_css, retval, cdir = -1;
+  dvdstat_t fileinfo;
+  int ret, have_css, cdir = -1;
   char *dev_name = NULL;
   char *path = NULL, *new_path = NULL, *path_copy = NULL;
   dvd_reader_t *ctx = calloc(1, sizeof(*ctx));
@@ -389,7 +492,7 @@ static dvd_reader_t *DVDOpenCommon( void *priv,
   }
 #endif
 
-  ret = stat( path, &fileinfo );
+  ret = dvdstat( path, &fileinfo );
 
   if( ret < 0 ) {
 
@@ -454,6 +557,7 @@ static dvd_reader_t *DVDOpenCommon( void *priv,
     /* Resolve any symlinks and get the absolute dir name. */
     {
       if( ( cdir  = open( ".", O_RDONLY ) ) >= 0 ) {
+        int retval;
         if( chdir( path_copy ) == -1 ) {
           goto DVDOpen_error;
         }
@@ -786,7 +890,7 @@ static dvd_file_t *DVDOpenFilePath( dvd_reader_t *ctx, const char *filename )
 {
   char full_path[ PATH_MAX + 1 ];
   dvd_file_t *dvd_file;
-  struct stat fileinfo;
+  dvdstat_t fileinfo;
   dvd_input_t dev;
 
   /* Get the full path of the file. */
@@ -809,7 +913,7 @@ static dvd_file_t *DVDOpenFilePath( dvd_reader_t *ctx, const char *filename )
   }
   dvd_file->ctx = ctx;
 
-  if( stat( full_path, &fileinfo ) < 0 ) {
+  if( dvdstat( full_path, &fileinfo ) < 0 ) {
     Log0(ctx, "Can't stat() %s.", filename );
     free( dvd_file );
     dvdinput_close( dev );
@@ -871,7 +975,7 @@ static dvd_file_t *DVDOpenVOBPath( dvd_reader_t *ctx, int title, int menu )
 {
   char filename[ MAX_UDF_FILE_NAME_LEN ];
   char full_path[ PATH_MAX + 1 ];
-  struct stat fileinfo;
+  dvdstat_t fileinfo;
   dvd_file_t *dvd_file;
 
   dvd_file = calloc( 1, sizeof( dvd_file_t ) );
@@ -898,7 +1002,7 @@ static dvd_file_t *DVDOpenVOBPath( dvd_reader_t *ctx, int title, int menu )
       return NULL;
     }
 
-    if( stat( full_path, &fileinfo ) < 0 ) {
+    if( dvdstat( full_path, &fileinfo ) < 0 ) {
       Log0(ctx, "Can't stat() %s.", filename );
       dvdinput_close(dev);
       free( dvd_file );
@@ -919,7 +1023,7 @@ static dvd_file_t *DVDOpenVOBPath( dvd_reader_t *ctx, int title, int menu )
         break;
       }
 
-      if( stat( full_path, &fileinfo ) < 0 ) {
+      if( dvdstat( full_path, &fileinfo ) < 0 ) {
         Log0(ctx, "Can't stat() %s.", filename );
         break;
       }
@@ -1063,7 +1167,7 @@ static int DVDFileStatVOBPath( dvd_reader_t *dvd, int title,
 {
   char filename[ MAX_UDF_FILE_NAME_LEN ];
   char full_path[ PATH_MAX + 1 ];
-  struct stat fileinfo;
+  dvdstat_t fileinfo;
   off_t tot_size;
   off_t parts_size[ 9 ];
   int nr_parts = 0;
@@ -1077,7 +1181,7 @@ static int DVDFileStatVOBPath( dvd_reader_t *dvd, int title,
   if( !findDVDFile( dvd, filename, full_path ) )
     return -1;
 
-  if( stat( full_path, &fileinfo ) < 0 ) {
+  if( dvdstat( full_path, &fileinfo ) < 0 ) {
     Log1(dvd, "Can't stat() %s.", filename );
     return -1;
   }
@@ -1093,7 +1197,7 @@ static int DVDFileStatVOBPath( dvd_reader_t *dvd, int title,
       if( !findDVDFile( dvd, filename, full_path ) )
         break;
 
-      if( stat( full_path, &fileinfo ) < 0 ) {
+      if( dvdstat( full_path, &fileinfo ) < 0 ) {
         Log1(dvd, "Can't stat() %s.", filename );
         break;
       }
@@ -1118,7 +1222,7 @@ int DVDFileStat( dvd_reader_t *reader, int titlenum,
 {
   dvd_reader_device_t *dvd = reader->rd;
   char filename[ MAX_UDF_FILE_NAME_LEN ];
-  struct stat fileinfo;
+  dvdstat_t fileinfo;
   uint32_t size;
 
   /* Check arguments. */
@@ -1176,7 +1280,7 @@ int DVDFileStat( dvd_reader_t *reader, int titlenum,
     char full_path[ PATH_MAX + 1 ];
 
     if( findDVDFile( reader, filename, full_path ) ) {
-      if( stat( full_path, &fileinfo ) < 0 )
+      if( dvdstat( full_path, &fileinfo ) < 0 )
         Log1(reader, "Can't stat() %s.", filename );
       else {
         statbuf->size = fileinfo.st_size;

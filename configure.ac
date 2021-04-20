@@ -1,7 +1,7 @@
 dnl library version number
 m4_define([dvdread_major], 6)
 m4_define([dvdread_minor], 1)
-m4_define([dvdread_micro], 1)
+m4_define([dvdread_micro], 2)
 m4_define([dvdread_version],[dvdread_major.dvdread_minor.dvdread_micro])
 
 AC_INIT(libdvdread, dvdread_version)
@@ -52,7 +52,7 @@ DVDREAD_LT_REVISION=0
 
 AC_SUBST([DVDREAD_LTVERSION], [$DVDREAD_LT_CURRENT:$DVDREAD_LT_REVISION:$DVDREAD_LT_AGE])
 
-AC_PROG_CC
+AC_PROG_CC_C99
 
 AC_CHECK_HEADERS_ONCE([sys/param.h limits.h dlfcn.h])
 

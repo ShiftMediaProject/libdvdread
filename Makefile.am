@@ -2,7 +2,7 @@ ACLOCAL_AMFLAGS = -Im4
 
 AM_CPPFLAGS = -I$(top_srcdir)/src -I$(top_builddir)/src/dvdread $(CSS_CFLAGS)
 
-dist_doc_DATA = AUTHORS ChangeLog COPYING NEWS README TODO
+dist_doc_DATA = AUTHORS ChangeLog COPYING NEWS README.md TODO
 
 MAINTAINERCLEANFILES = ChangeLog
 

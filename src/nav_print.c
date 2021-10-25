@@ -3,7 +3,7 @@
  *
  * Much of the contents in this file is based on VOBDUMP.
  *
- * VOBDUMP: a program for examining DVD .VOB filse
+ * VOBDUMP: a program for examining DVD .VOB files
  *
  * Copyright 1998, 1999 Eric Smith <eric@brouhaha.com>
  *

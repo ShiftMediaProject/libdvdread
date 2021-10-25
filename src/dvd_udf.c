@@ -324,7 +324,7 @@ static int SetUDFCache(dvd_reader_t *ctx, UDFCacheType type,
                   | ((uint32_t)data[(p) + 1] << 8)      \
                   | ((uint32_t)data[(p) + 2] << 16)     \
                   | ((uint32_t)data[(p) + 3] << 24))
-/* This is wrong with regard to endianess */
+/* This is wrong with regard to endianness */
 #define GETN(p, n, target) memcpy(target, &data[p], n)
 
 static int Unicodedecode( uint8_t *data, int len, char *target )

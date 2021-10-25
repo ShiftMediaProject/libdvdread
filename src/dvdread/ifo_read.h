@@ -144,7 +144,7 @@ int ifoRead_PGCI_UT(ifo_handle_t *);
  *
  * Reads in the VTS Time Map Table, this data is only located in the video
  * title set information file.  This fills the ifofile->vts_tmapt structure
- * and all its substructures.  When pressent enables VOBU level time-based
+ * and all its substructures.  When present enables VOBU level time-based
  * seeking for One_Sequential_PGC_Titles.
  */
 int ifoRead_VTS_TMAPT(ifo_handle_t *);

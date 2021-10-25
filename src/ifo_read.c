@@ -1937,7 +1937,7 @@ static int ifoRead_PGCIT_internal(ifo_handle_t *ifofile, pgcit_t *pgcit,
     if(!ifoRead_PGC(ifofile, pgcit->pgci_srp[i].pgc,
                     offset + pgcit->pgci_srp[i].pgc_start_byte)) {
       Log0(ifop->ctx, "Unable to read invalid PCG");
-      //E-One releases provide boggus PGC, ie: out of bound start_byte
+      //E-One releases provide bogus PGC, ie: out of bound start_byte
       free(pgcit->pgci_srp[i].pgc);
       pgcit->pgci_srp[i].pgc = NULL;
     }
@@ -2265,7 +2265,7 @@ int ifoRead_VTS_ATRT(ifo_handle_t *ifofile) {
       return 0;
     }
 
-    /* This assert cant be in ifoRead_VTS_ATTRIBUTES */
+    /* This assert can't be in ifoRead_VTS_ATTRIBUTES */
     CHECK_VALUE(offset + vts_atrt->vts[i].last_byte <= vts_atrt->last_byte + 1);
     /* Is this check correct? */
   }

@@ -98,7 +98,7 @@ CC_CHECK_CFLAGS_APPEND([-Wall -Wsign-compare -Wextra])
 
 
 AC_ARG_ENABLE([apidoc],
-  AS_HELP_STRING([--disable-apidoc], [Disable building (with Doxygen) and intalling API documentation @<:@default=auto@:@>]))
+  AS_HELP_STRING([--disable-apidoc], [Disable building (with Doxygen) and installing API documentation @<:@default=auto@:@>]))
 
 AC_PATH_PROG([DOXYGEN], [doxygen])
 

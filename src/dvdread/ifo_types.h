@@ -191,7 +191,7 @@ typedef struct {
   uint16_t nr_of_pre;
   uint16_t nr_of_post;
   uint16_t nr_of_cell;
-  uint16_t zero_1;
+  uint16_t last_byte;
   vm_cmd_t *pre_cmds;
   vm_cmd_t *post_cmds;
   vm_cmd_t *cell_cmds;

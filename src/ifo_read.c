@@ -1891,6 +1891,11 @@ static int ifoRead_PGCIT_internal(ifo_handle_t *ifofile, pgcit_t *pgcit,
      Titles with 0 PTTs. */
   CHECK_VALUE(pgcit->nr_of_pgci_srp < 10000); /* ?? seen max of 1338 */
 
+  if (pgcit->nr_of_pgci_srp == 0) {
+    pgcit->pgci_srp = NULL;
+    return 1;
+  }
+
   info_length = pgcit->nr_of_pgci_srp * PGCI_SRP_SIZE;
   data = calloc(1, info_length);
   if(!data)

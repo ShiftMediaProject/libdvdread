@@ -588,7 +588,7 @@ typedef struct {
  */
 typedef struct {
   char disc_name[12];
-  uint16_t zero_1;
+  uint16_t unknown1;
   uint16_t nr_of_language_units;
   uint32_t last_byte;
   txtdt_lu_t *lu;

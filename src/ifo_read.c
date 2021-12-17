@@ -1240,7 +1240,7 @@ int ifoRead_VTS_PTT_SRPT(ifo_handle_t *ifofile) {
     CHECK_VALUE(n % 4 == 0);
 
     vts_ptt_srpt->title[i].nr_of_ptts = n / 4;
-    vts_ptt_srpt->title[i].ptt = calloc(n, sizeof(ptt_info_t));
+    vts_ptt_srpt->title[i].ptt = calloc(n / 4, sizeof(ptt_info_t));
     if(!vts_ptt_srpt->title[i].ptt) {
       for(n = 0; n < i; n++)
         free(vts_ptt_srpt->title[n].ptt);

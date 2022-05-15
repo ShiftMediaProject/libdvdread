@@ -18,12 +18,12 @@ libdvdnav and libdvdread were merged, and then split again.
 
 ## Where is it now?
 
-Libdvdread is hosted [here](http://dvdnav.mplayerhq.hu/).
+Libdvdread is hosted [here](https://code.videolan.org/videolan/libdvdread)
 
 You can find more information [here](https://www.videolan.org/developers/libdvdnav.html)
 
 Please report bugs to the developers mailinglist at
-mailto:dvdnav-discuss@mplayerhq.hu .
+[dvdnav mailing list](https://mailman.videolan.org/listinfo/libdvdnav-devel)
 
 ## License
 

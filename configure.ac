@@ -1,7 +1,7 @@
 dnl library version number
 m4_define([dvdread_major], 6)
 m4_define([dvdread_minor], 1)
-m4_define([dvdread_micro], 2)
+m4_define([dvdread_micro], 3)
 m4_define([dvdread_version],[dvdread_major.dvdread_minor.dvdread_micro])
 
 AC_INIT(libdvdread, dvdread_version)

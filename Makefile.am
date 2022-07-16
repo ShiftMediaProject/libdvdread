@@ -2,7 +2,7 @@ ACLOCAL_AMFLAGS = -Im4
 
 AM_CPPFLAGS = -I$(top_srcdir)/src -I$(top_builddir)/src/dvdread $(CSS_CFLAGS)
 
-dist_doc_DATA = AUTHORS ChangeLog COPYING NEWS README TODO
+dist_doc_DATA = AUTHORS ChangeLog COPYING NEWS README.md TODO
 
 MAINTAINERCLEANFILES = ChangeLog
 
@@ -12,7 +12,7 @@ ChangeLog: $(wildcard $(srcdir)/.git/logs/HEAD)
 	-rm -f $(@)-tmp
 	test -e $(@) || touch $(@)
 
-EXTRA_DIST = msvc/ doc/footer.html doc/header.html
+EXTRA_DIST = msvc doc/footer.html doc/header.html
 
 lib_LTLIBRARIES = libdvdread.la
 

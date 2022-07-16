@@ -733,8 +733,11 @@ static int ifoRead_PGC_COMMAND_TBL(ifo_handle_t *ifofile,
   B2N_16(cmd_tbl->nr_of_pre);
   B2N_16(cmd_tbl->nr_of_post);
   B2N_16(cmd_tbl->nr_of_cell);
+  B2N_16(cmd_tbl->last_byte);
 
   CHECK_VALUE(cmd_tbl->nr_of_pre + cmd_tbl->nr_of_post + cmd_tbl->nr_of_cell<= 255);
+  CHECK_VALUE((cmd_tbl->nr_of_pre + cmd_tbl->nr_of_post + cmd_tbl->nr_of_cell) * COMMAND_DATA_SIZE
+              + PGC_COMMAND_TBL_SIZE <= cmd_tbl->last_byte + 1);
 
   if(cmd_tbl->nr_of_pre != 0) {
     unsigned int pre_cmds_size  = cmd_tbl->nr_of_pre * COMMAND_DATA_SIZE;
@@ -1240,7 +1243,7 @@ int ifoRead_VTS_PTT_SRPT(ifo_handle_t *ifofile) {
     CHECK_VALUE(n % 4 == 0);
 
     vts_ptt_srpt->title[i].nr_of_ptts = n / 4;
-    vts_ptt_srpt->title[i].ptt = calloc(n, sizeof(ptt_info_t));
+    vts_ptt_srpt->title[i].ptt = calloc(n / 4, sizeof(ptt_info_t));
     if(!vts_ptt_srpt->title[i].ptt) {
       for(n = 0; n < i; n++)
         free(vts_ptt_srpt->title[n].ptt);
@@ -1891,6 +1894,11 @@ static int ifoRead_PGCIT_internal(ifo_handle_t *ifofile, pgcit_t *pgcit,
      Titles with 0 PTTs. */
   CHECK_VALUE(pgcit->nr_of_pgci_srp < 10000); /* ?? seen max of 1338 */
 
+  if (pgcit->nr_of_pgci_srp == 0) {
+    pgcit->pgci_srp = NULL;
+    return 1;
+  }
+
   info_length = pgcit->nr_of_pgci_srp * PGCI_SRP_SIZE;
   data = calloc(1, info_length);
   if(!data)
@@ -1937,7 +1945,7 @@ static int ifoRead_PGCIT_internal(ifo_handle_t *ifofile, pgcit_t *pgcit,
     if(!ifoRead_PGC(ifofile, pgcit->pgci_srp[i].pgc,
                     offset + pgcit->pgci_srp[i].pgc_start_byte)) {
       Log0(ifop->ctx, "Unable to read invalid PCG");
-      //E-One releases provide boggus PGC, ie: out of bound start_byte
+      //E-One releases provide bogus PGC, ie: out of bound start_byte
       free(pgcit->pgci_srp[i].pgc);
       pgcit->pgci_srp[i].pgc = NULL;
     }
@@ -2265,7 +2273,7 @@ int ifoRead_VTS_ATRT(ifo_handle_t *ifofile) {
       return 0;
     }
 
-    /* This assert cant be in ifoRead_VTS_ATTRIBUTES */
+    /* This assert can't be in ifoRead_VTS_ATTRIBUTES */
     CHECK_VALUE(offset + vts_atrt->vts[i].last_byte <= vts_atrt->last_byte + 1);
     /* Is this check correct? */
   }

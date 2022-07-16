@@ -29,9 +29,7 @@
 #include <stdio.h>          /* fprintf */
 #include <errno.h>          /* errno, EIN* */
 #include <string.h>         /* memcpy, strlen */
-#ifdef HAVE_UNISTD_H
-#include <unistd.h>         /* chdir, getcwd */
-#endif
+#include <unistd.h>         /* pclose */
 #include <limits.h>         /* PATH_MAX */
 #include <dirent.h>         /* opendir, readdir */
 #include <ctype.h>          /* isalpha */
@@ -290,7 +288,7 @@ static int initAllCSSKeys( dvd_reader_t *ctx )
   for( title = 0; title < 100; title++ ) {
     gettimeofday( &t_s, NULL );
     if( title == 0 ) {
-      sprintf( filename, "/VIDEO_TS/VIDEO_TS.VOB" );
+      strcpy( filename, "/VIDEO_TS/VIDEO_TS.VOB" );
     } else {
       sprintf( filename, "/VIDEO_TS/VTS_%02d_%d.VOB", title, 0 );
     }
@@ -553,33 +551,18 @@ static dvd_reader_t *DVDOpenCommon( void *priv,
     if( !(path_copy = strdup( path ) ) )
       goto DVDOpen_error;
 
-#ifndef _WIN32 /* don't have fchdir, and getcwd( NULL, ... ) is strange */
+#ifndef _WIN32 /* win32 doesn't have realpath */
               /* Also WIN32 does not have symlinks, so we don't need this bit of code. */
 
     /* Resolve any symlinks and get the absolute dir name. */
     {
-      if( ( cdir  = open( ".", O_RDONLY ) ) >= 0 ) {
-        int retval;
-        if( chdir( path_copy ) == -1 ) {
-          goto DVDOpen_error;
-        }
-        new_path = malloc(PATH_MAX+1);
-        if(!new_path) {
-          goto DVDOpen_error;
-        }
-        if( getcwd( new_path, PATH_MAX ) == NULL ) {
-          goto DVDOpen_error;
-        }
-        retval = fchdir( cdir );
-        close( cdir );
-        cdir = -1;
-        if( retval == -1 ) {
+        new_path = realpath( path_copy, NULL );
+        if( new_path == NULL ) {
           goto DVDOpen_error;
         }
         free(path_copy);
         path_copy = new_path;
         new_path = NULL;
-      }
     }
 #endif
 

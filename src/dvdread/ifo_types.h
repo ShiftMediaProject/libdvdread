@@ -27,18 +27,16 @@
 
 
 #undef ATTRIBUTE_PACKED
-#undef PRAGMA_PACK_BEGIN
-#undef PRAGMA_PACK_END
 
 #if defined(__GNUC__)
-#if __GNUC__ > 2 || (__GNUC__ == 2 && __GNUC_MINOR__ >= 95)
-#if __GNUC__ > 3 || (__GNUC__ == 3 && __GNUC_MINOR__ >= 4)
-#define ATTRIBUTE_PACKED __attribute__ ((packed,gcc_struct))
-#else
-#define ATTRIBUTE_PACKED __attribute__ ((packed))
-#endif
-#define PRAGMA_PACK 0
-#endif
+# if __GNUC__ > 2 || (__GNUC__ == 2 && __GNUC_MINOR__ >= 95)
+#  if (__GNUC__ > 3 || (__GNUC__ == 3 && __GNUC_MINOR__ >= 4)) && !defined(__clang__)
+#   define ATTRIBUTE_PACKED __attribute__ ((packed,gcc_struct))
+#  else
+#   define ATTRIBUTE_PACKED __attribute__ ((packed))
+#  endif
+#  define PRAGMA_PACK 0
+# endif
 #endif
 
 #if !defined(ATTRIBUTE_PACKED)
@@ -193,7 +191,7 @@ typedef struct {
   uint16_t nr_of_pre;
   uint16_t nr_of_post;
   uint16_t nr_of_cell;
-  uint16_t zero_1;
+  uint16_t last_byte;
   vm_cmd_t *pre_cmds;
   vm_cmd_t *post_cmds;
   vm_cmd_t *cell_cmds;
@@ -565,7 +563,7 @@ typedef struct {
   uint8_t unknown1;
   uint8_t unknown2;
   uint8_t unknown3;
-  uint8_t unknown4; /* ?? allways 0x30 language?, text format? */
+  uint8_t unknown4; /* ?? always 0x30 language?, text format? */
   uint8_t unknown5;
   uint16_t offset; /* from first */
 
@@ -590,7 +588,7 @@ typedef struct {
  */
 typedef struct {
   char disc_name[12];
-  uint16_t zero_1;
+  uint16_t unknown1;
   uint16_t nr_of_language_units;
   uint32_t last_byte;
   txtdt_lu_t *lu;

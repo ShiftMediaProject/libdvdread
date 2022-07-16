@@ -10,7 +10,7 @@
  * Copyright 1998, 1999 Eric Smith <eric@brouhaha.com>
  *
  * VOBDUMP is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License version 2 as
+ * under the terms of the GNU General Public License version 2 or version 3 as
  * published by the Free Software Foundation.  Note that I am not
  * granting permission to redistribute or modify VOBDUMP under the terms
  * of any later version of the General Public License.
@@ -96,7 +96,7 @@ typedef struct {
 
 /**
  * Button Color Information Table
- * Each entry beeing a 32bit word that contains the color indexs and alpha
+ * Each entry is a 32bit word that contains the color indices and alpha
  * values to use.  They are all represented by 4 bit number and stored
  * like this [Ci3, Ci2, Ci1, Ci0, A3, A2, A1, A0].   The actual palette
  * that the indexes reference is in the PGC.

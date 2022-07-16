@@ -1,7 +1,7 @@
 dnl library version number
 m4_define([dvdread_major], 6)
 m4_define([dvdread_minor], 1)
-m4_define([dvdread_micro], 2)
+m4_define([dvdread_micro], 3)
 m4_define([dvdread_version],[dvdread_major.dvdread_minor.dvdread_micro])
 
 AC_INIT(libdvdread, dvdread_version)
@@ -98,7 +98,7 @@ CC_CHECK_CFLAGS_APPEND([-Wall -Wsign-compare -Wextra])
 
 
 AC_ARG_ENABLE([apidoc],
-  AS_HELP_STRING([--disable-apidoc], [Disable building (with Doxygen) and intalling API documentation @<:@default=auto@:@>]))
+  AS_HELP_STRING([--disable-apidoc], [Disable building (with Doxygen) and installing API documentation @<:@default=auto@:@>]))
 
 AC_PATH_PROG([DOXYGEN], [doxygen])
 

@@ -1,5 +1,8 @@
 ShiftMediaProject libdvdread
 =============
+[![Build status](https://ci.appveyor.com/api/projects/status/p22c5f61mcm2h9u0?svg=true)](https://ci.appveyor.com/project/Sibras/sdl)
+[![Github All Releases](https://img.shields.io/github/downloads/ShiftMediaProject/libdvdread/total.svg)](https://github.com/ShiftMediaProject/libdvdread/releases)
+[![GitHub release](https://img.shields.io/github/release/ShiftMediaProject/libdvdread.svg)](https://github.com/ShiftMediaProject/libdvdread/releases/latest)
 [![GitHub issues](https://img.shields.io/github/issues/ShiftMediaProject/libdvdread.svg)](https://github.com/ShiftMediaProject/libdvdread/issues)
 [![license](https://img.shields.io/github/license/ShiftMediaProject/libdvdread.svg)](https://github.com/ShiftMediaProject/libdvdread)
 [![donate](https://img.shields.io/badge/donate-link-brightgreen.svg)](https://shiftmediaproject.github.io/8-donate/)

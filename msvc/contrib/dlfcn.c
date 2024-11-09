@@ -36,6 +36,7 @@ void *dlopen(const char *module_name, int mode)
      * same path or can be found in the usual places.  Failing that, let's
      * let that dso look in the apache root.
      */
+#if !defined(WINAPI_FAMILY) || (WINAPI_FAMILY != WINAPI_FAMILY_APP)
     em = SetErrorMode(SEM_FAILCRITICALERRORS);
     dsoh = LoadLibraryExA(path, NULL, LOAD_WITH_ALTERED_SEARCH_PATH);
     if (!dsoh)
@@ -45,6 +46,11 @@ void *dlopen(const char *module_name, int mode)
     }
     SetErrorMode(em);
     SetLastError(0); // clear the last error
+#else
+    wchar_t pathW[MAX_PATH];
+    mbstowcs(pathW, path, MAX_PATH);
+    dsoh = LoadPackagedLibrary(pathW, 0);
+#endif
     return (void *)dsoh;
 }
 

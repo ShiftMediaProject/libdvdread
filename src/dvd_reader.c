@@ -29,7 +29,9 @@
 #include <stdio.h>          /* fprintf */
 #include <errno.h>          /* errno, EIN* */
 #include <string.h>         /* memcpy, strlen */
+#if HAVE_UNISTD_H
 #include <unistd.h>         /* pclose */
+#endif
 #include <limits.h>         /* PATH_MAX */
 #include <dirent.h>         /* opendir, readdir */
 #include <ctype.h>          /* isalpha */
@@ -61,6 +63,7 @@
 #if defined(_WIN32)
 # include <windows.h>
 # include "msvc/contrib/win32_cs.h"
+# include <winsock2.h>
 # define strcasecmp _stricmp
 # define strncasecmp _strnicmp
 #endif

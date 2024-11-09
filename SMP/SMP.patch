@@ -1,10 +1,12 @@
 diff --git a/msvc/contrib/dlfcn.c b/msvc/contrib/dlfcn.c
-index 01b5781..2ba939e 100644
+index 01b5781..30d56d3 100644
 --- a/msvc/contrib/dlfcn.c
 +++ b/msvc/contrib/dlfcn.c
-@@ -37,11 +37,11 @@ void *dlopen(const char *module_name, int mode)
+@@ -36,15 +36,21 @@ void *dlopen(const char *module_name, int mode)
+      * same path or can be found in the usual places.  Failing that, let's
       * let that dso look in the apache root.
       */
++#if !defined(WINAPI_FAMILY) || (WINAPI_FAMILY != WINAPI_FAMILY_APP)
      em = SetErrorMode(SEM_FAILCRITICALERRORS);
 -    dsoh = LoadLibraryEx(path, NULL, LOAD_WITH_ALTERED_SEARCH_PATH);
 +    dsoh = LoadLibraryExA(path, NULL, LOAD_WITH_ALTERED_SEARCH_PATH);
@@ -16,8 +18,16 @@ index 01b5781..2ba939e 100644
      }
      SetErrorMode(em);
      SetLastError(0); // clear the last error
++#else
++    wchar_t pathW[MAX_PATH];
++    mbstowcs(pathW, path, MAX_PATH);
++    dsoh = LoadPackagedLibrary(pathW, 0);
++#endif
+     return (void *)dsoh;
+ }
+ 
 diff --git a/src/dvd_input.c b/src/dvd_input.c
-index b4b11ae..1ec0c63 100644
+index d7dad87..14d54d3 100644
 --- a/src/dvd_input.c
 +++ b/src/dvd_input.c
 @@ -23,7 +23,11 @@
@@ -34,30 +44,31 @@ index b4b11ae..1ec0c63 100644
  #include <errno.h>
  
 diff --git a/src/dvd_reader.c b/src/dvd_reader.c
-index 5e97893..3b35ebe 100644
+index c4d9641..b222482 100644
 --- a/src/dvd_reader.c
 +++ b/src/dvd_reader.c
 @@ -29,7 +29,9 @@
  #include <stdio.h>          /* fprintf */
  #include <errno.h>          /* errno, EIN* */
  #include <string.h>         /* memcpy, strlen */
-+#ifdef HAVE_UNISTD_H
- #include <unistd.h>         /* chdir, getcwd */
++#if HAVE_UNISTD_H
+ #include <unistd.h>         /* pclose */
 +#endif
  #include <limits.h>         /* PATH_MAX */
  #include <dirent.h>         /* opendir, readdir */
  #include <ctype.h>          /* isalpha */
-@@ -61,6 +63,8 @@
+@@ -61,6 +63,9 @@
  #if defined(_WIN32)
  # include <windows.h>
  # include "msvc/contrib/win32_cs.h"
++# include <winsock2.h>
 +# define strcasecmp _stricmp
 +# define strncasecmp _strnicmp
  #endif
  
  /* misc win32 helpers */
 diff --git a/src/dvd_udf.c b/src/dvd_udf.c
-index 41517fa..45f682e 100644
+index 4d90ba4..ccd0a86 100644
 --- a/src/dvd_udf.c
 +++ b/src/dvd_udf.c
 @@ -32,17 +32,25 @@
@@ -87,7 +98,7 @@ index 41517fa..45f682e 100644
  static int DVDReadLBUDF( dvd_reader_t *ctx, uint32_t lb_number,
                           size_t block_count, unsigned char *data,
 diff --git a/src/dvdread/dvd_reader.h b/src/dvdread/dvd_reader.h
-index 208259b..00a20a0 100644
+index 5681e0e..2fd75b3 100644
 --- a/src/dvdread/dvd_reader.h
 +++ b/src/dvdread/dvd_reader.h
 @@ -28,6 +28,8 @@

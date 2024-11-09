@@ -6,16 +6,12 @@ branches:
 skip_non_tags: true
 clone_depth: 10
 
-configuration: Release+ReleaseDLLStaticDeps
+configuration: Release+ReleaseDLL
 
 platform: x86+x64
 
 environment:
-  GITHUBTOKEN:
-    secure: c9Sads7Y16h7FP+LrR3IjVygYAgh8GByE8TtazxDg7jpPVxc+XDV81z7MoUc2Ada
   matrix:
-  - MSVC_VER: 12
-    APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2013
   - MSVC_VER: 14
     APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
   - MSVC_VER: 15
@@ -24,7 +20,7 @@ environment:
     APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
   - MSVC_VER: 17
     APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2022
-
+    
 install:
 # Install GitLink
 - cmd: nuget install gitlink -Version 2.4.0
@@ -120,17 +116,10 @@ before_build:
         $env:VCTargetsPath="$env:MSBUILDDIR\..\..\..\Microsoft.Cpp\v4.0\V${env:MSVC_VER}0"
     }
 
-# Use project supplied script to download all required dependency libraries
-- cmd: call "%APPVEYOR_BUILD_FOLDER%\SMP\project_get_dependencies.bat"
-
 build:
   project: build.vcxproj
   parallel: true
   verbosity: minimal
-
-after_build:
-# Copy licenses for dependencies
-- cmd: copy /y %APPVEYOR_BUILD_FOLDER%\..\prebuilt\licenses\*.* %APPVEYOR_BUILD_FOLDER%\build_out\licenses\
 
 artifacts:
 - path: build_out
